@@ -1,7 +1,8 @@
 var db = require('../db/persistence-controller'),
 	userschema = require('../db/schema/UserSchema'),
 	fs = require('fs'),
-    mammoth = require("mammoth");
+    mammoth = require("mammoth"),
+    solr = require('solr-client');
 
 exports.register = function(req, res) {
     var UserInfo = req.body;    
@@ -90,5 +91,15 @@ exports.saveVacancies = function(req,res){
     db.save('vacancies',info,function(result){
         console.log("saved");
         res.send({message:"saved the vacancy details"});
+    });
+}
+
+exports.solrclient = function(req,res){
+    var searchtext=req.body.searchtext;
+    //console.log(searchtext);
+    var client = solr.createClient();
+    console.log(client);
+    client.search('q='+searchtext+'', function(err, obj){
+       res.send(obj);
     });
 }

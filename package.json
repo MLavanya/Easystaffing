@@ -15,6 +15,7 @@
     "mongoose": "^3.8.15",
     "cjson": "^0.3.0",
     "consolidate": "^0.10.0",
-    "mammoth": "^0.3.9"
+    "mammoth": "^0.3.9",
+    "solr-client": "^0.3.0"
   }
 }

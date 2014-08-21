@@ -194,7 +194,7 @@ Use search to find needed section.
               	<div class="form-group">
                     <label for="" class="col-sm-2 control-label">Resume / CV </label>
                     <div class="col-sm-6">
-                     {{#view App.CVUploadTool name="file" data-url="/hrm/uploadcv" id="uploadcv"}}{{/view}}
+                     {{#view App.CVUploadTool name="file" data-url="/uploadcv" id="uploadcv"}}{{/view}}
                       <label class="uploadedfile" style="display:none;"></label> 
 	                </div>
     	        </div>
@@ -295,35 +295,24 @@ Use search to find needed section.
 
 	<script type="text/x-handlebars" id="search">
 
-		<div class="search-text">
+		<!--div class="search-text">
 		    <strong>21</strong> results found for: <span class="text-primary">Lorem ipsum</span>
-		</div> <!-- / .search-text -->
-
-		   <!-- Tabs -->
-		<div class="search-tabs">
-		    <ul class="nav nav-tabs">
-		        <li class="active">
-		            <a href="#search-tabs-all" data-toggle="tab">Users <span class="label label-success">5</span></a>
-		        </li>
-		    </ul> <!-- / .nav -->
-		</div>
-		<!-- / Tabs -->
-
-		    <!-- Panel -->
-		<div class="panel search-panel">
-		      <!-- Search form -->
-		    <form action="" class="search-form bg-primary">
-		        <div class="container" id="VS" style="padding-top:15px;">
-		            <div id="search_box_container"></div>
-		            <div id="search_query">&nbsp;</div>
-		           <input type="button" value="search" {{action 'search'}}/>
-		        </div>
-		    </form>
-		      <!-- / Search form -->
-		     
-		</div>
-		      
-
+		</div-->
+		   
+	      <!-- Search form -->
+	    
+	    {{#view}}
+	        
+	        <div class="container" id="VS" style="padding-top:15px;">
+	            <div id="search_box_container"></div>
+	            <div id="search_query">&nbsp;</div>
+	           <input type="button" value="search" {{action 'search'}}/>
+	        </div>
+	    
+	    {{/view}}
+	  
+	      <!-- / Search form -->		     
+		
 	</script>
 
 	<script type="text/x-handlebars" id="candidate">
@@ -446,8 +435,10 @@ Use search to find needed section.
 <!-- Pixel Admin's javascripts -->
 <script src="assets/javascripts/bootstrap.min.js"></script>
 <script src="assets/javascripts/pixel-admin.min.js"></script>
+<script src="js/app.js" type="text/javascript"></script>
 <script src="js/controller/formController.js"></script>
 <script src="js/routes/router.js" type="text/javascript"></script>
+<script src="js/views/view.js" type="text/javascript"></script>
 
 
 <!-- grid view and scroll js -->
@@ -458,9 +449,11 @@ Use search to find needed section.
 <!-- Cookie Libs -->
 <script src="js/libs/jquery.cookie.js"></script>
 
-
-
 <script type="text/javascript">
+	var search_text;
+</script>
+
+<script type="text/javascript">	
 	init.push(function () {
 		var setEqHeight = function () {
 			$('#content-wrapper .row').each(function () {

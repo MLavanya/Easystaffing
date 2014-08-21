@@ -1,28 +1,29 @@
 App = Ember.Application.create({
-  ready:function(){
- 
 
-  }
+	needs : [ 'application' ],
+	ready : function() {
+
+		//$.noConflict(true);
+		// check if already authenticated via cookies.
+
+		if ($.cookie("loggedIn")) {
+			App.LoginUser.set('loggedinEmail', $.cookie("loggedinEmail"));
+			App.LoginUser.set('loggedinUser', $.cookie("loggedinUser"));
+			App.LoginUser.set('loggedin', false);
+
+		}
+		function getCookie(cname) {
+	        var name = cname + "=";
+	        var ca = document.cookie.split(';');
+            for(var i=0; i<ca.length; i++) {
+                var c = ca[i].trim();
+                if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+            }
+            return "";
+		}
+    	var user=getCookie("username");
+    	UserName = user;
+	}
+
 });
-
-App.Router.map(function() {
-
-   this.resource('login');
-   this.resource('signup');
-
-});
-
-
-
-
-
-App.IndexRoute = Ember.Route.extend({
-  afterModel:function(){
-
-   this.transitionTo("login");
-
-  }
-
-});
-
 

@@ -8,34 +8,7 @@ var popupbox = function(okfunction,data) {
 	$('#editemppopup .btn-primary').click(okfunction);
 };
 
-App = Ember.Application.create({
 
-	needs : [ 'application' ],
-	ready : function() {
-
-		//$.noConflict(true);
-		// check if already authenticated via cookies.
-
-		if ($.cookie("loggedIn")) {
-			App.LoginUser.set('loggedinEmail', $.cookie("loggedinEmail"));
-			App.LoginUser.set('loggedinUser', $.cookie("loggedinUser"));
-			App.LoginUser.set('loggedin', false);
-
-		}
-		function getCookie(cname) {
-	        var name = cname + "=";
-	        var ca = document.cookie.split(';');
-            for(var i=0; i<ca.length; i++) {
-                var c = ca[i].trim();
-                if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
-            }
-            return "";
-		}
-    	var user=getCookie("username");
-    	UserName = user;
-	}
-
-});
 
 /*Helpers*/
 
@@ -226,12 +199,10 @@ App.AddvacancyController = Ember.Controller.extend({
 App.SearchController = Ember.Controller.extend({
 	actions : {
 		search : function (){
-			var a;
-			alert("success");
-			/*$.ajax ({
+			$.ajax ({
                 type: "POST", 
                 url:'/solrclient',
-                data:{saerchtext:a},                   
+                data:{searchtext:search_text},                   
                 success: function(data) {  
     	          //  alert(data);  
 	                alert('success'+JSON.stringify(data));                 
@@ -239,7 +210,7 @@ App.SearchController = Ember.Controller.extend({
                 error: function(data) {
                     alert("Msg: "+ data.status + ": " + data.statusText);
                 }
-            }); */
+            }); 
 		}
 	}
 });

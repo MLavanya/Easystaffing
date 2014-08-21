@@ -53,8 +53,9 @@ res.redirect("login.html");
 app.post('/register', services.register);
 app.post('/login', services.login);
 app.post('/saveCandidate',services.saveCandidate);
-app.post('/hrm/uploadcv',services.upload);
+app.post('/uploadcv',services.upload);
 app.post('/saveVacancies',services.saveVacancies);
+app.post('/solrclient', services.solrclient);
 
 
 
