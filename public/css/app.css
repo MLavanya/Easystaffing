@@ -1,0 +1,35 @@
+#VS code, #VS pre, #VS tt {
+  font-family: Monaco, Consolas, "Lucida Console", monospace;
+  font-size: 12px;
+  line-height: 18px;
+  color: #444;
+  background: none;
+}
+#VS code {
+  margin-left: 8px;
+  padding: 0 0 0 12px;
+  font-weight: normal;
+}
+#VS pre {
+  font-size: 12px;
+  padding: 2px 0 2px 0;
+  border-left: 6px solid #829C37;
+  margin: 12px 0;
+}
+#search_query {
+  margin: 18px 0 -24px;
+  opacity: 0;
+}
+  #search_query .raquo {
+    font-size: 18px;
+    line-height: 12px;
+    font-weight: bold;
+    margin-right: 4px;
+  }
+.attribution {
+  margin: -12px 0 24px;
+  font-size: 14px;
+}
+a.thirdparty-link {
+  font-weight: bold;
+}
