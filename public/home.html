@@ -407,6 +407,13 @@ Use search to find needed section.
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="country" class="col-sm-2 control-label">Status</label>
+                    <div class="col-sm-6">
+                      {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses}}
+                	</div>
+              	</div>
+
               	<div class="form-group">
                     <label for="comments" class="col-sm-2 control-label">Description</label>
                     <div class="col-sm-3">
@@ -949,10 +956,6 @@ Use search to find needed section.
 		</div>
 	<!--/ candidate -->
 	</script>
-
-	<script type="text/x-handlebars" id="test">
-		
-	</script>	
 	
 	<script type="text/javascript"> window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js">'+"<"+"/script>"); </script>
 <!-- <![endif]-->
@@ -1032,13 +1035,8 @@ Use search to find needed section.
 			$(window).on('pa.resize', setEqHeight);
 			$(window).resize();
 		});
-	});
-	window.PixelAdmin.start(init);
-</script>
-<!-- Javascript for pie chart -->
-<script>
-	init.push(function () {
-		// Easy Pie Charts
+
+		<!-- Javascript for pie chart -->
 		var easyPieChartDefaults = {
 			animate: 2000,
 			scaleColor: false,
@@ -1056,13 +1054,8 @@ Use search to find needed section.
 		$('#easy-pie-chart-3').easyPieChart($.extend({}, easyPieChartDefaults, {
 			barColor: PixelAdmin.settings.consts.COLORS[1]
 		}));
-	});
-</script>
-<!-- / Javascript -->
 
-<!-- Javascript for ratings -->
-<script>
-	init.push(function () {
+		<!-- Javascript for ratings -->
 		var current_rating = 3.4;
 		$('#current-rating-example').text(current_rating);
 
@@ -1077,10 +1070,10 @@ Use search to find needed section.
 			$('#stars-rating-example').pixelRating('setRating', 2.3);
 			$('#current-rating-example').text(2.3);
 		});
+
 	});
-						
+	window.PixelAdmin.start(init);
 </script>
-<!-- / Javascript -->
 
 </body>
 </html>

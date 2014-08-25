@@ -10,33 +10,34 @@ var login = {
 	password:String
 };
 
-var candidates = {
-	recruiter		:String,
-	firstname       :String,
+var candidates = {	
+	name	        :String,
 	title           :String,
-	candidate_email :String,
+	email 			:String,
 	country			:String,
 	city			:String,
-	experience      :Number,
-	mobile_num      :Number,
+	exp 		    :String,
+	phone      		:String,
 	skills          :String,
 	country			:String,
 	city			:String,
-	cv              :String,
-	forcompany      :String,
+	cvpath	        :String,
+	company_id      :String,
 	status          :String,
 	comments        :String,
-	faved 			:Boolean
+	active 			:Boolean
 };
 
 var vacancies = {
-	jobTitle 		:String,
-	vacancy			:String,
-	min_experience	:Number,
-	max_experience	:Number,
-	country			:String,
+	title	 		:String,
+	name			:String,
+	exp_min			:Number,
+	exp_max			:Number,
+	status			:String,
+	country			:String,	
 	city			:String,
-	forcompany		:String,
+	skills			:String,
+	company_id		:String,
 	description 	:String
 }
 

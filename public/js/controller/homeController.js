@@ -116,6 +116,8 @@ App.AddcandidateController = Ember.Controller.extend({
 			var v = true;
 			var fileName = JSON.parse($(".uploadedfile").text());
 			var cv = fileName.filepath;
+
+			console.log(fileName);
 			
 			if($("#experience").val() == ""){
 				addmessage("danger","Experience has to be specified");
@@ -158,25 +160,24 @@ App.AddcandidateController = Ember.Controller.extend({
 		   		    type: 'POST',
 		   		    url: "/saveCandidate",
 		   		    dataType:"json",
-		   		    data: {
-		   		    		"recruiter"			: UserName,
-		   					"firstname"			: this.get("firstname"),
+		   		    data: {		   		    		
+		   					"name"				: this.get("firstname"),
 		   					"title"				: this.get("title"),
-		   					"candidate_email"	: this.get("email"),
-		   					"mobile_num"		: this.get("phone"),
-		   					"experience"		: this.get("experience"),
+		   					"email"				: this.get("email"),
+		   					"phone"				: this.get("phone"),
+		   					"exp"				: this.get("experience"),
 		   					"country"			: jQuery('#country').val(),
 		   					"city"				: jQuery('#city').val(),
-		   					"cv"				: cv,
-		   					"forcompany"		: jQuery("#company").val(),
+		   					"cvpath"			: cv,
+		   					"company_id"		: jQuery("#company").val(),
 		   					"status"			: jQuery("#status").val(),
 		   					"skills"			: text,
 		   					"comments"			: this.get("comments"),
-		   					"faved"				: "false",
+		   					"active"		   	:"true"			
 		      		    },
 		   		    success: function(data){		   		    			   		    	
 		   		    	jQuery(".form-control").val("");
-	   					setTimeout(function(){that.transitionTo('dashboard');},500);
+	   				//	setTimeout(function(){that.transitionTo('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	console.log("error");
@@ -192,7 +193,7 @@ App.AddcandidateController = Ember.Controller.extend({
 App.AddvacancyController = Ember.Controller.extend({
 
 	needs : [ 'application' ],
-	currentUser : Ember.computed.alias('controllers.application.loggedinUser'),
+	currentUser : Ember.computed.alias('controllers.application.loggedinUser'),	
 	usertypes: ["SAHAJ","SRS","CISCO","HCL"],
 	country : ["China", "India", "United States", "Indonesia", "Brazil",
                 "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
@@ -232,7 +233,7 @@ App.AddvacancyController = Ember.Controller.extend({
                 'Portland',
                 'Chicago',
                 'Boston'],
-	statuses: ['None','Interviewed','Rejected','Deferred','Accepted'],
+	statuses: ['open','closed'],
 	actions :{
 		savecandidate: function(){
 
@@ -248,11 +249,11 @@ App.AddvacancyController = Ember.Controller.extend({
 				v=false;
 			}
 			if($("#jobTitle").val() == ""){
-				addmessage("danger","Email has to be specified");
+				addmessage("danger","jobTitle has to be specified");
 				v=false;
 			}
 			if($("#vacancy").val() == ""){
-				addmessage("danger", "Phone number has to be specified");
+				addmessage("danger", "vacancy number has to be specified");
 				v=false;
 			}
 			if($("#country").val() == ""){
@@ -261,6 +262,10 @@ App.AddvacancyController = Ember.Controller.extend({
 			}
 			if($("#city").val() == ""){
 				addmessage("danger", "city has to be specified");
+				v=false;
+			}
+			if($("#status").val() == ""){
+				addmessage("danger", "status has to be specified");
 				v=false;
 			}
 
@@ -289,7 +294,8 @@ App.AddvacancyController = Ember.Controller.extend({
 		   					"city"				: jQuery('#city').val(),
 		   					"min_experience"	: this.get("min_experience"),
 		   					"max_experience"	: this.get("max_experience"),		   					
-		   					"forcompany"		: jQuery("#company").val(),		   					
+		   					"forcompany"		: jQuery("#company").val(),	
+		   					"status"			: jQuery("#status").val(),	   					
 		   					"skills"			: text,
 		   					"description"		: this.get("description"),
 		      		    },
@@ -297,7 +303,7 @@ App.AddvacancyController = Ember.Controller.extend({
 		   		    	console.log("success");
 		   		    	confirmbox("success", "Candidate Saved");
 		   		    	jQuery(".form-control").val("");
-	   					setTimeout(function(){that.transitionTo('home');},500);
+	   				//	setTimeout(function(){that.transitionTo('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	console.log("error");

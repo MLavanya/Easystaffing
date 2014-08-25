@@ -103,30 +103,3 @@ App.DashboardView = Ember.View.extend({
         });    
 	}
 });
-/*
-App.TestRoute = Ember.Route.extend({
-  model: function() {
-    var items = [];
-
-    for(var i = 0; i < 100; i++)
-      items.pushObject(i);
-
-    return items;
-  },
-
-  events: {
-    more: function() {
-      var items = this.modelFor('test'),
-          last  = items.get('lastObject');
-
-      for(var i = last + 1; i < last + 100; i++)
-        items.pushObject(i);
-    }
-  }
-});
-
-*/
-
-App.TestView = Ember.View.extend({
- 
-});
