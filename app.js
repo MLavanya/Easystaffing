@@ -45,8 +45,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/',function(req,res){
-
-res.redirect("login.html");
+	res.redirect("login.html");
 });
 
 

@@ -1,16 +1,17 @@
+/********************************
+ * Application
+ **********************************/
+
 App = Ember.Application.create({
 
 	needs : [ 'application' ],
 	ready : function() {
-
 		//$.noConflict(true);
 		// check if already authenticated via cookies.
-
 		if ($.cookie("loggedIn")) {
 			App.LoginUser.set('loggedinEmail', $.cookie("loggedinEmail"));
 			App.LoginUser.set('loggedinUser', $.cookie("loggedinUser"));
 			App.LoginUser.set('loggedin', false);
-
 		}
 		function getCookie(cname) {
 	        var name = cname + "=";
@@ -23,7 +24,23 @@ App = Ember.Application.create({
 		}
     	var user=getCookie("username");
     	UserName = user;
+		if(user !=""){		            
+        	//alert('Welcome'+" "+user);
+        }
+        else{window.location = 'login.html';}
 	}
-
 });
 
+/********************************
+ * Routes
+ **********************************/
+
+App.Router.map(function() {
+	this.resource('test');
+	this.resource('dashboard');
+	this.resource('addcandidate');
+	this.resource('addvacancy');
+	this.resource('candidate');
+	this.resource('searchResult');
+	this.resource('vacancy');	
+});

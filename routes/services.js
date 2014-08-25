@@ -35,7 +35,7 @@ exports.login = function(req, res) {
             console.log('no user data');
             res.send ({
                 message:'User does not exist',
-                redirectTo:'pages-signin.html'
+                redirectTo:'login.html'
             });
         }
     });

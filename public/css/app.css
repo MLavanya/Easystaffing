@@ -33,3 +33,83 @@
 a.thirdparty-link {
   font-weight: bold;
 }
+
+.pie-chart-label {
+  display: block!important;
+  width: 100%;
+  text-align: center;
+  line-height: 40px;
+  height: 40px;
+  margin-top: -20px;
+  position: absolute!important;
+  top: 50%;
+  font-weight: 300;
+  font-size: 17px;
+}
+
+.switcher {
+  height: 24px;
+  width: 60px;
+}
+.switcher {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.switcher>input[type=checkbox] {
+  left: -100000px;
+  position: absolute;
+  visibility: hidden;
+}
+.switcher-toggler {
+  background: #fff;
+  border-radius: 9999px;
+  height: 20px;
+  margin-left: 1px;
+  margin-top: 2px;
+  width: 20px;
+  -webkit-box-shadow: 0 1px 5px rgba(0,0,0,.3);
+  box-shadow: 0 1px 5px rgba(0,0,0,.3);
+}
+.switcher-toggler {
+  left: 0;
+  position: absolute;
+  text-align: center;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}
+.switcher-inner {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  word-spacing: 0;
+}
+.switcher-inner {
+  border-radius: 9999px;
+}
+
+.switcher-state-off, .switcher-state-on {
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 24px;
+}
+.switcher-state-off, .switcher-state-on {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}

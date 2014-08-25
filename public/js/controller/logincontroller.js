@@ -64,6 +64,8 @@ App.SignupController=Ember.Controller.extend({
                     data:adddetails,                  
                     success: function(data) {    
                         alert(data); 
+                        var email = data.Result[0].email; 
+                        setCookie("email", email, 30); 
                         that.transitionTo("login");                
                     },
                     error: function(data) {

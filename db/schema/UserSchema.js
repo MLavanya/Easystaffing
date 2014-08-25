@@ -15,9 +15,13 @@ var candidates = {
 	firstname       :String,
 	title           :String,
 	candidate_email :String,
+	country			:String,
+	city			:String,
 	experience      :Number,
 	mobile_num      :Number,
 	skills          :String,
+	country			:String,
+	city			:String,
 	cv              :String,
 	forcompany      :String,
 	status          :String,
@@ -26,12 +30,14 @@ var candidates = {
 };
 
 var vacancies = {
-	jobTitle 	:String,
-	vacancy		:String,
-	experience	:Number,
-	location	:String,
-	forcompany	:String,
-	description :String
+	jobTitle 		:String,
+	vacancy			:String,
+	min_experience	:Number,
+	max_experience	:Number,
+	country			:String,
+	city			:String,
+	forcompany		:String,
+	description 	:String
 }
 
 module.exports = mongoose.model('login',login);
