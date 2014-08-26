@@ -18,7 +18,8 @@ App.LoginController=Ember.Controller.extend({
                     success: function(data) {   
                         alert(data.message);
                         var email = data.email; 
-                        setCookie("username", email, 30); 
+                        var name = data.name;
+                        setCookie("email", email, 30); 
                         window.location = data.redirectTo; //redirects to the main page
                     },
                     error: function(data) {

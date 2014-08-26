@@ -43,4 +43,5 @@ App.Router.map(function() {
 	this.resource('candidate',{ path: '/candidate/:candidate_id' });
 	this.resource('searchResult');
 	this.resource('vacancy');	
+	this.resource('profile');
 });

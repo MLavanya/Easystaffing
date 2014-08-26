@@ -70,7 +70,7 @@ Use search to find needed section.
 	* 'main-menu-fixed'    - Fixes the main menu
 	* 'main-menu-animated' - Animate main menu
 -->
-<body class="theme-default main-menu-animated no-main-menu">
+<body class="theme-default main-menu-animated no-main-menu page-profile">
 
 <script>var init = [];</script>
 <!-- Demo script --> 
@@ -113,7 +113,7 @@ Use search to find needed section.
 										<span>John Doe</span>
 									</a>
 									<ul class="dropdown-menu">
-										<li><a href="#"><span class="label label-warning pull-right">New</span>Profile</a></li>
+										<li>{{#link-to 'profile'}}<span class="label label-warning pull-right">New</span>Profile{{/link-to}}</li>
 										<li><a href="#"><span class="badge badge-primary pull-right">New</span>Account</a></li>
 										<li><a href="#"><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Settings</a></li>
 										<li class="divider"></li>
@@ -876,7 +876,7 @@ Use search to find needed section.
 							<tbody>
 								<tr>
 									<td width="35%">Name</td>
-									<td width="65%"><a href="#">{{Details.name}}</a></td>
+									<td width="65%"><p>{{Details.name}}</p></td>
 								</tr>
 								<tr>
 									<td>Title</td>
@@ -884,40 +884,40 @@ Use search to find needed section.
 								</tr>
 								<tr>
 									<td>Email</td>
-									<td><a href="#">{{Details.email}}</a></td>
+									<td><p>{{Details.email}}</p></td>
 								</tr>
 								<tr>
 									<td>Experience</td>
-									<td><a href="#">{{Details.exp}}</a></td>
+									<td><p>{{Details.exp}}</p></td>
 								</tr>
 								<tr>
 									<td>Phone</td>
-									<td><a href="#">{{Details.phone}}</a></td>
+									<td><p>{{Details.phone}}</p></td>
 								</tr>
 								<tr>
 									<td>Skills</td>
-									<td><a href="#">{{Details.skills}}</a></td>
+									<td><p>{{Details.skills}}</p></td>
 								</tr>
 								<tr>
 									<td>Country</td>
-									<td><a href="#">{{Details.country}}</a></td>
+									<td><p>{{Details.country}}</p></td>
 								</tr>
 								<tr>
 									<td>City</td>
-									<td><a href="#">{{Details.city}}</a></td>
+									<td><p>{{Details.city}}</p></td>
 								</tr>
 								<tr>
 									<td>Company Submitted</td>
-									<td><a href="#">{{Details.company_id}}</a></td>
+									<td><p>{{Details.company_id}}</p></td>
 								</tr>
 
 								<tr>
 									<td>Prescreening Status</td>
-									<td><a href="#">{{Details.status}}</a></td>
+									<td><p>{{Details.status}}</p></td>
 								</tr>
 								<tr>
 									<td>Comments</td>
-									<td><a href="#">{{Details.comments}}</a></td>
+									<td><p>{{Details.comments}}</p></td>
 								</tr>								
 							</tbody>							
 						</table>
@@ -1013,6 +1013,160 @@ Use search to find needed section.
 		</div>
 	<!--/ candidate -->
 	</script>
+
+	<script type="text/x-handlebars" id="profile">
+		<div class="profile-full-name">
+			<span class="text-semibold">Denise Steiner</span> profile
+		</div>
+	 	<div class="profile-row">
+			<div class="left-col">
+				<div class="profile-block">
+					<div class="panel profile-photo">
+						<img src="assets/demo/avatars/5.jpg" alt="">
+					</div><br>
+					<a href="#" class="btn btn-success"><i class="fa fa-check"></i>&nbsp;&nbsp;Following</a>&nbsp;&nbsp;
+					<a href="#" class="btn"><i class="fa fa-comment"></i></a>
+				</div>
+				
+				<div class="panel panel-transparent">
+					<div class="panel-heading">
+						<span class="panel-title">About me</span>
+					</div>
+					<div class="panel-body">
+						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et <a href="#">dolore magna</a> aliqua.
+					</div>
+				</div>
+
+				<div class="panel panel-transparent">
+					<div class="panel-heading">
+						<span class="panel-title">Statistics</span>
+					</div>
+					<div class="list-group">
+						<a href="#" class="list-group-item"><strong>126</strong> Likes</a>
+						<a href="#" class="list-group-item"><strong>579</strong> Followers</a>
+						<a href="#" class="list-group-item"><strong>100</strong> Following</a>
+					</div>
+				</div>
+
+				<div class="panel panel-transparent profile-skills">
+					<div class="panel-heading">
+						<span class="panel-title">Skills</span>
+					</div>
+					<div class="panel-body">
+						<span class="label label-primary">UI/UX</span>
+						<span class="label label-primary">Web design</span>
+						<span class="label label-primary">Photoshop</span>
+						<span class="label label-primary">HTML</span>
+						<span class="label label-primary">CSS</span>
+					</div>
+				</div>
+
+				<div class="panel panel-transparent">
+					<div class="panel-heading">
+						<span class="panel-title">Social</span>
+					</div>
+					<div class="list-group">
+						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-twitter" style="color: #4ab6d5"></i> @dsteiner</a>
+						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-facebook-square" style="color: #1a7ab9"></i> Denise Steiner</a>
+						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-envelope" style="color: #888"></i> dsteiner@example.com</a>
+					</div>
+				</div>
+
+			</div>
+			<div class="right-col">
+
+				<hr class="profile-content-hr no-grid-gutter-h">
+				
+				<div class="profile-content">
+
+					<ul id="profile-tabs" class="nav nav-tabs">
+						<li class="active">
+							<a href="#profile-tabs-board" data-toggle="tab">Board</a>
+						</li>
+						<li>
+							<a href="#profile-tabs-activity" data-toggle="tab">Timeline</a>
+						</li>
+						<li>
+							<a href="#profile-tabs-followers" data-toggle="tab">Followers</a>
+						</li>
+						<li>
+							<a href="#profile-tabs-following" data-toggle="tab">Following</a>
+						</li>
+					</ul>
+
+					<div class="tab-content tab-content-bordered panel-padding">
+						<div class="widget-article-comments tab-pane panel no-padding no-border fade in active" id="profile-tabs-board">
+
+							<hr class="no-panel-padding-h panel-wide">
+							
+							<div class="comment">
+								<img src="assets/demo/avatars/3.jpg" alt="" class="comment-avatar">
+								<div class="comment-body">
+									<div class="comment-text">
+										<div class="comment-heading">
+											<a href="#" title="">Michelle Bortz</a><span>14 hours ago</span>
+										</div>
+										Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.
+									</div>
+									<div class="comment-footer">
+										<a href="#"><i class="fa fa-thumbs-o-up"></i></a>&nbsp;&nbsp;
+										<a href="#"><i class="fa fa-thumbs-o-down"></i></a>
+										&nbsp;&nbsp;·&nbsp;&nbsp;
+										<a href="#">Reply</a>
+									</div>
+								</div> <!-- / .comment-body -->
+							</div> <!-- / .comment -->						
+						
+						</div> <!-- / .tab-pane -->
+						<div class="tab-pane fade" id="profile-tabs-activity">
+							<div class="timeline">
+								<!-- Timeline header -->
+								<div class="tl-header now">Now</div>
+
+								<div class="tl-entry">
+									<div class="tl-time">
+										1h ago
+									</div>
+									<div class="tl-icon bg-warning"><i class="fa fa-envelope"></i></div>
+									<div class="panel tl-body">
+										<h4 class="text-warning">Lorem ipsum dolor sit amet</h4>
+										Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+									</div> <!-- / .tl-body -->
+								</div> <!-- / .tl-entry -->
+								
+							</div> <!-- / .timeline -->
+						</div> <!-- / .tab-pane -->
+						<div class="tab-pane fade widget-followers" id="profile-tabs-followers">
+							<div class="follower">
+								<img src="assets/demo/avatars/1.jpg" alt="" class="follower-avatar">
+								<div class="body">
+									<div class="follower-controls">
+										<a href="#" class="btn btn-sm btn-success"><i class="fa fa-check"></i><span>&nbsp;&nbsp;Following</span></a>
+									</div>
+									<a href="#" class="follower-name">John Doe</a><br>
+									<a href="#" class="follower-username">@jdoe</a>
+								</div>
+							</div>
+							
+						</div> <!-- / .tab-pane -->
+						<div class="tab-pane fade widget-followers" id="profile-tabs-following">
+							<div class="follower">
+								<img src="assets/demo/avatars/1.jpg" alt="" class="follower-avatar">
+								<div class="body">
+									<div class="follower-controls">
+										<a href="#" class="btn btn-sm btn-success"><i class="fa fa-check"></i><span>&nbsp;&nbsp;Following</span></a>
+									</div>
+									<a href="#" class="follower-name">John Doe</a><br>
+									<a href="#" class="follower-username">@jdoe</a>
+								</div>
+							</div>
+							
+						</div> <!-- / .tab-pane -->
+					</div> <!-- / .tab-content -->
+				</div>
+			</div>
+		</div>
+	</script>
 	
 	<script type="text/javascript"> window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js">'+"<"+"/script>"); </script>
 <!-- <![endif]-->
@@ -1060,6 +1214,16 @@ Use search to find needed section.
 <script type="text/javascript">	
 
 	init.push(function () {
+		$('#profile-tabs').tabdrop();
+
+		$("#leave-comment-form").expandingInput({
+			target: 'textarea',
+			hidden_content: '> div',
+			placeholder: 'Write message',
+			onAfterExpand: function () {
+				$('#leave-comment-form textarea').attr('rows', '3').autosize();
+			}
+		});
 		$('#ui-bootbox-prompt').on('click', function () {
 			bootbox.prompt({
 				title: "Enter the company name",

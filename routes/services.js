@@ -45,6 +45,7 @@ exports.login = function(req, res) {
                 con.release();
                 res.send ({ 
                     email:rows[0].email,
+                    name:rows[0].name,
                     message:'Successfully loggedin',
                     redirectTo:'home.html'
                 });
@@ -154,10 +155,10 @@ exports.getcandidate = function(req, res) {
                         var html = result.value; // The generated HTML
                         var messages = result.messages; // Any messages, such as warnings during conversion  
                         var newFile = newFilePath+docName+".html";                     
-                        fs.writeFile(newFile, html, function (err) {
-                            console.log(newFile);
+                        /*fs.writeFile(newFile, html, function (err) {
+                            console.log("querying.."+docName);*/
                             res.send({docFile:html,Details:rows[0]});  
-                        });
+                       /* });*/
                     })
                     .done();
                     

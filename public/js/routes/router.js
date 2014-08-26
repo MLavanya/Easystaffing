@@ -1,5 +1,10 @@
 App.IndexRoute = Ember.Route.extend({
-	model : function(){
+	beforeModel:function(){
+		alert(UserName);
+		return UserName;
+	},
+	model : function(){	
+		alert(UserName);	
 		this.transitionTo("dashboard");
 	}
 });
