@@ -51,6 +51,10 @@ Ember.Handlebars.helper('format-date', function(date) {
 	return moment(date).fromNow();
 });
 
+Ember.Handlebars.helper('format-cv', function(value) {
+  return new Ember.Handlebars.SafeString(value);
+});
+
 
 /********************************
  * Controllers
@@ -175,12 +179,13 @@ App.AddcandidateController = Ember.Controller.extend({
 		   					"comments"			: this.get("comments"),
 		   					"active"		   	:"true"			
 		      		    },
-		   		    success: function(data){		   		    			   		    	
+		   		    success: function(data){		   	
+		   		    	alert(data.message);	    			   		    	
 		   		    	jQuery(".form-control").val("");
-	   				//	setTimeout(function(){that.transitionTo('dashboard');},500);
+	   					setTimeout(function(){that.transitionTo('dashboard');},500);
 		   		    },
 		   		    error: function(data){
-		   		    	console.log("error");
+		   		    	console.log("error");		   		    	
 		   		    	//confirmbox("danger", "Sorry, Data could not be saved. Server error.");
 		   		    }
 	   		     });
@@ -288,26 +293,27 @@ App.AddvacancyController = Ember.Controller.extend({
 		   		    url: "/saveVacancies",
 		   		    dataType:"json",
 		   		    data: {
-		   					"jobTitle"			: this.get("jobTitle"),
-		   					"vacancy"			: this.get("vacancy"),
+		   					"title"				: this.get("jobTitle"),
+		   					"name"				: this.get("vacancy"),
 		   					"country"			: jQuery('#country').val(),
 		   					"city"				: jQuery('#city').val(),
-		   					"min_experience"	: this.get("min_experience"),
-		   					"max_experience"	: this.get("max_experience"),		   					
-		   					"forcompany"		: jQuery("#company").val(),	
+		   					"exp_min"			: this.get("min_experience"),
+		   					"exp_max"			: this.get("max_experience"),		   					
+		   					"company_id"		: jQuery("#company").val(),	
 		   					"status"			: jQuery("#status").val(),	   					
 		   					"skills"			: text,
 		   					"description"		: this.get("description"),
 		      		    },
 		   		    success: function(data){
+		   		    	alert(data.message);
 		   		    	console.log("success");
-		   		    	confirmbox("success", "Candidate Saved");
+		   		    	//confirmbox("success", "Candidate Saved");
 		   		    	jQuery(".form-control").val("");
-	   				//	setTimeout(function(){that.transitionTo('dashboard');},500);
+	   					setTimeout(function(){that.transitionTo('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	console.log("error");
-		   		    	confirmbox("danger", "Sorry, Data could not be saved. Server error.");
+		   		    	//confirmbox("danger", "Sorry, Data could not be saved. Server error.");
 		   		    } 
 	   		     });
           	}

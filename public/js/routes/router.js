@@ -4,8 +4,13 @@ App.IndexRoute = Ember.Route.extend({
 	}
 });
 
+App.CandidateRoute = Ember.Route.extend({
 
+	model: function(params){
+		return $.get('/getcandidate/'+params.candidate_id,function(data){
+			console.log(data);
+			return data;
+		});
+	}
 
-App.SearchRoute = Ember.Route.extend({
-   
 });

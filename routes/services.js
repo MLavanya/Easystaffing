@@ -1,53 +1,95 @@
-var db = require('../db/persistence-controller'),
-	userschema = require('../db/schema/UserSchema'),
+var pool = require('./db'),	
 	fs = require('fs'),
     mammoth = require("mammoth"),
     solr = require('solr-client');
 
 exports.register = function(req, res) {
-    var UserInfo = req.body;    
-    db.read("login",{"email":UserInfo.email},function(result){ 
-        if(result.length > 0){
-            res.send("user already exist"); 
-        } 
-        else{
-            db.save('login', UserInfo, function(result) { 
-       	        /*db.save('candidates',{'recruiter_email':UserInfo.email},function(result){
-                    console.log("Successfully saved the UserInfo");
-                });*/  
-            });
-        } 
+    var registerdetails = req.body;
+    var email= req.body.email;
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from user where email=?',[email], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length > 0){
+                con.release();
+                res.send("user already exist");                                                     
+            }
+            else{
+                var query = con.query('INSERT INTO user SET ?', registerdetails, function(err, result) {
+                    if (err) throw err;
+                    con.release();
+                    res.send("Success");
+                });
+            }
+        });
     });
 }
+
 
 exports.login = function(req, res) {
-    var userInfo = req.body;
-    db.read("login",{"username":userInfo.username,"password":userInfo.password},function(result){ 
-        if(result.length > 0){
-            console.log('Successfully loggedin'+JSON.stringify(result)); 
-            res.send ({ 
-                Result:result,              
-                message:'Successfully loggedin',
-                redirectTo:'home.html'
-            });
+    var email=req.body.email;
+    var password=req.body.password;
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
         }
-        else{
-            console.log('no user data');
-            res.send ({
-                message:'User does not exist',
-                redirectTo:'login.html'
-            });
+        con.connect();
+        con.query('SELECT *  from user where email=? and password=?',[email,password], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows <=0){
+                res.send (401);
+            }else{
+                con.release();
+                res.send ({ 
+                    email:rows[0].email,
+                    message:'Successfully loggedin',
+                    redirectTo:'home.html'
+                });
+            }           
+        });        
+    });       
+}
+
+exports.saveCandidate = function(req,res){  
+    var candidatedetails = req.body;
+    var email= req.body.email;
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
         }
+        con.connect();
+        con.query('SELECT *  from candidate where email=?',[email], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length > 0){
+                con.release();                     
+                res.send({message:"candidate already exist"});                 
+            }
+            else{
+                var query = con.query('INSERT INTO candidate SET ?', candidatedetails, function(err, result) {
+                    if (err) throw err;
+                    con.release();
+                    res.send({message:'Successfully saved'});
+                });
+            }
+        });
     });
 }
 
-exports.saveCandidate = function(req,res){
-    var info = req.body;
-   // console.log("entered the function"+ JSON.stringify(info));
-    db.save('candidates',info,function(result){
-        console.log("saved");
-        res.send({message:"saved the candidate's profile"});
-    });
+exports.companyList = function(req, res) {
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from company', function(err, rows, fields) {
+            if (err) throw err;
+            con.release();
+            res.send(rows);
+        });         
+    });        
 }
 
 exports.upload =function(req,res){  
@@ -58,39 +100,23 @@ exports.upload =function(req,res){
         var fileName = req.files.file.name;
         fs.writeFile(newPath, data, function (err) {
             console.log(newPath);           
-            res.send({filepath:fileName});
+            res.send({filepath:newPath});
         });
-
-
     });
-
-    /*fs.readFile(req.files.file.path, function (err, data) {    
-        var newPath = __dirname+"/uploads/"+req.files.file.name;
-        var newFile = __dirname+"/uploads/";
-
-        mammoth.convertToHtml({path: newPath})
-        .then(function(result){
-            var html = result.value; // The generated HTML
-            var messages = result.messages; // Any messages, such as warnings during conversion
-            console.log(html);
-            fs.writeFile(newFile+"name.html", html, function (err) {
-                console.log(html);
-                res.send({filepath:html});  
-            });
-        })
-        .done();
-        
-    });   */
-   
-
 };
 
 exports.saveVacancies = function(req,res){
-    var info = req.body;
-    //console.log("test"+JSON.stringify(req.body));
-    db.save('vacancies',info,function(result){
-        console.log("saved");
-        res.send({message:"saved the vacancy details"});
+    var vacancydetails = req.body;
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        var query = con.query('INSERT INTO vacancy SET ?', vacancydetails, function(err, result) {               
+            if (err) throw err;
+            con.release();
+            res.send({message:'Successfully saved'});         
+        });
     });
 }
 
@@ -102,4 +128,45 @@ exports.solrclient = function(req,res){
     client.search('q='+searchtext+'', function(err, obj){
        res.send(obj);
     });
+}
+
+
+exports.getcandidate = function(req, res) {    
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from candidate where id = ?', [req.params.candidate_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();
+
+                var docName = rows[0].name;
+                var docPath = rows[0].cvpath;
+
+                fs.readFile(docPath, function (err, data) {                   
+                    var newFilePath = __dirname+"/uploads/";
+
+                    mammoth.convertToHtml({path: docPath})
+                    .then(function(result){
+                        var html = result.value; // The generated HTML
+                        var messages = result.messages; // Any messages, such as warnings during conversion  
+                        var newFile = newFilePath+docName+".html";                     
+                        fs.writeFile(newFile, html, function (err) {
+                            console.log(newFile);
+                            res.send({docFile:html,Details:rows[0]});  
+                        });
+                    })
+                    .done();
+                    
+                });
+//                res.send(rows[0]);
+            }else{
+                con.release();
+                res.send({});                
+            }
+        });         
+    });       
 }

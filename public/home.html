@@ -839,8 +839,9 @@ Use search to find needed section.
 			<div class="panel-heading">
 				<div class="widget-profile-bg-icon"><i class="fa fa-user"></i></div>
 				<div class="widget-profile-header">
-					<span>Candidate 1</span><br>
-					<a href="#">QA Engineer </a>
+					<span>{{Details.title}}</span><br>
+					<a href="#">{{Details.name}}</a>
+					<p>{{Details.status}}</p>
 					<div class="search-tags">
 						<span class="search-tags-text">Tags:</span>
 						<a href="#" class="label label-success">Java</a>
@@ -871,7 +872,63 @@ Use search to find needed section.
 					</div>								
 					</div>
 					<div class="panel-body">
-						Panel body content
+						<table id="user" class="table table-bordered table-striped" style="clear: both">
+							<tbody>
+								<tr>
+									<td width="35%">Name</td>
+									<td width="65%"><a href="#">{{Details.name}}</a></td>
+								</tr>
+								<tr>
+									<td>Title</td>
+									<td><p>{{Details.title}}</p></td>
+								</tr>
+								<tr>
+									<td>Email</td>
+									<td><a href="#">{{Details.email}}</a></td>
+								</tr>
+								<tr>
+									<td>Experience</td>
+									<td><a href="#">{{Details.exp}}</a></td>
+								</tr>
+								<tr>
+									<td>Phone</td>
+									<td><a href="#">{{Details.phone}}</a></td>
+								</tr>
+								<tr>
+									<td>Skills</td>
+									<td><a href="#">{{Details.skills}}</a></td>
+								</tr>
+								<tr>
+									<td>Country</td>
+									<td><a href="#">{{Details.country}}</a></td>
+								</tr>
+								<tr>
+									<td>City</td>
+									<td><a href="#">{{Details.city}}</a></td>
+								</tr>
+								<tr>
+									<td>Company Submitted</td>
+									<td><a href="#">{{Details.company_id}}</a></td>
+								</tr>
+
+								<tr>
+									<td>Prescreening Status</td>
+									<td><a href="#">{{Details.status}}</a></td>
+								</tr>
+								<tr>
+									<td>Comments</td>
+									<td><a href="#">{{Details.comments}}</a></td>
+								</tr>								
+							</tbody>							
+						</table>
+						<table class="table table-bordered table-striped" style="clear: both">
+							<tr>
+								<td>Resume</td>
+							</tr>
+							<tr>									
+								<td><div class="candidateCV">{{format-cv docFile}}</div></td>
+							</tr>
+						</table>
 					</div>
 				</div>
 
@@ -984,6 +1041,7 @@ Use search to find needed section.
 <script src="js/model/model.js" type="text/javascript"></script>
 <script src="js/routes/router.js" type="text/javascript"></script>
 <script src="js/views/view.js" type="text/javascript"></script>
+<script src="js/main.js" type="text/javascript"></script>
 
 
 <!-- grid view and scroll js -->

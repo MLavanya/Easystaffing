@@ -40,7 +40,7 @@ App.Router.map(function() {
 	this.resource('dashboard');
 	this.resource('addcandidate');
 	this.resource('addvacancy');
-	this.resource('candidate');
+	this.resource('candidate',{ path: '/candidate/:candidate_id' });
 	this.resource('searchResult');
 	this.resource('vacancy');	
 });

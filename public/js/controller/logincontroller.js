@@ -9,7 +9,7 @@ App.LoginController=Ember.Controller.extend({
             }
             else{
                 var adddetails={};
-                adddetails.username=username;
+                adddetails.email=username;
                 adddetails.password=password;
                 $.ajax ({
                     type: "POST",
@@ -17,8 +17,8 @@ App.LoginController=Ember.Controller.extend({
                     data:adddetails,                  
                     success: function(data) {   
                         alert(data.message);
-                        var name = data.Result[0].name; 
-                        setCookie("username", name, 30); 
+                        var email = data.email; 
+                        setCookie("username", email, 30); 
                         window.location = data.redirectTo; //redirects to the main page
                     },
                     error: function(data) {

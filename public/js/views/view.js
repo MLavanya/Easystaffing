@@ -103,3 +103,4 @@ App.DashboardView = Ember.View.extend({
         });    
 	}
 });
+

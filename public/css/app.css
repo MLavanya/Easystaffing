@@ -113,3 +113,9 @@ a.thirdparty-link {
   -webkit-transition: all .2s;
   transition: all .2s;
 }
+
+
+.candidateCV {    
+    height: 400px;
+    overflow: scroll;
+}

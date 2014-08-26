@@ -55,9 +55,7 @@ app.post('/saveCandidate',services.saveCandidate);
 app.post('/uploadcv',services.upload);
 app.post('/saveVacancies',services.saveVacancies);
 app.post('/solrclient', services.solrclient);
-
-
-
+app.get('/getcandidate/:candidate_id',services.getcandidate);
 
 console.log('Express server listening on port '+ config.port);
 
