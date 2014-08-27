@@ -52,10 +52,16 @@ app.get('/',function(req,res){
 app.post('/register', services.register);
 app.post('/login', services.login);
 app.post('/saveCandidate',services.saveCandidate);
+app.get('/me',services.me);
 app.post('/uploadcv',services.upload);
-app.post('/saveVacancies',services.saveVacancies);
+app.post('/saveVacancies',services.vacancyadd);
 app.post('/solrclient', services.solrclient);
+app.get('/getvacancy/:vacancy_id',services.getvacancy);
+app.get('/companies',services.companies);
 app.get('/getcandidate/:candidate_id',services.getcandidate);
+
+
+
 
 console.log('Express server listening on port '+ config.port);
 

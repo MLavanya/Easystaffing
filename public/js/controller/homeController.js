@@ -47,6 +47,28 @@ setInterval(function() {
  * Helpers
  **********************************/
 
+Ember.Handlebars.helper('format-skill', function(skills) {
+	var res = skills.split(",");
+	var ret = "";
+	for(var i=0;i<res.length;i++){
+		ret = ret+'<a href="#" class="label label-info">'+res[i]+'</a>';
+	}
+	return new Ember.Handlebars.SafeString(ret);
+});
+
+Ember.Handlebars.helper('format-matched', function(skills) {
+	var res = skills.split(",");
+	var ret = "";
+	for(var i=0;i<res.length;i++){
+		ret = ret+'<a href="#" class="label label-success">'+res[i]+'</a>';
+	}
+	return new Ember.Handlebars.SafeString(ret);
+});
+
+Ember.Handlebars.helper('format-vacancy', function(id) {
+	return "#/vacancy/"+id;
+});
+
 Ember.Handlebars.helper('format-date', function(date) {
 	return moment(date).fromNow();
 });
@@ -55,15 +77,23 @@ Ember.Handlebars.helper('format-cv', function(value) {
   return new Ember.Handlebars.SafeString(value);
 });
 
-
 /********************************
  * Controllers
  **********************************/
 
 App.ApplicationController = Ember.Controller.extend({
+	name: "",
+
+	init: function(){
+		var that = this;
+		$.get('/me',function(data){
+			that.set('name',data[0].name);
+		});
+	},
+
 	actions:{				
 		signout:function(){			
-			document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+			document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     		window.location='login.html';
 		},	
 	}
@@ -120,8 +150,6 @@ App.AddcandidateController = Ember.Controller.extend({
 			var v = true;
 			var fileName = JSON.parse($(".uploadedfile").text());
 			var cv = fileName.filepath;
-
-			console.log(fileName);
 			
 			if($("#experience").val() == ""){
 				addmessage("danger","Experience has to be specified");
@@ -145,15 +173,15 @@ App.AddcandidateController = Ember.Controller.extend({
 			}
 
 
-			var textarea = $('#skills:last');
-			//var textext = textarea.textext()[0];
+			var textarea = $('#tags:last');
+			var textext = textarea.textext()[0];
 
-			if(textarea.val().length < 3){
-				addmessage("danger","All fields are Mandatory.");
+			if(textext.hiddenInput().val().length < 3){
+				addmessage("danger","Skills has to be specified.");
 				v=false;
 			}
 
-			var text = textarea.val();
+			var text = textext.hiddenInput().val();
 			text = text.replace("[","");
 			text = text.replace("]","");
 			text = text.replace(/['"]+/g, '');
@@ -164,7 +192,7 @@ App.AddcandidateController = Ember.Controller.extend({
 		   		    type: 'POST',
 		   		    url: "/saveCandidate",
 		   		    dataType:"json",
-		   		    data: {		   		    		
+		   		    data: {
 		   					"name"				: this.get("firstname"),
 		   					"title"				: this.get("title"),
 		   					"email"				: this.get("email"),
@@ -177,15 +205,14 @@ App.AddcandidateController = Ember.Controller.extend({
 		   					"status"			: jQuery("#status").val(),
 		   					"skills"			: text,
 		   					"comments"			: this.get("comments"),
-		   					"active"		   	:"true"			
+		   					"active"		   	:"true"		
 		      		    },
-		   		    success: function(data){		   	
-		   		    	alert(data.message);	    			   		    	
+		   		    success: function(data){
 		   		    	jQuery(".form-control").val("");
 	   					setTimeout(function(){that.transitionTo('dashboard');},500);
 		   		    },
 		   		    error: function(data){
-		   		    	console.log("error");		   		    	
+		   		    	addmessage("danger","Sorry, Data could not be saved. Server error.");
 		   		    	//confirmbox("danger", "Sorry, Data could not be saved. Server error.");
 		   		    }
 	   		     });
@@ -198,8 +225,9 @@ App.AddcandidateController = Ember.Controller.extend({
 App.AddvacancyController = Ember.Controller.extend({
 
 	needs : [ 'application' ],
-	currentUser : Ember.computed.alias('controllers.application.loggedinUser'),	
-	usertypes: ["SAHAJ","SRS","CISCO","HCL"],
+	currentUser : Ember.computed.alias('controllers.application.loggedinUser'),
+	statuses: ['None','Interviewed','Rejected','Deferred','Accepted'],
+	companies: [],
 	country : ["China", "India", "United States", "Indonesia", "Brazil",
                 "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
                 "Mexico", "Philippines", "Vietnam", "Ethiopia", "Egypt",
@@ -238,8 +266,19 @@ App.AddvacancyController = Ember.Controller.extend({
                 'Portland',
                 'Chicago',
                 'Boston'],
-	statuses: ['open','closed'],
+	statuses: ['OPEN','CLOSED'],
 	actions :{
+		addCompany: function(){
+
+			bootbox.prompt({
+				title: "Enter the company name",
+				callback: function(result) {
+				},
+				className: "bootbox-sm"
+			});
+
+		},
+
 		savecandidate: function(){
 
 			var that = this;
@@ -254,11 +293,11 @@ App.AddvacancyController = Ember.Controller.extend({
 				v=false;
 			}
 			if($("#jobTitle").val() == ""){
-				addmessage("danger","jobTitle has to be specified");
+				addmessage("danger","Email has to be specified");
 				v=false;
 			}
 			if($("#vacancy").val() == ""){
-				addmessage("danger", "vacancy number has to be specified");
+				addmessage("danger", "Phone number has to be specified");
 				v=false;
 			}
 			if($("#country").val() == ""){
@@ -274,14 +313,15 @@ App.AddvacancyController = Ember.Controller.extend({
 				v=false;
 			}
 
-			var textarea = $('#skills:last');			
+			var textarea = $('#tags:last');
+			var textext = textarea.textext()[0];
 
-			if(textarea.val().length < 3){
-				addmessage("danger","Skills has to be specified");
+			if(textext.hiddenInput().val().length < 3){
+				addmessage("danger","Skills has to be specified.");
 				v=false;
-			}			
+			}		
 
-			var text = textarea.val();
+			var text = textext.hiddenInput().val();
 			text = text.replace("[","");
 			text = text.replace("]","");
 			text = text.replace(/['"]+/g, '');
@@ -293,27 +333,26 @@ App.AddvacancyController = Ember.Controller.extend({
 		   		    url: "/saveVacancies",
 		   		    dataType:"json",
 		   		    data: {
-		   					"title"				: this.get("jobTitle"),
-		   					"name"				: this.get("vacancy"),
+		   					"title"			: this.get("jobTitle"),
+		   					"name"			: this.get("vacancy"),
 		   					"country"			: jQuery('#country').val(),
 		   					"city"				: jQuery('#city').val(),
-		   					"exp_min"			: this.get("min_experience"),
-		   					"exp_max"			: this.get("max_experience"),		   					
+		   					"exp_min"		: this.get("min_experience"),
+		   					"exp_max"		: this.get("max_experience"),		   					
 		   					"company_id"		: jQuery("#company").val(),	
 		   					"status"			: jQuery("#status").val(),	   					
 		   					"skills"			: text,
 		   					"description"		: this.get("description"),
 		      		    },
 		   		    success: function(data){
-		   		    	alert(data.message);
 		   		    	console.log("success");
-		   		    	//confirmbox("success", "Candidate Saved");
+		   		    	confirmbox("success", "Vacancy Saved");
 		   		    	jQuery(".form-control").val("");
 	   					setTimeout(function(){that.transitionTo('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	console.log("error");
-		   		    	//confirmbox("danger", "Sorry, Data could not be saved. Server error.");
+		   		    	confirmbox("danger", "Sorry, Data could not be saved. Server error.");
 		   		    } 
 	   		     });
           	}
@@ -326,133 +365,32 @@ App.DashboardController = Ember.Controller.extend({
 	actions : {		
 		search : function (){
 			var that = this;
-			$.ajax ({
+			that.transitionTo('searchResult',search_text);
+/*			$.ajax ({
                 type: "POST", 
                 url:'/solrclient',
                 data:{searchtext:search_text},                   
                 success: function(data) {  
-    	          //  alert(data);  
-	                alert('success'+JSON.stringify(data));  
+	                search_text="";
 	                that.transitionTo('searchResult');
                 },
                 error: function(data) {
                     alert("Msg: "+ data.status + ": " + data.statusText);
                 }
-            }); 
+            });*/ 
 		}
 	}
 });
 
-App.FileUploadTool = Ember.TextField.extend({
-	tagName : 'input',
-	attributeBindings : [ 'name', 'data-url' ],
-	classNamesBindings : [ 'class' ],
-	type : 'file',
-	classNames : 'form-control',
-	didInsertElement : function() {
-		/*
-		 this.$().fileupload('option', {
-		 maxFileSize: 5000000
-		 });*/
+App.VacancyController = Ember.ObjectController.extend({
 
-		var that = this;
 
-		this.$().fileupload({
-			add : function(e, data) {
-				var goUpload = true;
-				var uploadFile = data.files[0];
-				if (!(/\.(xls|xlsx)$/i)
-						.test(uploadFile.name)) {
-					addmessage("danger",'Please select an xls or xlsx file.');
-					goUpload = false;
-				}				
-				if (uploadFile.size > 5000000) { // 2mb
-					addmessage("warning",'Please upload a smaller file, max size is 5 MB');
-					goUpload = false;
-				}
-				if (goUpload == true) {
-					$('#importcandidatefile').attr('disable', true);
-					addmessage("info","Uploading "+data.files[0].name);
-					data.submit();
-				}
-			},
-			dataType : 'text',
-			done : function(e, data) {
-				addmessage("success","Upload Complete");
-				$('#importcandidatefile').attr('disable', false);
-				console.log(JSON.parse(data.result));
-			}
-
-		});
-
-	}
 
 });
 
-App.CVUploadTool = Ember.TextField.extend({
-	tagName : 'input',
-	attributeBindings : [ 'name', 'data-url' ],
-	classNamesBindings : [ 'class' ],
-	type : 'file',
-	classNames : 'form-control',
-	didInsertElement : function() {
+App.SearchResultController = Ember.ObjectController.extend({
 
-		/*
-		 this.$().fileupload('option', {
-		 maxFileSize: 5000000
-		 });*/
 
-		var that = this;
-
-		this.$().fileupload({
-			add : function(e, data) {
-				var goUpload = true;
-				var file = document.getElementById("uploadcv").value;
-				var uploadFile = data.files[0];
-				if (!(/\.(doc|docx)$/i)
-						.test(uploadFile.name)) {
-					addmessage("danger",'Please select an doc or docx file.');
-					goUpload = false;
-				}				
-				if (uploadFile.size > 5000000) { // 2mb
-					addmessage("warning",'Please upload a smaller file, max size is 5 MB');
-					goUpload = false;
-				}
-				if (goUpload == true) {
-					$('#uploadcv').hide();
-            		$('#addEmpSbmt').attr('disabled',true);
-            		data.context = $('<button/>').text('Upload')
-                	.appendTo($("#uploadcv").parent())
-                	.click(function (e) {
-                		e.preventDefault();
-                		$(this).parent().append('<div class="progress" id="#progress"> <div class="progress-bar progress-bar-aqua" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"> </div> </div>');
-				
-                		//addmessage("info","Uploading "+data.files[0].name);
-                    	//data.context = $('<p/>').text('Uploading...').replaceAll($(this));
-                    	data.submit();
-                	});					
-					
-					//data.submit();
-				}
-			},
-			dataType : 'text',
-		    progressall: function (e, data) {
-		        var progress = parseInt(data.loaded / data.total * 100, 10);
-		        $('.progress-bar').css(
-		            'width',
-		            progress + '%'
-		        );
-		    },			
-			done : function(e, data) {
-				//console.log(JSON.parse(data.result));
-				$('.progress-bar').parent().prev().text('Uploaded').attr('disabled',true);
-				$('#addEmpSbmt').attr('disabled',false);
-				$('.uploadedfile').text(data.result);
-			}
-
-		});
-
-	}
 
 });
 

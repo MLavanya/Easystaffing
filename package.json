@@ -10,7 +10,7 @@
     "ejs": "*",
     "method-override": "*",
     "secure_random": "^0.1.0",
-    "moment": "^2.7.0",
+    "moment": "^2.8.2",
     "JSON": "^1.0.0",
     "cjson": "^0.3.0",
     "consolidate": "^0.10.0",

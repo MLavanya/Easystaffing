@@ -9,7 +9,7 @@ App = Ember.Application.create({
             }
             return "";
           }
-          var user=getCookie("username");
+          var user=getCookie("email");
           if(user !=""){
             window.location = 'home.html';
           }

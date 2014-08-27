@@ -1,3 +1,5 @@
+var search_text;
+
 /********************************
  * Application
  **********************************/
@@ -22,7 +24,7 @@ App = Ember.Application.create({
             }
             return "";
 		}
-    	var user=getCookie("username");
+    	var user=getCookie("email");
     	UserName = user;
 		if(user !=""){		            
         	//alert('Welcome'+" "+user);
@@ -38,10 +40,10 @@ App = Ember.Application.create({
 App.Router.map(function() {
 	this.resource('test');
 	this.resource('dashboard');
+	this.resource('profile');
 	this.resource('addcandidate');
 	this.resource('addvacancy');
 	this.resource('candidate',{ path: '/candidate/:candidate_id' });
-	this.resource('searchResult');
-	this.resource('vacancy');	
-	this.resource('profile');
+	this.resource('searchResult', { path: '/searchResult/:query' });
+	this.resource('vacancy', { path: '/vacancy/:vacancy_id' });
 });

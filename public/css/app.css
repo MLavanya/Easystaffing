@@ -119,3 +119,9 @@ a.thirdparty-link {
     height: 400px;
     overflow: scroll;
 }
+
+#example{
+    width: 200px;
+    height: 350px;
+    margin-top: -88px;
+}
