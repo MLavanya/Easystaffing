@@ -1,5 +1,5 @@
+var searchQuery =[];
 App.DashboardView = Ember.View.extend({
-	
 	didInsertElement : function() {
 		window.visualSearch = VS.init({
             container  : $('#search_box_container'),
@@ -102,15 +102,19 @@ App.DashboardView = Ember.View.extend({
                 }
             }
         });  
-        var word_array = [
-            {text: "Lorem", weight: 15},
-            {text: "Ipsum", weight: 9},
-            {text: "Dolor", weight: 6},
-            {text: "Sit", weight: 7},
-            {text: "Amet", weight: 5}
-            // ...as many words as you want
-        ];
-        $("#example").jQCloud(word_array);  
+        $.ajax ({
+            type: "GET", 
+            url:'/jqcloudCall',            
+            success: function(data) {                                     
+                for(var i=0;i<data.length;i++){                                    
+                    searchQuery.push({text: data[i].searchQuery, weight: data[i].count});                   
+                }
+                $("#example").jQCloud(searchQuery);     
+            },
+            error:function(data){
+                alert("Msg: "+ data.status + ": " + data.statusText);
+            }                        
+        });         
 	}
 });
 
@@ -220,35 +224,6 @@ App.SearchResultView = Ember.View.extend({
         });    
     }
 });
-
-/*
-App.TestRoute = Ember.Route.extend({
-  model: function() {
-    var items = [];
-
-    for(var i = 0; i < 100; i++)
-      items.pushObject(i);
-
-    return items;
-  },
-
-  events: {
-    more: function() {
-      var items = this.modelFor('test'),
-          last  = items.get('lastObject');
-
-      for(var i = last + 1; i < last + 100; i++)
-        items.pushObject(i);
-    }
-  }
-});
-
-*/
-
-App.TestView = Ember.View.extend({
- 
-});
-
 
 App.TagsView = Ember.View.extend({
     tagName : 'div',
@@ -377,3 +352,4 @@ App.FileUploadTool = Ember.TextField.extend({
     }
 
 });
+

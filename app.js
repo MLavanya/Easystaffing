@@ -59,8 +59,7 @@ app.post('/solrclient', services.solrclient);
 app.get('/getvacancy/:vacancy_id',services.getvacancy);
 app.get('/companies',services.companies);
 app.get('/getcandidate/:candidate_id',services.getcandidate);
-
-
+app.get('/jqcloudCall',services.jqcloudCall);
 
 
 console.log('Express server listening on port '+ config.port);

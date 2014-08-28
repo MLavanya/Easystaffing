@@ -48,8 +48,8 @@ exports.register = function(req, res) {
 
 exports.login = function(req, res) {
 
-var email=req.body.email;
-var password=req.body.password;
+    var email=req.body.email;
+    var password=req.body.password;
 
     pool.getConnection(function(err,con){
 
@@ -149,54 +149,33 @@ exports.saveCandidate = function(req, res) {
 
 exports.candidateretreive = function(req, res) {
 
-
-                pool.getConnection(function(err,con){
-
+    pool.getConnection(function(err,con){
         if(err){
-
             console.log("Error connection to the db.");
         }
 
         con.connect();
-
-    
-        
-
-            con.query('SELECT *  from candidate', function(err, rows, fields) {
+        con.query('SELECT *  from candidate', function(err, rows, fields) {
             if (err) throw err;
-
               con.release();
               res.send(rows);
-          });         
-
-
-
+        });         
     });       
-
-
 
 }
 
 exports.candidateupdate = function(req, res) {
-
-
-                pool.getConnection(function(err,con){
-
+    
+    pool.getConnection(function(err,con){
         if(err){
             console.log("Error connection to the db.");
         }
-
         con.connect();
-
-            con.query('update candidate set ', function(err, rows, fields) {
+        con.query('update candidate set ', function(err, rows, fields) {
             if (err) throw err;
-
             con.release();
             res.send(rows);
         });       
-
-
-
     });
 
 }
@@ -374,7 +353,9 @@ exports.getcandidate = function(req, res) {
 */
 exports.solrclient = function(req,res){
     var searchtext=req.body.searchtext;
-    console.log(searchtext);
+    var email = req.cookies.email;
+    console.log("solrclient call",searchtext+email);
+    updateSearchLog(searchtext,email);
     var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
     var query2 = client.createQuery()
                        .q(searchtext)
@@ -496,3 +477,51 @@ exports.solraddcandidate = function(data){
 
 }
 
+exports.jqcloudCall = function(req,res){
+    console.log("hurray"+res);    
+    
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT *  from search_log', function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });        
+}
+
+function updateSearchLog (searchtext,email,callback){
+    console.log("SearchLog"+searchtext);
+
+    var search_log = {"user_id":email,"searchQuery":searchtext,"count":1}
+
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from search_log where searchQuery=? and user_id=?',[searchtext,email], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length > 0){                
+                con.query('UPDATE search_log set count=count+1 where searchQuery=? and user_id=?',[searchtext,email], function(err, rows, fields) {
+                    con.release();
+                   // res.send({message:"Updated Successfully"})
+                });                            
+            }
+            else{
+                var query = con.query('INSERT INTO search_log SET ?', search_log ,function(err, result) {
+                    if (err) throw err;
+                    con.release();                   
+                    //res.send({message:'Successfully saved'});
+                });
+            }
+        });
+    });
+}

@@ -1,4 +1,14 @@
 mesgs = [];
+var searchQuery ;
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return "";
+  }
 
 
 var addmessage = function(type,msg){
@@ -209,7 +219,7 @@ App.AddcandidateController = Ember.Controller.extend({
 		      		    },
 		   		    success: function(data){
 		   		    	jQuery(".form-control").val("");
-	   					setTimeout(function(){that.transitionTo('dashboard');},500);
+	   					setTimeout(function(){that.transitionToRoute('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	addmessage("danger","Sorry, Data could not be saved. Server error.");
@@ -335,20 +345,20 @@ App.AddvacancyController = Ember.Controller.extend({
 		   		    data: {
 		   					"title"			: this.get("jobTitle"),
 		   					"name"			: this.get("vacancy"),
-		   					"country"			: jQuery('#country').val(),
-		   					"city"				: jQuery('#city').val(),
+		   					"country"		: jQuery('#country').val(),
+		   					"city"			: jQuery('#city').val(),
 		   					"exp_min"		: this.get("min_experience"),
 		   					"exp_max"		: this.get("max_experience"),		   					
-		   					"company_id"		: jQuery("#company").val(),	
-		   					"status"			: jQuery("#status").val(),	   					
-		   					"skills"			: text,
-		   					"description"		: this.get("description"),
+		   					"company_id"	: jQuery("#company").val(),	
+		   					"status"		: jQuery("#status").val(),	   					
+		   					"skills"		: text,
+		   					"description"	: this.get("description"),
 		      		    },
 		   		    success: function(data){
 		   		    	console.log("success");
 		   		    	confirmbox("success", "Vacancy Saved");
 		   		    	jQuery(".form-control").val("");
-	   					setTimeout(function(){that.transitionTo('dashboard');},500);
+	   					setTimeout(function(){that.transitionToRoute('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	console.log("error");
@@ -361,23 +371,23 @@ App.AddvacancyController = Ember.Controller.extend({
 	}
 });
 
-App.DashboardController = Ember.Controller.extend({
+App.DashboardController = Ember.Controller.extend({	
 	actions : {		
 		search : function (){
-			var that = this;
-			that.transitionTo('searchResult',search_text);
-/*			$.ajax ({
+			var that = this;						
+			//that.transitionToRoute('searchResult',search_text);
+			$.ajax ({
                 type: "POST", 
                 url:'/solrclient',
                 data:{searchtext:search_text},                   
                 success: function(data) {  
 	                search_text="";
-	                that.transitionTo('searchResult');
+	                that.transitionToRoute('searchResult',search_text);
                 },
                 error: function(data) {
                     alert("Msg: "+ data.status + ": " + data.statusText);
                 }
-            });*/ 
+            });           
 		}
 	}
 });
@@ -389,9 +399,24 @@ App.VacancyController = Ember.ObjectController.extend({
 });
 
 App.SearchResultController = Ember.ObjectController.extend({
-
-
-
+	/*actions :{
+		search : function (){
+			var that = this;
+			that.transitionToRoute('searchResult',search_text);
+			$.ajax ({
+                type: "POST", 
+                url:'/solrclient',
+                data:{searchtext:search_text},                   
+                success: function(data) {  
+	                search_text="";
+	                that.transitionToRoute('searchResult');
+                },
+                error: function(data) {
+                    alert("Msg: "+ data.status + ": " + data.statusText);
+                }
+            }); 
+		}
+	}	*/
 });
 
 
