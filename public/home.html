@@ -1,28 +1,4 @@
 <!DOCTYPE html>
-<!--
-
-TABLE OF CONTENTS.
-
-Use search to find needed section.
-
-==================================================================
-
-|  1. $BODY                        |  Body                       |
-|  2. $MAIN_NAVIGATION             |  Main navigation            |
-|  3. $NAVBAR_ICON_BUTTONS         |  Navbar Icon Buttons        |
-|  4. $MAIN_MENU                   |  Main menu                  |
-|  5. $EXAMPLE_NOTIFICATIONS       |  Notifications example      |
-|  6. $EXAMPLE_COMMENTS_COUNT      |  Comments count example     |
-|  7. $EXAMPLE_ICON_PANEL          |  Icon panel example         |
-|  8. $EXAMPLE_VISITORS_CHART      |  Visitors chart example     |
-|  9. $EXAMPLE_RETWEETS_GRAPH      |  Retweets graph example     |
-|  10. $EXAMPLE_EARNINGS_GRAPH     |  Earnings graph example     |
-|  11. $EXAMPLE_ACCOUNT_OVERVIEW   |  Account overview example   |
-|  12. $EXAMPLE_UPLOAD_STATISTICS  |  Upload statistics example  |
-
-==================================================================
-
--->
 
 
 <!--[if IE 8]>         <html class="ie8"> <![endif]-->
@@ -33,7 +9,7 @@ Use search to find needed section.
 
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>Stat Panels - Easy Staffing</title>
+	<title>Easy Staffing</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
 	<!-- Open Sans font from Google CDN -->
@@ -55,8 +31,8 @@ Use search to find needed section.
     <link rel="stylesheet" href="css/textext.plugin.autocomplete.css" type="text/css" />
     <link rel="stylesheet" href="css/textext.plugin.focus.css" type="text/css" />
     <link rel="stylesheet" href="css/textext.plugin.prompt.css" type="text/css" />
-    <link rel="stylesheet" href="css/textext.plugin.arrow.css" type="text/css" /> 
-    <link rel="stylesheet" type="text/css" href="css/jqcloud.css" />     	
+    <link rel="stylesheet" href="css/textext.plugin.arrow.css" type="text/css" />      	
+    <link href="css/jqcloud.css" rel="stylesheet" type="text/css" >
 
 	<!--[if lt IE 9]>
 		<script src="assets/javascripts/ie.min.js"></script>
@@ -122,7 +98,7 @@ Use search to find needed section.
 									</a>
 									<ul class="dropdown-menu">
 										<li>{{#link-to 'profile'}}<i class="dropdown-icon fa fa-user"></i>&nbsp;&nbsp;Profile{{/link-to}}</li>
-										<li><a href="#"><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Settings</a></li>
+										<li><a href="#" {{action configure}}><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Configure</a></li>
 										<li class="divider"></li>
 										<li {{action 'signout'}}><a><i class="dropdown-icon fa fa-power-off" ></i>&nbsp;&nbsp;Log Out</a></li>
 									</ul>
@@ -256,9 +232,9 @@ Use search to find needed section.
 					<div class="stat-cell bordered no-border-t no-padding-hr">
 
 						    <div class="col-sm-offset-0" style="margin-left:20px;">
-								<input type="radio" name="searchtype" value="vacancy">Vacancy &nbsp;&nbsp;
-								<input type="radio" name="searchtype" value="candidate">Candidate &nbsp;&nbsp;
-								<input type="radio" name="searchtype" value="company">Company	        	
+								<input type="radio" name="searchtype" value="vacancy"> Vacancy &nbsp;&nbsp;
+								<input type="radio" name="searchtype" value="candidate"> Candidate &nbsp;&nbsp;
+								<input type="radio" name="searchtype" value="company"> Company	        	
 						    </div>
 
 						<!-- Search form -->	   
@@ -270,24 +246,65 @@ Use search to find needed section.
 						        </div>    
 						    {{/view}}	  
 						      <!-- / Search form -->
+						     <br/>
+						    <div class="pull-left" style="margin-left:20px;">
+								<input type="checkbox" name="searchtype" value="vacancy"> Exact Match        	
+						    </div>						      
 
 					</div>
 				</div> <!-- /.stat-row -->
 			</div> <!-- /.stat-panel -->
-			
+
 			<div class="graph-area" style="text-align:center">
-				<div class="col-sm-3">
-					text-semibold text-semibold
+				<div class="col-sm-4">
+				
+				{{#view App.GraphChartView}}
+
+					<div class="panel">
+						<div class="panel-heading">
+							<span class="panel-title">Staffing Trend</span>
+						</div>
+						<div class="panel-body">
+							<div class="graph-container">
+								<div id="hero-area" class="graph"></div>
+							</div>
+						</div>
+					</div>
+					<!-- /6. $MORRISJS_AREA -->
+              {{/view}}
+
 				</div>
 
 				<div class="col-sm-4">
-					text-semibold text-semibold
+
+				{{#view App.BarChartView}}
+
+					<div class="panel">
+						<div class="panel-heading">
+							<span class="panel-title">Company Wise Placement</span>
+						</div>
+						<div class="panel-body">							
+							<div class="graph-container">
+								<div id="hero-bar" class="graph"></div>
+							</div>
+						</div>
+					</div>
+
+                {{/view}}
+
 				</div>
 
-				<div class="col-sm-5">
-					{{#view}}
-						<div id="example"></div>
-					{{/view}}
+				<div class="col-sm-4">
+					<div class="panel">
+						<div class="panel-heading">
+							<span class="panel-title">Search Tags</span>
+						</div>
+						<div class="panel-body">
+							{{#view App.JqcloudView}}
+								<div id="example"></div>
+							{{/view}}
+						</div>
+					</div>					
 				</div>
 			</div><!-- /.graph-area-->
 
@@ -311,7 +328,7 @@ Use search to find needed section.
 			<div class="panel-body">
 				<div class="form-group">
                     <label for="name" class="col-sm-2 control-label">Name</label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-6">
                       {{input type="text" class="form-control" id="name" placeholder="Name" value=firstname}}
                     </div>
                 </div>
@@ -325,21 +342,21 @@ Use search to find needed section.
 
               	<div class="form-group">
                     <label for="email" class="col-sm-2 control-label">Email</label>
-	                <div class="col-sm-4">
+	                <div class="col-sm-6">
     	              {{input type="email" class="form-control" id="email" placeholder="Email" value=email}}
         	        </div>
             	</div>
 
               	<div class="form-group">
                     <label for="experience" class="col-sm-2 control-label">Experience</label>
-                    <div class="col-sm-1">
+                    <div class="col-sm-3">
                       {{input type="num" class="form-control" id="experience" placeholder="Experience" value=experience}}
                     </div>
               	</div>                  
 
               	<div class="form-group">
                 	<label for="phone" class="col-sm-2 control-label">Phone</label>
-                	<div class="col-sm-3">
+                	<div class="col-sm-6">
                       {{input type="tel" class="form-control" id="phone" placeholder="Phone" value=phone}}
                     </div>
               	</div>
@@ -356,15 +373,15 @@ Use search to find needed section.
     	        </div>
 
     	        <div class="form-group">
-                    <label for="country" class="col-sm-2 control-label">Country</label>
-                    <div class="col-sm-2">
+                    <label for="skills" class="col-sm-2 control-label">Country</label>
+                    <div class="col-sm-6">
                         {{view Ember.Select  classNames="form-control" id="country" value=forcountry  content=country}}
 	                </div>
     	        </div>
 
     	        <div class="form-group">
-                    <label for="city" class="col-sm-2 control-label">City</label>
-                    <div class="col-sm-2">
+                    <label for="skills" class="col-sm-2 control-label">City</label>
+                    <div class="col-sm-6">
                         {{view Ember.Select  classNames="form-control" id="city" value=forcity  content=city}}
 	                </div>
     	        </div>
@@ -376,17 +393,10 @@ Use search to find needed section.
 	                </div>
     	        </div>
              
-        	    <div class="form-group">
-                    <label for="usertype" class="col-sm-2 control-label">Company Submitted</label>
-                    <div class="col-sm-6">
-                      {{view Ember.Select  classNames="form-control" id="company" value=forcompany  content=usertypes}}
-                    </div>
-                </div>
-
               	<div class="form-group">
                     <label for="country" class="col-sm-2 control-label">Prescreening Status</label>
                     <div class="col-sm-6">
-                      {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses}}
+                      {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses optionValuePath="content.id" optionLabelPath="content.name"}}
                 	</div>
               	</div>
 
@@ -478,7 +488,7 @@ Use search to find needed section.
         	    <div class="form-group">
                     <label for="usertype" class="col-sm-2 control-label">Company Submitted</label>
                     <div class="col-sm-2">
-                      {{view Ember.Select  classNames="form-control" id="company" value=forcompany  content=companies}}                      
+                      {{view Ember.Select  classNames="form-control" id="company" value=forcompany  content=companies optionValuePath="content.id"       optionLabelPath="content.name"}}                      
                     </div>	
                     <div class="col-sm-2">                     
                       <button id="ui-bootbox-prompt" class="btn btn-outline btn-sm btn-labeled" {{action addCompany}} ><span class="btn-label icon fa fa-plus"></span>Company</button>
@@ -488,7 +498,7 @@ Use search to find needed section.
                 <div class="form-group">
                     <label for="country" class="col-sm-2 control-label">Status</label>
                     <div class="col-sm-2">
-                      {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses}}
+                      {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses }}
                 	</div>
               	</div>	
 
@@ -510,7 +520,7 @@ Use search to find needed section.
 			<!-- search results -->
 			
 			<div class="search-text">
-				<strong>{{response.numFound}}</strong> results found for: <span class="text-primary">Lorem ipsum</span>
+				<strong>{{response.numFound}}</strong> results found for: <span class="text-primary">{{keyword}}</span>
 			</div>
 
 			<div class="search-tabs ">
@@ -531,10 +541,10 @@ Use search to find needed section.
 
 				<!-- Search form -->
 				<form action="" class="search-form bg-primary">
-				    <div class="col-sm-offset-0">
-						<input type="radio" name="searchtype" value="vacancy">Vacancy &nbsp;&nbsp;
-						<input type="radio" name="searchtype" value="candidate">Candidate &nbsp;&nbsp;
-						<input type="radio" name="searchtype" value="company">Company	        	
+				    <div class="col-sm-offset-0" style="margin-left:20px;">
+						<input type="radio" name="searchtype" value="vacancy"> Vacancy &nbsp;&nbsp;
+						<input type="radio" name="searchtype" value="candidate"> Candidate &nbsp;&nbsp;
+						<input type="radio" name="searchtype" value="company"> Company	        	
 				    </div> <br/>				
 					<div class="input-group">
 						<!-- Search form -->	   
@@ -549,6 +559,11 @@ Use search to find needed section.
 							<button class="btn btn-default" type="submit" {{action 'search'}}>Search</button>
 						</span>
 					</div> <!-- / .input-group -->
+					<br/>
+				    <div class="pull-left" style="margin-left:20px;">
+						<input type="checkbox" name="searchtype" value="vacancy"> Exact Match        	
+				    </div>
+				    <br/>						
 				</form>
 				<!-- / Search form -->
 
@@ -558,22 +573,7 @@ Use search to find needed section.
 					<!-- Classic search -->
 					<ul class="search-classic tab-pane fade in active" id="search-tabs-all">
 						{{#each response.docs}}
-							<li>
-								{{#link-to 'vacancy' id class="search-title"}}{{vname}}{{/link-to}}
-								<p>{{description}}</p>
-								<div class="search-content">
-									{{vexp_min}} to {{vexp_max}} years with {{vskills}} skills located in {{vlocation}} .
-								</div> <!-- / .search-content -->
-								<div class="search-tags">
-									<span class="search-tags-text">Skills:</span>
-										{{format-skill vskills}}
-								</div> <!-- / .search-tags -->
-								<div class="search-tags">
-									<span class="search-tags-text">Keywords:</span>
-										{{format-matched vskills}}
-								</div> <!-- / .search-tags -->
-
-							</li>
+							{{format-results this}}
 						{{else}}
 							<li>No Results Found.</li>
 						{{/each}}
@@ -612,7 +612,7 @@ Use search to find needed section.
 				<div class="col-xs-3"><span>56</span><br>IN PROGRESS</div>
 			</div>			
 			<div class="widget-profile-text">
-				<p></p><h4>Status : &nbsp; &nbsp;</h4><div class="switcher switcher-sm switcher-primary checked"><input type="checkbox" data-class="switcher-sm switcher-primary" id="panel-switcher" checked="checked"><div class="switcher-toggler"></div><div class="switcher-inner"><div class="switcher-state-on">OPEN</div><div class="switcher-state-off">CLOSED</div></div></div>		<p></p>				
+				<p></p><h4>Status : &nbsp; &nbsp;{{format-vstatus status}}<p></p>				
 			</div>
 		</div>
 
@@ -674,7 +674,15 @@ Use search to find needed section.
 						<span class="panel-title"><i class="panel-title-icon fa fa-folder-open"></i>Applications</span>
 					</div>
 					<div class="panel-body">
-						Panel body content
+						<table class="table table-striped">
+						<thead>
+							<tr><td>ID</td><td>Name</td><td>Status</td></tr>
+						</thead>
+							{{#each applications}}							
+								<tr><td>{{id}}</td><td>{{name}}</td><td>{{format-cstatus status}}</td><td><i class="fa fa-eye"></i></td></tr>
+							{{/each}}
+
+						</table>
 					</div>
 				</div>
 
@@ -689,54 +697,9 @@ Use search to find needed section.
 					</div>
 					<div class="panel-body">
 
-					<!-- 15. $RATING ===================================================================================Rating	-->
-									
+						{{format-csuggestions this}}
 
-						<div class="panel widget-tasks">
-							<div class="panel-body">	
-								<p><i class="panel-title-icon fa fa-user"></i><strong>Candidate 1</strong></p>						
-								<span id="stars-rating-example"><ul class="widget-rating"><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li><a href="#" title="" class="widget-rating-item"></a></li></ul></span>
-								<p> 4 years Exp</p>
-								<div class="search-tags">
-									<span class="search-tags-text">Tags:</span>
-									<a href="#" class="label label-success">Lorem</a>
-									<a href="#" class="label label-success">Ipsum</a>
-									<a href="#" class="label label-success">Dolor</a>
-								</div>													
-							</div> <!-- / .panel-body -->
-						</div> <!-- / .panel -->
-
-									<div class="panel widget-tasks">
-										<div class="panel-body">	
-											<p><i class="panel-title-icon fa fa-user"></i><strong>Candidate 1</strong></p>						
-											<span id="stars-rating-example"></span>
-											<p> 4 years Exp</p>
-											<div class="search-tags">
-												<span class="search-tags-text">Tags:</span>
-												<a href="#" class="label label-success">Lorem</a>
-												<a href="#" class="label label-success">Ipsum</a>
-												<a href="#" class="label label-success">Dolor</a>
-											</div>													
-										</div> <!-- / .panel-body -->
-									</div> <!-- / .panel -->
-
-									<div class="panel widget-tasks">
-										<div class="panel-body">	
-											<p><i class="panel-title-icon fa fa-user"></i><strong>Candidate 1</strong></p>						
-											<span id="stars-rating-example"></span>
-											<p> 4 years Exp</p>
-											<div class="search-tags">
-												<span class="search-tags-text">Tags:</span>
-												<a href="#" class="label label-success">Lorem</a>
-												<a href="#" class="label label-success">Ipsum</a>
-												<a href="#" class="label label-success">Dolor</a>
-											</div>													
-										</div> <!-- / .panel-body -->
-									</div> <!-- / .panel -->							
-
-									<button class="btn btn-outline btn-xs">More...</button>		
-					<!-- /15. $RATING -->
-
+						<button class="btn btn-outline btn-xs" {{action searchbyv}}>More...</button>		
 
 					</div>
 				</div>
@@ -761,9 +724,9 @@ Use search to find needed section.
 			<div class="panel-heading">
 				<div class="widget-profile-bg-icon"><i class="fa fa-user"></i></div>
 				<div class="widget-profile-header">
-					<span>{{Details.title}}</span><br>
-					<a href="#">{{Details.name}}</a>
-					<p>{{Details.status}}</p>
+					<span>{{details.title}}</span><br>
+					<a href="#">{{details.name}}</a>
+					<p>{{details.status}}</p>
 					<div class="search-tags">
 						<span class="search-tags-text">Tags:</span>
 						<a href="#" class="label label-success">Java</a>
@@ -779,7 +742,7 @@ Use search to find needed section.
 				<div class="col-xs-3"><span>0</span><br>.</div>
 			</div>			
 			<div class="widget-profile-text">
-				<p></p><h4>Available : &nbsp; &nbsp;<div class="switcher switcher-sm switcher-primary checked"><input type="checkbox" data-class="switcher-sm switcher-primary" id="panel-switcher" checked="checked"><div class="switcher-toggler"></div><div class="switcher-inner"><div class="switcher-state-on">YES</div><div class="switcher-state-off">NO</div></div></div>		</h4><p></p>				
+				<p></p><h4>Status : &nbsp; &nbsp;{{format-cstatus details.status}}<p></p>
 			</div>
 		</div>
 
@@ -798,48 +761,48 @@ Use search to find needed section.
 							<tbody>
 								<tr>
 									<td width="35%">Name</td>
-									<td width="65%"><a href="#">{{Details.name}}</a></td>
+									<td width="65%"><a href="#">{{details.name}}</a></td>
 								</tr>
 								<tr>
 									<td>Title</td>
-									<td><p>{{Details.title}}</p></td>
+									<td><p>{{details.title}}</p></td>
 								</tr>
 								<tr>
 									<td>Email</td>
-									<td><a href="#">{{Details.email}}</a></td>
+									<td><a href="#">{{details.email}}</a></td>
 								</tr>
 								<tr>
 									<td>Experience</td>
-									<td><a href="#">{{Details.exp}}</a></td>
+									<td><a href="#">{{details.exp}}</a></td>
 								</tr>
 								<tr>
 									<td>Phone</td>
-									<td><a href="#">{{Details.phone}}</a></td>
+									<td><a href="#">{{details.phone}}</a></td>
 								</tr>
 								<tr>
 									<td>Skills</td>
-									<td><a href="#">{{Details.skills}}</a></td>
+									<td><a href="#">{{details.skills}}</a></td>
 								</tr>
 								<tr>
 									<td>Country</td>
-									<td><a href="#">{{Details.country}}</a></td>
+									<td><a href="#">{{details.country}}</a></td>
 								</tr>
 								<tr>
 									<td>City</td>
-									<td><a href="#">{{Details.city}}</a></td>
+									<td><a href="#">{{details.city}}</a></td>
 								</tr>
 								<tr>
 									<td>Company Submitted</td>
-									<td><a href="#">{{Details.company_id}}</a></td>
+									<td><a href="#">{{details.company_id}}</a></td>
 								</tr>
 
 								<tr>
 									<td>Prescreening Status</td>
-									<td><a href="#">{{Details.status}}</a></td>
+									<td><a href="#">{{details.status}}</a></td>
 								</tr>
 								<tr>
 									<td>Comments</td>
-									<td><a href="#">{{Details.comments}}</a></td>
+									<td><a href="#">{{details.comments}}</a></td>
 								</tr>								
 							</tbody>							
 						</table>
@@ -859,7 +822,17 @@ Use search to find needed section.
 						<span class="panel-title"><i class="panel-title-icon fa fa-folder-open"></i>Applications</span>
 					</div>
 					<div class="panel-body">
-						Panel body content
+						<table class="table table-hover">
+						<thead>
+							<tr><td>ID</td><td>Name</td><td>Status</td></tr>
+						</thead>
+							{{#each applications}}							
+								<tr {{action showHistory this}}><td>{{id}}</td><td>{{name}}</td><td>{{format-cstatus status}} <i class="fa fa-edit" {{action updateapplication}}></i></td></tr>
+							{{else}}
+								No Applications.
+							{{/each}}
+
+						</table>
 					</div>
 				</div>
 
@@ -868,7 +841,14 @@ Use search to find needed section.
 						<span class="panel-title"><i class="panel-title-icon fa fa-folder-open"></i>History</span>
 					</div>
 					<div class="panel-body">
-						Panel body content
+						<table class="table table-striped">
+						<thead>
+							<tr><td>Prev Status</td><td>Curr Status</td><td>Updated on</td></tr>
+						</thead>
+							{{#each apphistory}}
+							<tr><td>{{format-cstatus prevstatus}}</td><td>{{format-cstatus curstatus}}</td><td>{{format-date updated_time}}</td></tr>
+							{{/each}}
+						</table>							
 					</div>
 				</div>
 
@@ -883,52 +863,9 @@ Use search to find needed section.
 					</div>
 					<div class="panel-body">
 
-					<!-- 15. $RATING ===================================================================================Rating	-->									
+						<button class="btn btn-outline btn-xs" {{action searchbyc}}>More...</button>	
 
-									<div class="panel widget-tasks">
-										<div class="panel-body">	
-											<p><i class="panel-title-icon fa fa-user"></i><strong>Vacancy 1</strong></p>						
-											<span id="stars-rating-example"><ul class="widget-rating"><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li><a href="#" title="" class="widget-rating-item"></a></li></ul></span>
-											<p> 4 years Exp</p>
-											<div class="search-tags">
-												<span class="search-tags-text">Tags:</span>
-												<a href="#" class="label label-success">Lorem</a>
-												<a href="#" class="label label-success">Ipsum</a>
-												<a href="#" class="label label-success">Dolor</a>
-											</div>													
-										</div> <!-- / .panel-body -->
-									</div> <!-- / .panel -->
 
-									<div class="panel widget-tasks">
-										<div class="panel-body">	
-											<p><i class="panel-title-icon fa fa-user"></i><strong>Vacancy 1</strong></p>						
-											<span id="stars-rating-example"></span>
-											<p> 4 years Exp</p>
-											<div class="search-tags">
-												<span class="search-tags-text">Tags:</span>
-												<a href="#" class="label label-success">Lorem</a>
-												<a href="#" class="label label-success">Ipsum</a>
-												<a href="#" class="label label-success">Dolor</a>
-											</div>													
-										</div> <!-- / .panel-body -->
-									</div> <!-- / .panel -->
-
-									<div class="panel widget-tasks">
-										<div class="panel-body">	
-											<p><i class="panel-title-icon fa fa-user"></i><strong>Vacancy 1</strong></p>						
-											<span id="stars-rating-example"></span>
-											<p> 4 years Exp</p>
-											<div class="search-tags">
-												<span class="search-tags-text">Tags:</span>
-												<a href="#" class="label label-success">Lorem</a>
-												<a href="#" class="label label-success">Ipsum</a>
-												<a href="#" class="label label-success">Dolor</a>
-											</div>													
-										</div> <!-- / .panel-body -->
-									</div> <!-- / .panel -->											
-									<button class="btn btn-outline btn-xs">More...</button>
-
-					<!-- /15. $RATING -->
 					</div>
 				</div>
 			</div>
@@ -939,6 +876,30 @@ Use search to find needed section.
 
 	<script type="text/x-handlebars" id="profile">
 
+		<div id="myModal" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						<h4 class="modal-title" id="myModalLabel">Update Profile</h4>
+					</div>
+					<div class="modal-body">	
+						<div>					
+							{{input type="text" class="form-control" id="description" placeholder="Description" value=description}}
+						</div>
+						&nbsp;&nbsp;
+						<div class="">
+							{{input type="text" class="form-control" id="mobile_number" placeholder="Mobile Number" value=mobile_number}}
+						</div>
+					</div> <!-- / .modal-body -->
+					<div class="modal-footer">						
+						<button type="button" class="btn btn-primary" data-dismiss="modal" {{action 'updateProfile'}}>Save updates</button>
+					</div>
+				</div> <!-- / .modal-content -->
+			</div> <!-- / .modal-dialog -->
+		</div> <!-- /.modal -->
+		<!-- / Modal -->
+
 		<div class="profile-full-name">
 			<span class="text-semibold">Denise Steiner</span> profile
 		</div>
@@ -947,17 +908,16 @@ Use search to find needed section.
 				<div class="profile-block">
 					<div class="panel profile-photo">
 						<img src="images/user.png" alt="">
-					</div><br>
-					<a href="#" class="btn btn-success"><i class="fa fa-check"></i>&nbsp;&nbsp;Following</a>&nbsp;&nbsp;
-					<a href="#" class="btn"><i class="fa fa-comment"></i></a>
+					</div><br>					
+					<a href="#" class="btn" data-toggle="modal" data-target="#myModal">&nbsp;&nbsp;Edit Profile&nbsp;&nbsp;<i class="fa fa-comment"></i></a>					
 				</div>
 				
 				<div class="panel panel-transparent">
 					<div class="panel-heading">
-						<span class="panel-title">About me</span>
+						<span class="panel-title">About me</span>						
 					</div>
 					<div class="panel-body">
-						Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et <a href="#">dolore magna</a> aliqua.
+						<p>{{userdata.description}}</p>
 					</div>
 				</div>
 
@@ -978,8 +938,7 @@ Use search to find needed section.
 					</div>
 					<div class="panel-body">
 						<span class="label label-primary">UI/UX</span>
-						<span class="label label-primary">Web design</span>
-						<span class="label label-primary">Photoshop</span>
+						<span class="label label-primary">Web design</span>					
 						<span class="label label-primary">HTML</span>
 						<span class="label label-primary">CSS</span>
 					</div>
@@ -989,10 +948,9 @@ Use search to find needed section.
 					<div class="panel-heading">
 						<span class="panel-title">Social</span>
 					</div>
-					<div class="list-group">
-						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-twitter" style="color: #4ab6d5"></i> @dsteiner</a>
-						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-facebook-square" style="color: #1a7ab9"></i> Denise Steiner</a>
-						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-envelope" style="color: #888"></i> dsteiner@example.com</a>
+					<div class="list-group">						
+						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-mobile icon-large" style="color: #1a7ab9"></i> {{userdata.mobile_number}}</a>
+						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-envelope" style="color: #888"></i>{{userdata.email}}</a>						
 					</div>
 				</div>
 
@@ -1011,11 +969,8 @@ Use search to find needed section.
 							<a href="#profile-tabs-activity" data-toggle="tab">Timeline</a>
 						</li>
 						<li>
-							<a href="#profile-tabs-followers" data-toggle="tab">Followers</a>
-						</li>
-						<li>
-							<a href="#profile-tabs-following" data-toggle="tab">Following</a>
-						</li>
+							<a href="#profile-tabs-followers" data-toggle="tab">My Candidates</a>
+						</li>						
 					</ul>
 
 					<div class="tab-content tab-content-bordered panel-padding">
@@ -1061,37 +1016,33 @@ Use search to find needed section.
 							</div> <!-- / .timeline -->
 						</div> <!-- / .tab-pane -->
 						<div class="tab-pane fade widget-followers" id="profile-tabs-followers">
-							<div class="follower">
-								<img src="assets/demo/avatars/1.jpg" alt="" class="follower-avatar">
-								<div class="body">
-									<div class="follower-controls">
-										<a href="#" class="btn btn-sm btn-success"><i class="fa fa-check"></i><span>&nbsp;&nbsp;Following</span></a>
-									</div>
-									<a href="#" class="follower-name">John Doe</a><br>
-									<a href="#" class="follower-username">@jdoe</a>
-								</div>
-							</div>
-							
-						</div> <!-- / .tab-pane -->
-						<div class="tab-pane fade widget-followers" id="profile-tabs-following">
-							<div class="follower">
-								<img src="assets/demo/avatars/1.jpg" alt="" class="follower-avatar">
-								<div class="body">
-									<div class="follower-controls">
-										<a href="#" class="btn btn-sm btn-success"><i class="fa fa-check"></i><span>&nbsp;&nbsp;Following</span></a>
-									</div>
-									<a href="#" class="follower-name">John Doe</a><br>
-									<a href="#" class="follower-username">@jdoe</a>
-								</div>
-							</div>
-							
-						</div> <!-- / .tab-pane -->
+							{{#each candidatelist}}
+								<ul class="follower">	
+									<img src="images/user.png" alt="" class="follower-avatar">
+									<li class="body">									
+										<div class="col-xs-2">
+											{{#link-to 'candidate' id class="follower-name"}}{{name}}{{/link-to}}
+										</div>
+										<div class="col-xs-4">
+											{{format-skill skills}}
+										</div>
+										<div class="col-xs-3">
+											<div class="follower-email">{{email}}</div>
+										</div>
+										<div class="col-xs-2">
+											<div class="follower-phone">{{phone}}</div>
+										</div>
+									</li>
+								</ul>								
+							{{/each}}
+						</div> <!-- / .tab-pane -->					
 					</div> <!-- / .tab-content -->
 				</div>
 			</div>
 		</div>
 
 	</script>	
+
 
 
 	<script type="text/javascript"> window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js">'+"<"+"/script>"); </script>
@@ -1128,7 +1079,6 @@ Use search to find needed section.
 <script src="js/libs/jquery.jscroll.min.js" type="text/javascript"></script>
 <script src="js/libs/dependencies.js" type="text/javascript" charset="utf-8"></script> 
 <script src="js/libs/visualsearch.js" type="text/javascript" charset="utf-8"></script>
-<script type="text/javascript" src="js/libs/jqcloud-1.0.4.js"></script>
 
 <!-- Cookie Libs -->
 <script src="js/libs/jquery.cookie.js"></script>
@@ -1142,6 +1092,8 @@ Use search to find needed section.
 <script src="js/libs/textext.plugin.prompt.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/libs/textext.plugin.ajax.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/libs/textext.plugin.arrow.js" type="text/javascript" charset="utf-8"></script>
+
+<script src="js/libs/jqcloud-1.0.4.js" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript">	
 

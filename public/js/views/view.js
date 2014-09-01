@@ -1,5 +1,6 @@
-var searchQuery =[];
+var searchQuery=[];
 App.DashboardView = Ember.View.extend({
+	
 	didInsertElement : function() {
 		window.visualSearch = VS.init({
             container  : $('#search_box_container'),
@@ -101,20 +102,7 @@ App.DashboardView = Ember.View.extend({
                     }
                 }
             }
-        });  
-        $.ajax ({
-            type: "GET", 
-            url:'/jqcloudCall',            
-            success: function(data) {                                     
-                for(var i=0;i<data.length;i++){                                    
-                    searchQuery.push({text: data[i].searchQuery, weight: data[i].count});                   
-                }
-                $("#example").jQCloud(searchQuery);     
-            },
-            error:function(data){
-                alert("Msg: "+ data.status + ": " + data.statusText);
-            }                        
-        });         
+        });    
 	}
 });
 
@@ -224,6 +212,35 @@ App.SearchResultView = Ember.View.extend({
         });    
     }
 });
+
+/*
+App.TestRoute = Ember.Route.extend({
+  model: function() {
+    var items = [];
+
+    for(var i = 0; i < 100; i++)
+      items.pushObject(i);
+
+    return items;
+  },
+
+  events: {
+    more: function() {
+      var items = this.modelFor('test'),
+          last  = items.get('lastObject');
+
+      for(var i = last + 1; i < last + 100; i++)
+        items.pushObject(i);
+    }
+  }
+});
+
+*/
+
+App.TestView = Ember.View.extend({
+ 
+});
+
 
 App.TagsView = Ember.View.extend({
     tagName : 'div',
@@ -353,3 +370,136 @@ App.FileUploadTool = Ember.TextField.extend({
 
 });
 
+
+App.CandidateSuggestionsView = Ember.View.extend({
+
+    didInsertElement : function(){
+/*
+        var model = this.get('controller').get('content');
+        var that = this;
+
+        var key = model.city+"+"+model.country+"+"+model.skills+"+"+model.title+"+"+model.name+"+"+model.exp_max+"&fl=*,score";
+
+        $.ajax ({
+            type: "POST", 
+            url:'/solrclient',
+            data:{searchtext:key,schema:'c'},                   
+            success: function(data) {  
+                search_text="";
+                // model.candidates = data.response.docs;
+                //that.get('controller').set('content',model);
+                that.set('result',data.response.docs);
+            },
+            error: function(data) {
+                alert("Msg: "+ data.status + ": " + data.statusText);
+            }
+        }); 
+*/
+    }
+
+});
+
+
+App.VacancySuggestionsView = Ember.View.extend({
+
+    didInsertElement : function(){
+        
+    }
+
+});
+/*
+App.SetTabView = Ember.View.extend({
+    didInsertElement : function(){
+        var that = this;
+        setTimeout(function(){
+            $("[href='#search-tabs-c']").parent().removeClass('active');    
+            $("[href='#search-tabs-v']").parent().removeClass('active');    
+            $("[href='#search-tabs-co']").parent().removeClass('active');    
+            $("[href='#search-tabs-"+that.get('controller').get('model').schema+"']").parent().addClass('active');    
+        },100);
+    }
+
+});*/
+
+App.GraphChartView = Ember.View.extend({
+
+    didInsertElement:function(){
+        Morris.Area({
+            element: 'hero-area',
+            data: [
+                { period: '2010 Q1', iphone: 2666, ipad: null, itouch: 2647 },
+                { period: '2010 Q2', iphone: 2778, ipad: 2294, itouch: 2441 },
+                { period: '2010 Q3', iphone: 4912, ipad: 1969, itouch: 2501 },
+                { period: '2010 Q4', iphone: 3767, ipad: 3597, itouch: 5689 },
+                { period: '2011 Q1', iphone: 6810, ipad: 1914, itouch: 2293 },
+                { period: '2011 Q2', iphone: 5670, ipad: 4293, itouch: 1881 },
+                { period: '2011 Q3', iphone: 4820, ipad: 3795, itouch: 1588 },
+                { period: '2011 Q4', iphone: 15073, ipad: 5967, itouch: 5175 },
+                { period: '2012 Q1', iphone: 10687, ipad: 4460, itouch: 2028 },
+                { period: '2012 Q2', iphone: 8432, ipad: 5713, itouch: 1791 }
+            ],
+            xkey: 'period',
+            ykeys: ['iphone', 'ipad', 'itouch'],
+            labels: ['iPhone', 'iPad', 'iPod Touch'],
+            hideHover: 'auto',
+            //lineColors: PixelAdmin.settings.consts.COLORS,
+                                         lineColors: ['red','blue','green','yellow'],
+            fillOpacity: 0.3,
+            behaveLikeLine: true,
+            lineWidth: 2,
+            pointSize: 4,
+            gridLineColor: '#cfcfcf',
+            resize: true
+        });
+
+    }
+
+});
+
+App.BarChartView = Ember.View.extend({
+
+    didInsertElement:function(){
+        Morris.Bar({
+            element: 'hero-bar',
+            data: [
+                { device: 'iPhone', geekbench: 136 },
+                { device: 'iPhone 3G', geekbench: 137 },
+                { device: 'iPhone 3GS', geekbench: 275 },
+                { device: 'iPhone 4', geekbench: 380 },
+                { device: 'iPhone 4S', geekbench: 655 },
+                { device: 'iPhone 5', geekbench: 1571 }
+            ],
+            xkey: 'device',
+            ykeys: ['geekbench'],
+            labels: ['Geekbench'],
+            barRatio: 0.4,
+            xLabelAngle: 35,
+            hideHover: 'auto',
+            //barColors: PixelAdmin.settings.consts.COLORS,
+                                        barColors: ['green'],
+            gridLineColor: '#cfcfcf',
+            resize: true
+        });
+
+    }
+
+});
+
+App.JqcloudView = Ember.View.extend({
+    didInsertElement: function(){
+        $.ajax ({
+            type: "GET", 
+            url:'/jqcloudCall',            
+            success: function(data) {         
+                searchQuery = [];                            
+                for(var i=0;i<data.length;i++){                                    
+                    searchQuery.push({text: '<a href="#/searchResult/'+data[i].searchQuery+'">'+data[i].searchQuery+'</a>', weight: data[i].count});                   
+                }
+                $("#example").jQCloud(searchQuery);     
+            },
+            error:function(data){
+                alert("Msg: "+ data.status + ": " + data.statusText);
+            }                        
+        }); 
+    }
+});

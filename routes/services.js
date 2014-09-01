@@ -48,8 +48,8 @@ exports.register = function(req, res) {
 
 exports.login = function(req, res) {
 
-    var email=req.body.email;
-    var password=req.body.password;
+var email=req.body.email;
+var password=req.body.password;
 
     pool.getConnection(function(err,con){
 
@@ -75,6 +75,16 @@ exports.login = function(req, res) {
        });        
 
     });       
+
+}
+
+exports.validateadm = function(req, res) {
+
+    if(req.body.password == "2014"){
+        res.send("success");
+    }else{
+        res.send("failure");
+    }
 
 }
 
@@ -149,33 +159,54 @@ exports.saveCandidate = function(req, res) {
 
 exports.candidateretreive = function(req, res) {
 
-    pool.getConnection(function(err,con){
+
+                pool.getConnection(function(err,con){
+
         if(err){
+
             console.log("Error connection to the db.");
         }
 
         con.connect();
-        con.query('SELECT *  from candidate', function(err, rows, fields) {
+
+    
+        
+
+            con.query('SELECT *  from candidate', function(err, rows, fields) {
             if (err) throw err;
+
               con.release();
               res.send(rows);
-        });         
+          });         
+
+
+
     });       
+
+
 
 }
 
 exports.candidateupdate = function(req, res) {
-    
-    pool.getConnection(function(err,con){
+
+
+                pool.getConnection(function(err,con){
+
         if(err){
             console.log("Error connection to the db.");
         }
+
         con.connect();
-        con.query('update candidate set ', function(err, rows, fields) {
+
+            con.query('update candidate set ', function(err, rows, fields) {
             if (err) throw err;
+
             con.release();
             res.send(rows);
         });       
+
+
+
     });
 
 }
@@ -223,8 +254,22 @@ exports.getvacancy = function(req, res) {
             if (err) throw err;
 
             if(rows.length > 0){
-                con.release();
-                res.send(rows[0]);
+
+                var data = rows[0];
+
+                con.query('SELECT application.id,application.status,vacancy.name,vacancy.title  from application,vacancy where application.vacancy_id = vacancy.id and application.vacancy_id = ?', [data.id],function(err, rows, fields) {
+                    if (err) throw err;
+
+                    if(rows.length > 0){
+                        con.release();
+                        data.applications = rows;
+                        res.send(data);
+                    }else{
+                        con.release();
+                        res.send(data);                
+                    }
+                });  
+
             }else{
                 con.release();
                 res.send({});                
@@ -275,7 +320,7 @@ exports.vacancyupdate = function(req, res) {
 
 }
 
-exports.companies = function(req, res) {
+/*exports.companies = function(req, res) {
 
     pool.getConnection(function(err,con){
 
@@ -292,7 +337,7 @@ exports.companies = function(req, res) {
         });         
 
     });       
-}
+}*/
 
 exports.getcandidate = function(req, res) {    
     pool.getConnection(function(err,con){
@@ -304,10 +349,13 @@ exports.getcandidate = function(req, res) {
             if (err) throw err;
 
             if(rows.length > 0){
-                con.release();
+                //con.release();
 
                 var docName = rows[0].name;
                 var docPath = rows[0].cvpath;
+
+                var datas = {};
+                datas.details = rows[0];
 
                 fs.readFile(docPath, function (err, data) {                   
                     var newFilePath = __dirname+"/uploads/";
@@ -316,11 +364,24 @@ exports.getcandidate = function(req, res) {
                     .then(function(result){
                         var html = result.value; // The generated HTML
                         var messages = result.messages; // Any messages, such as warnings during conversion  
-                        var newFile = newFilePath+docName+".html";                     
-                        fs.writeFile(newFile, html, function (err) {
-                            console.log("querying.."+docName);
-                            res.send({docFile:html,Details:rows[0]});  
-                        });
+
+                        datas.docFile = html;
+
+                        con.query('SELECT application.id,application.status,vacancy.name,vacancy.title from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ?', [datas.details.id],function(err, rows, fields) {
+                            if (err) throw err;
+
+                            if(rows.length > 0){
+                                con.release();
+                                datas.applications = rows;
+                                datas.apphistory = [];
+                                res.send(datas);
+                            }else{
+                                con.release();
+                                res.send(datas);                
+                            }
+                        });                        
+
+
                     })
                     .done();
                     
@@ -332,6 +393,252 @@ exports.getcandidate = function(req, res) {
             }
         });         
     });       
+}
+
+exports.applyvacancy = function(req, res) {
+
+    var applydetails = req.body;
+
+    applydetails.created_by=req.cookies.email;
+    applydetails.updated_time= moment();
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+
+        var query = con.query('SELECT * from application where candidate_id = ? and vacancy_id = ?', [applydetails.candidate_id,applydetails.vacancy_id], function(err, rows, fields) {
+                
+            if (err) throw err;
+
+            console.log(rows);
+
+            if(rows.length > 0){
+                res.send('Already applied for this vacany');
+            }else{
+
+                var query = con.query('INSERT INTO application SET ?', applydetails, function(err, result) {
+                        
+                    if (err) throw err;
+
+                    applydetails.id = result.insertId;
+                    var query = con.query('INSERT INTO application_h SET ?', {application_id:applydetails.id,prevstatus:'C01',curstatus:applydetails.status}, function(err, result) {
+                        if (err) throw err;                            
+                        con.release();
+                        res.send("succuss");
+                    });
+                    
+                });
+
+            }
+            
+        });
+
+    });
+
+}
+
+exports.appliedforv = function(req, res) {
+
+    var applydetails = req.body;
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+
+        var query = con.query('SELECT * from application where candidate_id = ? and vacancy_id = ?', [applydetails.candidate_id,applydetails.vacancy_id], function(err, rows, fields) {
+                
+            if (err) throw err;
+
+            if(rows > 0){
+                res.send({ status: 'true'});
+            }else{
+                res.send({ status: 'false'});
+            }
+            
+        });
+
+    });
+
+}
+
+exports.jqcloudCall = function(req,res){
+    
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT *  from search_log where user_id= ?',[req.cookies.email], function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });        
+}
+
+exports.companyList = function(req,res){
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from company',function(err, rows, fields) {
+            if (err) throw err;                                
+            con.release();   
+            console.log(rows);
+            res.send(rows);
+        });
+    });
+}
+
+exports.statusList = function(req,res){
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from status',function(err, rows, fields) {
+            if (err) throw err;                                
+            con.release();   
+            res.send(rows);
+        });
+    });
+}
+
+exports.applicationbycid = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT *  from application where candidate_id = ?', [req.params.candidate_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+exports.applicationbyvid = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+
+        con.query('SELECT application.id,application.status,vacancy.name,vacancy.title  from application,vacancy where application.vacancy_id = vacancy.id and application.vacancy_id = ?', [req.params.vacancy_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+exports.apphistorybyid = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT *  from application_h where application_id = ?', [req.params.application_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+
+exports.getUserdata = function(req,res){
+    var email = req.cookies.email;
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from user where email = ?', [email],function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length > 0){
+                con.release();   
+                var userdata = rows[0];
+                //res.send(rows[0]);                 
+                con.query('SELECT *  from candidate',function(err, result, fields) {
+                    if (err) throw err;
+                    if(result.length > 0){
+                        con.release();  
+                        var candidatelist = result;                                   
+                        //res.send(result);                 
+                        res.send({userdata:userdata,candidatelist:candidatelist});
+                    }
+                }); 
+            }
+        }); 
+                 
+    });       
+}
+
+exports.updateProfile = function(req,res){    
+    
+    var profileUpdates = req.body;
+    var email = req.cookies.email;
+    
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from user where email=?',[email], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length > 0){                                
+                con.query('UPDATE user set ? WHERE email = ?',[profileUpdates,email], function(err, rows, fields) {
+                    con.release();
+                    res.send({message:"Updated Successfully"});
+                });                            
+            }            
+        });
+    });
 }
 
 
@@ -352,11 +659,18 @@ exports.getcandidate = function(req, res) {
 }
 */
 exports.solrclient = function(req,res){
-    var searchtext=req.body.searchtext;
-    var email = req.cookies.email;
-    console.log("solrclient call",searchtext+email);
-    updateSearchLog(searchtext,email);
-    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
+    var searchtext=req.body.searchtext//+"&fl=*,score&hl=true&hl.fl=content&hl.snippets=10000";
+    console.log(JSON.stringify(req.body));
+    updateSearchLog(searchtext+"&schema="+req.body.schema,req.cookies.email);
+    if(req.body.schema == 'c'){
+        console.log("candidate schema");
+        var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,'','','');
+    }
+    else if (req.body.schema == 'v'){
+        console.log("vacancy schema");
+        var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
+    }
+    
     var query2 = client.createQuery()
                        .q(searchtext)
                        .start(0)
@@ -475,26 +789,6 @@ exports.solraddcandidate = function(data){
        }
     });
 
-}
-
-exports.jqcloudCall = function(req,res){
-    console.log("hurray"+res);    
-    
-    pool.getConnection(function(err,con){
-
-        if(err){
-            console.log("Error connection to the db.");
-        }
-
-        con.connect();
-        con.query('SELECT *  from search_log', function(err, rows, fields) {
-            if (err) throw err;
-
-            con.release();
-            res.send(rows);
-        });         
-
-    });        
 }
 
 function updateSearchLog (searchtext,email,callback){

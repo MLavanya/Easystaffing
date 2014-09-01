@@ -1,6 +1,22 @@
 App.LoginController=Ember.Controller.extend({
 
     actions:{
+        checkadm: function(){
+            var that = this;
+
+            bootbox.prompt({
+                title: "Authentication",
+                message: "Enter the password.",
+                callback: function(result) {
+                    $.post('/validateadm',{password:result},function(data){
+                        if(data == "success")
+                            that.transitionTo('signup');
+                    });
+                },
+                className: "bootbox-sm"
+            });
+
+        },
         signinclick:function(){
             var username=$("#username_id").val();
             var password=$("#password_id").val();
@@ -34,23 +50,24 @@ App.SignupController=Ember.Controller.extend({
    
     actions:{
         signupclick:function(){
+
             var that = this;
             var name = $("#name_id").val();
-    		var email = $("#email_id").val();
-    		var username = $("#signupusername_id").val();
-    		var password = $("#signuppassword_id").val();
+            var email = $("#email_id").val();
+            var username = $("#signupusername_id").val();
+            var password = $("#signuppassword_id").val();
 
-    		var emailreg = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-    		var namereg =/^[a-zA-Z][a-zA-Z\\s]+$/;
+            var emailreg = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+            var namereg =/^[a-zA-Z][a-zA-Z\\s]+$/;
             if(name == "" || email == "" || username == "" || password == ""){
-        		alert('some of the required fields are Empty!!');
-    		}
+                alert('some of the required fields are Empty!!');
+            }
             else if(!namereg.test(name)){
-    			alert('Enter valid Name');
-    		}
-    		else if(!emailreg.test(email)){
-    			alert('Enter the valid email address');
-    		}
+                alert('Enter valid Name');
+            }
+            else if(!emailreg.test(email)){
+                alert('Enter the valid email address');
+            }
             else{
                 var adddetails={};
                 adddetails.name=name;
@@ -72,6 +89,7 @@ App.SignupController=Ember.Controller.extend({
                     }
                 }); 
             } 
+
         }
     }
 

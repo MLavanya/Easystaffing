@@ -27,4 +27,35 @@ App.IndexRoute = Ember.Route.extend({
   	}
 });
 
+App.SignupRoute = Ember.Route.extend({
+
+    beforeModel: function(){
+
+        var that = this;
+
+        var box = bootbox.confirm({
+            title: "Authentication",
+            message: "Enter the PIN <br/> <input id='pin_code' type='password' name='pin_code' tabindex=0></input>",
+            callback: function(result) {
+
+                if(result)
+                  $.post('/validateadm',{password:$('#pin_code').val()},function(data){
+
+                      if(data == "success")
+                          that.transitionTo('signup');
+                      else
+                        that.transitionTo('login');  
+                  });
+                else
+                   that.transitionTo('login');
+            },
+            className: "bootbox-sm"
+        });
+
+        box.on('shown',function(){
+            $("#pin_code").focus();
+        });        
+
+    }
+})
 

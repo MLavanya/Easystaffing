@@ -48,18 +48,28 @@ app.get('/',function(req,res){
 	res.redirect("login.html");
 });
 
-
 app.post('/register', services.register);
 app.post('/login', services.login);
+app.post('/validateadm', services.validateadm);
 app.post('/saveCandidate',services.saveCandidate);
 app.get('/me',services.me);
 app.post('/uploadcv',services.upload);
 app.post('/saveVacancies',services.vacancyadd);
 app.post('/solrclient', services.solrclient);
 app.get('/getvacancy/:vacancy_id',services.getvacancy);
-app.get('/companies',services.companies);
 app.get('/getcandidate/:candidate_id',services.getcandidate);
+app.post('/applyvacancy',services.applyvacancy);
+app.post('/appliedforv',services.appliedforv);
 app.get('/jqcloudCall',services.jqcloudCall);
+app.get('/companyList',services.companyList);
+app.get('/statusList',services.statusList);
+app.get('/applicationbycid/:candidate_id',services.applicationbycid);
+app.get('/applicationbyvid/:vacancy_id',services.applicationbyvid);
+app.get('/apphistorybyid/:application_id',services.apphistorybyid);
+app.get('/getUserdata',services.getUserdata);
+app.post('/updateProfile',services.updateProfile);
+
+
 
 
 console.log('Express server listening on port '+ config.port);
