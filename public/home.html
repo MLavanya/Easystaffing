@@ -17,7 +17,7 @@
 
 	<!-- easy staffing's stylesheets -->
 	<link href="assets/stylesheets/bootstrap.min.css" rel="stylesheet" type="text/css">
-	<link href="assets/stylesheets/pixel-admin1.min.css" rel="stylesheet" type="text/css">
+	<link href="assets/stylesheets/pixel-admin1.css" rel="stylesheet" type="text/css">
 	<link href="assets/stylesheets/pages.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/stylesheets/widgets.min.css" rel="stylesheet" type="text/css">
 	<link href="assets/stylesheets/rtl.min.css" rel="stylesheet" type="text/css">
@@ -126,6 +126,8 @@
 	
 
 	<div class="row">
+	 {{#view App.PieChartView}}
+	 	{{#each item in model}}
 		<div class="col-xs-2">
 			<!-- Centered text -->
 			<div class="stat-panel text-center">
@@ -136,12 +138,12 @@
 					</div>
 				</div> <!-- /.stat-row -->
 				<div class="stat-row">
-					<!-- Bordered, without top border, without horizontal padding -->
+					<!-- Bordered, without top border, without horizontal padding -->					
 					<div class="stat-cell bordered no-border-t no-padding-hr">
-						<div class="pie-chart" data-percent="43" id="easy-pie-chart-1">
-							<div class="pie-chart-label">12.3TB</div>
-						<canvas height="90" width="90"></canvas></div>
-					</div>
+						<div class="pie-chart"  data-percent="43" id="easy-pie-chart-1">
+							<div class="pie-chart-label" id="totalcandidates">{{item.candidates}}</div>
+						</div>
+					</div>					
 				</div> <!-- /.stat-row -->
 			</div> <!-- /.stat-panel -->
 		</div>
@@ -155,52 +157,56 @@
 					</div>
 				</div> <!-- /.stat-row -->
 				<div class="stat-row">
-					<!-- Bordered, without top border, without horizontal padding -->
+					<!-- Bordered, without top border, without horizontal padding -->					
 					<div class="stat-cell bordered no-border-t no-padding-hr">
-						<div class="pie-chart" data-percent="43" id="easy-pie-chart-1">
-							<div class="pie-chart-label">12.3TB</div>
-						<canvas height="90" width="90"></canvas></div>
-					</div>
+						<div class="pie-chart" {{bind-attr data-percent=item.inprg_perc}} id="easy-pie-chart-2">
+							<div class="pie-chart-label" id="candidateinprogress">{{item.inprogress}}</div>
+						</div>
+					</div>					
 				</div> <!-- /.stat-row -->
 			</div> <!-- /.stat-panel -->
 		</div>
 		<div class="col-xs-2">
+			<!-- Centered text -->
 			<div class="stat-panel text-center">
 				<div class="stat-row">
 					<!-- Dark gray background, small padding, extra small text, semibold text -->
 					<div class="stat-cell bg-default padding-sm text-xs text-semibold">
-						<i class="fa fa-flash"></i>&nbsp;&nbsp;AVAILABLE
+						<i class="fa fa-globe"></i>&nbsp;&nbsp;AVAILABLE
 					</div>
 				</div> <!-- /.stat-row -->
 				<div class="stat-row">
-					<!-- Bordered, without top border, without horizontal padding -->
+					<!-- Bordered, without top border, without horizontal padding -->					
 					<div class="stat-cell bordered no-border-t no-padding-hr">
-						<div class="pie-chart" data-percent="93" id="easy-pie-chart-2">
-							<div class="pie-chart-label">93%</div>
-						<canvas height="90" width="90"></canvas></div>
-					</div>
+						<div class="pie-chart" {{bind-attr data-percent=item.avb_perc}} id="easy-pie-chart-3">
+							<div class="pie-chart-label" id="candidateavailable">{{item.available}}</div>
+						</div>
+					</div>					
 				</div> <!-- /.stat-row -->
 			</div> <!-- /.stat-panel -->
-		</div>
+		</div>	
+	
 		<div class="col-xs-2">
+			<!-- Centered text -->
 			<div class="stat-panel text-center">
 				<div class="stat-row">
 					<!-- Dark gray background, small padding, extra small text, semibold text -->
 					<div class="stat-cell bg-default padding-sm text-xs text-semibold">
-						<i class="fa fa-cloud"></i>&nbsp;&nbsp;VACANCIES
+						<i class="fa fa-globe"></i>&nbsp;&nbsp;VACANCY
 					</div>
 				</div> <!-- /.stat-row -->
 				<div class="stat-row">
 					<!-- Bordered, without top border, without horizontal padding -->
 					<div class="stat-cell bordered no-border-t no-padding-hr">
-						<div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
-							<div class="pie-chart-label">12GB</div>
-						<canvas height="90" width="90"></canvas></div>
+						<div class="pie-chart" data-percent="43" id="easy-pie-chart-4">
+							<div class="pie-chart-label" id="vacancydetails">{{item.vacancies}}</div>
+						</div>
 					</div>
 				</div> <!-- /.stat-row -->
 			</div> <!-- /.stat-panel -->
 		</div>
-
+		{{/each}}
+	{{/view}}
 		<div class="col-xs-4">
 			<div class="stat-panel text-center">
 				<div class="stat-row">
@@ -239,7 +245,7 @@
 
 						<!-- Search form -->	   
 						    {{#view }}	        
-						        <div class="" id="VS" style="padding-top:15px;">
+						        <div class="row" id="VS">
 						            <div id="search_box_container" class="col-sm-11"></div>
 						            <div class="col-sm-1" id="search_query"></div>
 						            <button class="btn btn-rounded btn-default" {{action 'search'}}>Search</button>	           
@@ -971,6 +977,9 @@
 						<li>
 							<a href="#profile-tabs-followers" data-toggle="tab">My Candidates</a>
 						</li>						
+						<li>
+							<a href="#profile-tabs-following" data-toggle="tab">My Vacancies</a>
+						</li>
 					</ul>
 
 					<div class="tab-content tab-content-bordered panel-padding">
@@ -1018,9 +1027,9 @@
 						<div class="tab-pane fade widget-followers" id="profile-tabs-followers">
 							{{#each candidatelist}}
 								<ul class="follower">	
-									<img src="images/user.png" alt="" class="follower-avatar">
-									<li class="body">									
-										<div class="col-xs-2">
+									<li class="body row">									
+										<div class="col-xs-3">
+											<img src="images/user.png" alt="" class="follower-avatar">&nbsp;&nbsp;
 											{{#link-to 'candidate' id class="follower-name"}}{{name}}{{/link-to}}
 										</div>
 										<div class="col-xs-4">
@@ -1035,7 +1044,26 @@
 									</li>
 								</ul>								
 							{{/each}}
-						</div> <!-- / .tab-pane -->					
+						</div> <!-- / .tab-pane -->		
+
+						<div class="tab-pane fade widget-followers" id="profile-tabs-following">
+							{{#each vacancylist}}
+								<ul class="follower">										
+									<li class="body">									
+										<div class="col-xs-3">
+											<img src="images/user.png" alt="" class="follower-avatar">&nbsp;&nbsp;
+											{{#link-to 'vacancy' id class="follower-name"}}{{name}}{{/link-to}}
+										</div>
+										<div class="col-xs-5">
+											SKILLS:&nbsp; {{format-skill skills}}
+										</div>										
+										<div class="col-xs-4">
+											<div class="follower-email">STATUS:&nbsp; {{format-vstatus status}}</div>
+										</div>										
+									</li>
+								</ul>								
+							{{/each}}
+						</div> <!-- / .tab-pane -->				
 					</div> <!-- / .tab-content -->
 				</div>
 			</div>
@@ -1094,6 +1122,7 @@
 <script src="js/libs/textext.plugin.arrow.js" type="text/javascript" charset="utf-8"></script>
 
 <script src="js/libs/jqcloud-1.0.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://rendro.github.io/easy-pie-chart/javascripts/jquery.easy-pie-chart.js"></script>
 
 <script type="text/javascript">	
 

@@ -491,7 +491,7 @@ App.AddcandidateController = Ember.Controller.extend({
 	}
 });
 
-App.AddvacancyController = Ember.Controller.extend({
+App.AddvacancyController = Ember.ArrayController.extend({
 
 	init: function(){
 		var companyList =[];
@@ -553,13 +553,31 @@ App.AddvacancyController = Ember.Controller.extend({
                 'Portland',
                 'Chicago',
                 'Boston'],
-	statuses: ['OPEN','CLOSED'],
+	statuses: ['OPEN','CLOSED'],	
 	actions :{
 		addCompany: function(){
-
+			var that =  this;
 			bootbox.prompt({
 				title: "Enter the company name",
 				callback: function(result) {
+					if(result){
+						$.post('/updateCompany',{'name':result},function(data){
+							if(data == "200"){
+								var companies = [];
+				                $.get('/companyList',function(data){		               		
+									for(var i=0;i<data.length;i++){
+					                    companies.push({
+					                    	id: data[i].id,
+					                    	name:data[i].name});
+					                }   
+					                that.set('companies',companies);
+								});	
+
+							}else if(data =="201"){
+								alert("Already exists");
+							}
+						});
+					}					
 				},
 				className: "bootbox-sm"
 			});
@@ -726,7 +744,8 @@ App.SearchResultController = Ember.ObjectController.extend({
 
 App.ProfileController = Ember.ObjectController.extend({
 	actions:{
-		updateProfile : function(){
+		updateProfile : function(){			
+			var that = this;
 			var description = this.get('description');
 			var mobile_number = this.get('mobile_number');		
 			$.ajax ({
@@ -735,12 +754,15 @@ App.ProfileController = Ember.ObjectController.extend({
                 dataType:'JSON',
                 data:{'description':description,'mobile_number':mobile_number},                   
                 success: function(data) {  
-	                alert(data.message);
+	                alert(data.message);	                
+	               	$.get('/getUserdata',function(data){		               		
+						that.set('content.userdata',data);
+					});									
                 },
                 error: function(data) {
                     alert("Msg: "+ data.status + ": " + data.statusText);
                 }
-            });	
+            });	                      
 		}
 	}
 });

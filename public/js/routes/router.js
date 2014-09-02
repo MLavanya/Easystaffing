@@ -5,7 +5,11 @@ App.IndexRoute = Ember.Route.extend({
 });
 
 App.DashboardRoute = Ember.Route.extend({
-
+	model:function(){
+		return $.get('/piechartdetails',function(data){			
+			return data;
+		});
+	}
 });
 
 
@@ -62,8 +66,9 @@ App.CandidateRoute = Ember.Route.extend({
 App.ProfileRoute = Ember.Route.extend({
 
 	model:function(){
-		return $.get('/getUserdata',function(data){			
+		return $.get('/getUserdata',function(data){		
 			return data;
 		});				
 	}
+
 });

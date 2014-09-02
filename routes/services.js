@@ -497,9 +497,42 @@ exports.companyList = function(req,res){
         con.query('SELECT *  from company',function(err, rows, fields) {
             if (err) throw err;                                
             con.release();   
-            console.log(rows);
+        //    console.log(rows);
             res.send(rows);
         });
+    });
+}
+
+exports.updateCompany = function(req,res){
+    
+    var company = req.body;
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+
+        con.query('SELECT * from company where name = ?', [company], function(err, rows, fields) {
+                
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();   
+                res.send('201');
+            }else{
+                con.query('INSERT INTO company SET ?', company, function(err, result) {
+                    if (err) throw err;
+                    con.release();   
+                    res.send('200');
+                });
+
+            }
+            
+        });
+
     });
 }
 
@@ -514,6 +547,40 @@ exports.statusList = function(req,res){
             con.release();   
             res.send(rows);
         });
+    });
+}
+
+exports.piechartdetails = function(req, res) {
+
+    var available,candidates;
+    pool.getConnection(function(err,con){
+
+    if(err){
+        console.log("Error connection to the db.");
+    }
+    con.connect();
+    con.query('SELECT *  from candidate', function(err, rows, fields) {
+        if (err) throw err;
+            candidates=rows.length;
+        });
+        con.query('SELECT *  from candidate where status="C01"', function(err, rows, fields) {
+            if (err) throw err;
+            available=rows.length;
+        });
+        con.query('SELECT *  from candidate where status="C04"', function(err, rows, fields) {
+            if (err) throw err;
+
+            var inprogress = rows.length;
+            var avb_perc = (available/candidates)*100;
+            var inprg_perc = (inprogress/candidates)*100;
+            //console.log('avb_perc'+ " "+avb_perc+" "+inprg_perc);
+            con.query('SELECT *  from vacancy', function(err, rows, fields) {
+                if (err) throw err;
+                con.release();
+                var vacancies = rows.length;
+                res.send([{"candidates":candidates,"available":available,"inprogress":inprogress,"avb_perc":avb_perc,"inprg_perc":inprg_perc,"vacancies":vacancies}]);
+            });             
+        });       
     });
 }
 
@@ -592,6 +659,7 @@ exports.apphistorybyid = function(req, res) {
 
 
 exports.getUserdata = function(req,res){
+    
     var email = req.cookies.email;
     pool.getConnection(function(err,con){
         if(err){
@@ -610,7 +678,17 @@ exports.getUserdata = function(req,res){
                         con.release();  
                         var candidatelist = result;                                   
                         //res.send(result);                 
-                        res.send({userdata:userdata,candidatelist:candidatelist});
+                       // res.send({userdata:userdata,candidatelist:candidatelist});
+                        con.query('SELECT *  from vacancy',function(err, result, fields) {
+                            if (err) throw err;
+                            if(result.length > 0){
+                                con.release();  
+                                var vacancylist = result;                                   
+                                //res.send(result);                 
+                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist});                               
+                            }
+                        }); 
+
                     }
                 }); 
             }

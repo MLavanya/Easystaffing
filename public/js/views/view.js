@@ -443,7 +443,7 @@ App.GraphChartView = Ember.View.extend({
             labels: ['iPhone', 'iPad', 'iPod Touch'],
             hideHover: 'auto',
             //lineColors: PixelAdmin.settings.consts.COLORS,
-                                         lineColors: ['red','blue','green','yellow'],
+            lineColors: ['red','blue','green','yellow'],
             fillOpacity: 0.3,
             behaveLikeLine: true,
             lineWidth: 2,
@@ -476,7 +476,7 @@ App.BarChartView = Ember.View.extend({
             xLabelAngle: 35,
             hideHover: 'auto',
             //barColors: PixelAdmin.settings.consts.COLORS,
-                                        barColors: ['green'],
+            barColors: ['green'],
             gridLineColor: '#cfcfcf',
             resize: true
         });
@@ -502,4 +502,31 @@ App.JqcloudView = Ember.View.extend({
             }                        
         }); 
     }
+});
+
+App.PieChartView = Ember.View.extend({
+    didInsertElement:function(){
+        // Easy Pie Charts
+        var easyPieChartDefaults = {
+            animate: 2000,
+            scaleColor: false,
+            lineWidth: 6,
+            lineCap: 'square',
+            size: 90,
+            trackColor: '#e5e5e5'
+        };
+        jQuery('#easy-pie-chart-1').easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: '#489cdf'
+        }));
+        $('#easy-pie-chart-2').easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: '#489cdf'
+        }));
+        $('#easy-pie-chart-3').easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: '#489cdf'
+        }));
+        $('#easy-pie-chart-4').easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: '#489cdf'
+        }));                                
+    }
+
 });

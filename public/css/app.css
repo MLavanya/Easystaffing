@@ -16,6 +16,10 @@
   border-left: 6px solid #829C37;
   margin: 12px 0;
 }
+
+#VS{
+  padding:15px 0px 0px 15px;
+}
 #search_query {
   margin: 18px 0 -24px;
   opacity: 0;
@@ -133,7 +137,7 @@ ul.follower{
 }
 
 ul.follower li{
-  padding: 10px 20px;  
+  /*padding: 10px 20px 0px;  */
   text-overflow: ellipsis;
   overflow: hidden;
 }
@@ -141,4 +145,7 @@ ul.follower li{
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+.widget-followers .body {
+  line-height: 33px;
 }
