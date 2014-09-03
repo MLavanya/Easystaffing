@@ -213,35 +213,6 @@ App.SearchResultView = Ember.View.extend({
     }
 });
 
-/*
-App.TestRoute = Ember.Route.extend({
-  model: function() {
-    var items = [];
-
-    for(var i = 0; i < 100; i++)
-      items.pushObject(i);
-
-    return items;
-  },
-
-  events: {
-    more: function() {
-      var items = this.modelFor('test'),
-          last  = items.get('lastObject');
-
-      for(var i = last + 1; i < last + 100; i++)
-        items.pushObject(i);
-    }
-  }
-});
-
-*/
-
-App.TestView = Ember.View.extend({
- 
-});
-
-
 App.TagsView = Ember.View.extend({
     tagName : 'div',
     attributeBindings : [ 'name', 'id','border','width' ],
@@ -443,7 +414,7 @@ App.GraphChartView = Ember.View.extend({
             labels: ['iPhone', 'iPad', 'iPod Touch'],
             hideHover: 'auto',
             //lineColors: PixelAdmin.settings.consts.COLORS,
-            lineColors: ['red','blue','green','yellow'],
+            lineColors: ['#71c73e','#77b7c5','#d54848','yellow'],
             fillOpacity: 0.3,
             behaveLikeLine: true,
             lineWidth: 2,
@@ -476,7 +447,7 @@ App.BarChartView = Ember.View.extend({
             xLabelAngle: 35,
             hideHover: 'auto',
             //barColors: PixelAdmin.settings.consts.COLORS,
-            barColors: ['green'],
+            barColors: ['#71c73e'],
             gridLineColor: '#cfcfcf',
             resize: true
         });
@@ -504,6 +475,107 @@ App.JqcloudView = Ember.View.extend({
     }
 });
 
+
+App.VSuggestionsView = Ember.View.extend({
+    tagName : 'div',
+    attributeBindings : [ 'name','id' ],
+    classNamesBindings : [ 'class' ],
+
+    didInsertElement : function() {
+
+        var sug = $('#suggestions');
+
+        var m = this.get('controller').get('content').details;
+        var key = m.city+"+"+m.country+"+"+m.skills+"+"+m.title+"+"+m.name+"+"+m.exp;
+
+        $.ajax ({
+            type: "POST", 
+            url:'/solrclient',
+            data:{searchtext:key,schema:'v'},                   
+            success: function(data) {  
+                var cs = data.response.docs;
+                var res="";
+
+                for(var i=0; i<(cs.length>3?3:cs.length); i++){
+
+                    res = res  + '<div class="panel-body">'
+                        +'<p><i class="panel-title-icon fa fa-user"></i><strong>'+cs[i].vname+'</strong></p>'
+                        +'<span id="stars-rating-example"><ul class="widget-rating"><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li><a href="#" title="" class="widget-rating-item"></a></li></ul></span>'
+                        +'<p> '+cs[i].vexp_min+' to '+cs[i].vexp_min+' years Exp</p>'
+                        +'<div class="search-tags">'
+                        +'<span class="search-tags-text">Tags:</span>';
+
+                    var r = cs[i].vskills.split(",");
+                    for(var j=0;j<r.length;j++){
+                        res = res+'<label class="label label-success">'+r[j]+'</label>&nbsp;';
+                    }
+
+                    res = res + '</div><br/>'
+                        +'</div>';
+                }
+
+                sug.html(res);
+
+            },
+            error: function(data) {
+                sug.html("");
+            }
+        }); 
+
+    }
+
+});
+
+App.CSuggestionsView = Ember.View.extend({
+    tagName : 'div',
+    attributeBindings : [ 'name','id' ],
+    classNamesBindings : [ 'class' ],
+
+    didInsertElement : function() {
+
+        var sug = $('#suggestions');
+
+        var m = this.get('controller').get('content');
+        var key = m.city+"+"+m.country+"+"+m.skills+"+"+m.title+"+"+m.name+"+"+m.exp_max;
+
+        $.ajax ({
+            type: "POST", 
+            url:'/solrclient',
+            data:{searchtext:key,schema:'c'},                   
+            success: function(data) {  
+                var cs = data.response.docs;
+                var res="";
+
+                for(var i=0; i<(cs.length>3?3:cs.length); i++){
+
+                    res = res  + '<div class="panel-body">'
+                        +'<p><i class="panel-title-icon fa fa-user"></i><strong>'+cs[i].cname+'</strong></p>'
+                        +'<span id="stars-rating-example"><ul class="widget-rating"><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li class="active"><a href="#" title="" class="widget-rating-item"></a></li><li><a href="#" title="" class="widget-rating-item"></a></li></ul></span>'
+                        +'<p> '+cs[i].cexp+' years Exp</p>'
+                        +'<div class="search-tags">'
+                        +'<span class="search-tags-text">Tags:</span>';
+
+                    var r = cs[i].cskills.split(",");
+                    for(var j=0;j<r.length;j++){
+                        res = res+'<label class="label label-success">'+r[j]+'</label>&nbsp;';
+                    }
+
+                    res = res + '</div><br/>'
+                        +'</div>';
+                }
+
+                sug.html(res);
+
+            },
+            error: function(data) {
+                sug.html("");
+            }
+        }); 
+
+    }
+
+});
+
 App.PieChartView = Ember.View.extend({
     didInsertElement:function(){
         // Easy Pie Charts
@@ -515,17 +587,17 @@ App.PieChartView = Ember.View.extend({
             size: 90,
             trackColor: '#e5e5e5'
         };
-        jQuery('#easy-pie-chart-1').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#489cdf'
-        }));
+        /*jQuery('#easy-pie-chart-1').easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: '#77b7c5'
+        }));*/
         $('#easy-pie-chart-2').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#489cdf'
+            barColor: '#77b7c5'
         }));
         $('#easy-pie-chart-3').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#489cdf'
+            barColor: '#77b7c5'
         }));
         $('#easy-pie-chart-4').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#489cdf'
+            barColor: '#77b7c5'
         }));                                
     }
 

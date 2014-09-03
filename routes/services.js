@@ -4,6 +4,8 @@ var fs = require('fs');
 var mammoth = require("mammoth");
 var solr = require('solr-client');
 var moment = require('moment');
+var Cryptr = require("cryptr"),
+    cryptr = new Cryptr('myTotalySecretKey');
 var solrinfo=require('../solrconfig');
 
 
@@ -13,8 +15,17 @@ var solrinfo=require('../solrconfig');
 
 exports.register = function(req, res) {
 
-    var registerdetails = req.body;
+    var user = req.body;
     var email= req.body.email;
+    var pwd = req.body.password;
+    var password = cryptr.encrypt(pwd);     
+
+    var registerdetails = {
+        "email"         :user.email,
+        "username"      :user.username,
+        "name"          :user.name,
+        "password"      :password
+    }
 
     pool.getConnection(function(err,con){
 
@@ -49,7 +60,8 @@ exports.register = function(req, res) {
 exports.login = function(req, res) {
 
 var email=req.body.email;
-var password=req.body.password;
+var pwd=req.body.password;
+var password = cryptr.encrypt(pwd);
 
     pool.getConnection(function(err,con){
 
@@ -257,7 +269,7 @@ exports.getvacancy = function(req, res) {
 
                 var data = rows[0];
 
-                con.query('SELECT application.id,application.status,vacancy.name,vacancy.title  from application,vacancy where application.vacancy_id = vacancy.id and application.vacancy_id = ?', [data.id],function(err, rows, fields) {
+                con.query('SELECT application.id,application.status,vacancy.name,vacancy.title,candidate.id as candidate_id,candidate.name as candidate_name from application,vacancy,candidate where application.vacancy_id = vacancy.id and application.candidate_id = candidate.id  and application.vacancy_id = ?', [data.id],function(err, rows, fields) {
                     if (err) throw err;
 
                     if(rows.length > 0){
@@ -367,7 +379,7 @@ exports.getcandidate = function(req, res) {
 
                         datas.docFile = html;
 
-                        con.query('SELECT application.id,application.status,vacancy.name,vacancy.title from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ?', [datas.details.id],function(err, rows, fields) {
+                        con.query('SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ? ', [datas.details.id],function(err, rows, fields) {
                             if (err) throw err;
 
                             if(rows.length > 0){
@@ -497,42 +509,9 @@ exports.companyList = function(req,res){
         con.query('SELECT *  from company',function(err, rows, fields) {
             if (err) throw err;                                
             con.release();   
-        //    console.log(rows);
+            console.log(rows);
             res.send(rows);
         });
-    });
-}
-
-exports.updateCompany = function(req,res){
-    
-    var company = req.body;
-
-    pool.getConnection(function(err,con){
-
-        if(err){
-            console.log("Error connection to the db.");
-        }
-
-        con.connect();
-
-        con.query('SELECT * from company where name = ?', [company], function(err, rows, fields) {
-                
-            if (err) throw err;
-
-            if(rows.length > 0){
-                con.release();   
-                res.send('201');
-            }else{
-                con.query('INSERT INTO company SET ?', company, function(err, result) {
-                    if (err) throw err;
-                    con.release();   
-                    res.send('200');
-                });
-
-            }
-            
-        });
-
     });
 }
 
@@ -550,40 +529,6 @@ exports.statusList = function(req,res){
     });
 }
 
-exports.piechartdetails = function(req, res) {
-
-    var available,candidates;
-    pool.getConnection(function(err,con){
-
-    if(err){
-        console.log("Error connection to the db.");
-    }
-    con.connect();
-    con.query('SELECT *  from candidate', function(err, rows, fields) {
-        if (err) throw err;
-            candidates=rows.length;
-        });
-        con.query('SELECT *  from candidate where status="C01"', function(err, rows, fields) {
-            if (err) throw err;
-            available=rows.length;
-        });
-        con.query('SELECT *  from candidate where status="C04"', function(err, rows, fields) {
-            if (err) throw err;
-
-            var inprogress = rows.length;
-            var avb_perc = (available/candidates)*100;
-            var inprg_perc = (inprogress/candidates)*100;
-            //console.log('avb_perc'+ " "+avb_perc+" "+inprg_perc);
-            con.query('SELECT *  from vacancy', function(err, rows, fields) {
-                if (err) throw err;
-                con.release();
-                var vacancies = rows.length;
-                res.send([{"candidates":candidates,"available":available,"inprogress":inprogress,"avb_perc":avb_perc,"inprg_perc":inprg_perc,"vacancies":vacancies}]);
-            });             
-        });       
-    });
-}
-
 exports.applicationbycid = function(req, res) {
 
     pool.getConnection(function(err,con){
@@ -593,7 +538,7 @@ exports.applicationbycid = function(req, res) {
         }
 
         con.connect();
-        con.query('SELECT *  from application where candidate_id = ?', [req.params.candidate_id],function(err, rows, fields) {
+        con.query('SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ?', [req.params.candidate_id],function(err, rows, fields) {
             if (err) throw err;
 
             if(rows.length > 0){
@@ -642,7 +587,7 @@ exports.apphistorybyid = function(req, res) {
         }
 
         con.connect();
-        con.query('SELECT *  from application_h where application_id = ?', [req.params.application_id],function(err, rows, fields) {
+        con.query('SELECT application_h.id,application_h.application_id,application_h.prevstatus,application_h.curstatus,application_h.updated_time,comments.comment from application_h,comments where application_h.id = comments.application_h_id and application_id = ?', [req.params.application_id],function(err, rows, fields) {
             if (err) throw err;
 
             if(rows.length > 0){
@@ -672,14 +617,14 @@ exports.getUserdata = function(req,res){
                 con.release();   
                 var userdata = rows[0];
                 //res.send(rows[0]);                 
-                con.query('SELECT *  from candidate',function(err, result, fields) {
+                con.query('SELECT *  from candidate where created_by=?',[email],function(err, result, fields) {
                     if (err) throw err;
                     if(result.length > 0){
                         con.release();  
                         var candidatelist = result;                                   
                         //res.send(result);                 
                        // res.send({userdata:userdata,candidatelist:candidatelist});
-                        con.query('SELECT *  from vacancy',function(err, result, fields) {
+                        con.query('SELECT *  from vacancy where created_by=?',[email],function(err, result, fields) {
                             if (err) throw err;
                             if(result.length > 0){
                                 con.release();  
@@ -689,6 +634,9 @@ exports.getUserdata = function(req,res){
                             }
                         }); 
 
+                    }else{
+                        con.release();
+                        res.send({userdata:userdata});
                     }
                 }); 
             }
@@ -719,6 +667,160 @@ exports.updateProfile = function(req,res){
     });
 }
 
+exports.updateappstatus = function(req,res){    
+        
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('UPDATE application set ? WHERE id = ?',[req.body.data,req.body.id], function(err, rows, fields) {
+            con.query('insert into application_h set ? ',req.body.history, function(err,result) {
+
+                req.body.comment.application_h_id = result.insertId;
+
+                if(req.body.data.status == "C06")
+                  req.body.data.status = "C01";
+                con.query('UPDATE candidate set ? WHERE id = ?',[req.body.data,req.body.candidate_id], function(err, rows, fields) {
+                    
+                    exports.solrupdatecandidate({
+                      "id": req.body.candidate_id,
+                      "cstatus" : {"set": req.body.data.status}
+                    });
+
+                    req.body.comment.created_by = req.cookies.email;
+                    console.log(req.body);
+                    con.query('insert into comments set ? ',req.body.comment, function(err,result) {
+                      console.log("inserted" + result);
+                      con.release();
+                      res.send({message:"Updated Successfully"});
+                    });
+                    
+                });                            
+
+            });
+        });                            
+
+
+
+    });
+}
+
+exports.updatevacancystatus = function(req,res){    
+        
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('UPDATE vacancy set ? WHERE id = ?',[req.body.data,req.body.id], function(err, rows, fields) {
+
+          con.release();
+          exports.solrupdatevacancy({
+            "id": req.body.id,
+            "vstatus" : {"set": req.body.data.status}
+          });
+          res.send({message:"Updated Successfully"});
+
+        });                            
+
+
+
+    });
+}
+
+exports.piechartdetails = function(req, res) {
+
+    var email =  req.cookies.email;
+    var available,candidates;
+
+    pool.getConnection(function(err,con){
+
+    if(err){
+        console.log("Error connection to the db.");
+    }
+    con.connect();
+    con.query('SELECT *  from candidate', function(err, rows, fields) {
+        if (err) throw err;
+            candidates=rows.length;
+        });
+        con.query('SELECT *  from candidate where status="C01" AND created_by=?',[email], function(err, rows, fields) {
+            if (err) throw err;
+            available=rows.length;
+        });
+        con.query('SELECT *  from candidate where status="C04" AND created_by=?',[email], function(err, rows, fields) {
+            if (err) throw err;
+
+            var inprogress = rows.length;
+            var avb_perc = (available/candidates)*100;
+            var inprg_perc = (inprogress/candidates)*100;
+            //console.log('avb_perc'+ " "+avb_perc+" "+inprg_perc);
+            con.query('SELECT *  from vacancy', function(err, rows, fields) {
+                if (err) throw err;
+
+                var vacancies = rows.length;
+                con.query('SELECT *  from vacancy WHERE status="open" AND created_by=?',[email], function(err, rows, fields) {
+                    if (err) throw err;
+                    con.release();                    
+                    var vac_open = rows.length;
+                    var vac_perc = (vac_open/vacancies)*100;                    
+                    res.send([{"candidates":candidates,"available":available,"inprogress":inprogress,"avb_perc":avb_perc,"inprg_perc":inprg_perc,"vacancies":vac_open,'vac_perc':vac_perc}]);
+                });                   
+            });             
+        });       
+    });
+}
+
+exports.updateCompany = function(req,res){
+    
+    var company = req.body;
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+
+        con.query('SELECT * from company where name = ?', [company], function(err, rows, fields) {
+                
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();   
+                res.send('201');
+            }else{
+                con.query('INSERT INTO company SET ?', company, function(err, result) {
+                    if (err) throw err;
+                    con.release();   
+                    res.send('200');
+                });
+
+            }
+            
+        });
+
+    });
+}
+
+exports.UpdateCandidate = function(req,res){
+    var candidateData = req.body;
+    var id = candidateData.id;
+    console.log(JSON.stringify(candidateData));
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('UPDATE candidate set ? WHERE id = ?',[candidateData,id], function(err, rows, fields) {
+            if (err) throw err;
+                                         
+            con.release();
+            res.send({"status":200,"statusText":"updated Successfully"});
+        });
+    });
+}
 
 /*-------------------------------*/
 // Solr API
@@ -742,10 +844,12 @@ exports.solrclient = function(req,res){
     updateSearchLog(searchtext+"&schema="+req.body.schema,req.cookies.email);
     if(req.body.schema == 'c'){
         console.log("candidate schema");
+        searchtext = searchtext +' AND (cstatus:"C01" OR cstatus:"C02") AND ccreated_by:'+req.cookies.email + '&hl=true&hl.snippets=10000&hl.fl=id&hl.fl=cname&hl.fl=ctitle&hl.fl=cemail&hl.fl=cexp&hl.fl=cphone&hl.fl=cskills&hl.fl=ccountry&hl.fl=ccity&hl.fl=ccompany_id&hl.fl=cstatus&hl.fl=cactive&hl.fl=ccomments&hl.fl=ccreated_by&hl.fl=content';
         var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,'','','');
     }
     else if (req.body.schema == 'v'){
         console.log("vacancy schema");
+        searchtext = searchtext +' AND vstatus:"OPEN" AND vcreated_by:'+req.cookies.email;
         var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
     }
     
@@ -815,8 +919,6 @@ exports.solraddvacancy = function(data){
 
 }
 
-
-
 exports.solraddcandidate = function(data){
 
     var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,'','','');
@@ -856,6 +958,64 @@ exports.solraddcandidate = function(data){
         contentType:'application/msword'   // document type
     }
     client.addRemoteResource(options,function(err,obj){
+       if(err){
+            console.log(err);
+       }else{
+            console.log(obj);
+            client.commit(function(err,res){
+               if(err) console.log(err);
+               if(res) console.log(res);
+            });          
+       }
+    });
+
+}
+
+exports.solrupdatecandidate = function(data){
+
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,'','','');
+
+    // Switch on "auto commit", by default `client.autoCommit = false`
+    client.autoCommit = true;
+    /*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */
+
+     client.add(data,function(err,obj){
+       if(err){
+            console.log(err);
+       }else{
+            console.log(obj);
+            client.commit(function(err,res){
+               if(err) console.log(err);
+               if(res) console.log(res);
+            });          
+       }
+    });
+
+}
+
+exports.solrupdatevacancy = function(data){
+
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
+
+    // Switch on "auto commit", by default `client.autoCommit = false`
+    client.autoCommit = true;
+    /*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */
+
+     client.add(data,function(err,obj){
        if(err){
             console.log(err);
        }else{

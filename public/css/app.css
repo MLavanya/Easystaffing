@@ -16,10 +16,6 @@
   border-left: 6px solid #829C37;
   margin: 12px 0;
 }
-
-#VS{
-  padding:15px 0px 0px 15px;
-}
 #search_query {
   margin: 18px 0 -24px;
   opacity: 0;
@@ -121,6 +117,7 @@ a.thirdparty-link {
 
 .candidateCV {    
     height: 400px;
+    width: 100%;
     overflow: scroll;
 }
 
@@ -148,4 +145,28 @@ ul.follower li{
 }
 .widget-followers .body {
   line-height: 33px;
+}
+.pie-chart {
+  display: inline-block !important;
+  position: relative !important;
+}
+.pie-chart:before,
+.pie-chart:after {
+  content: " ";
+  display: table;
+}
+.pie-chart:after {
+  clear: both;
+}
+.pie-chart-label {
+  display: block !important;
+  width: 100%;
+  text-align: center;
+  line-height: 40px;
+  height: 40px;
+  margin-top: -20px;
+  position: absolute !important;
+  top: 50%;
+  font-weight: 300;
+  font-size: 17px;
 }

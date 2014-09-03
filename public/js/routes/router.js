@@ -30,6 +30,7 @@ App.SearchResultRoute = Ember.Route.extend({
 	            search_text="";
 	            data.keyword = params.query;
 	            data.schema = s;
+	            console.log(data);
 	          	return data;  
 	        },
 	        error: function(data) {
@@ -45,7 +46,10 @@ App.VacancyRoute = Ember.Route.extend({
 
 	model: function(params){
 		return $.get('/getvacancy/'+params.vacancy_id,function(data){
-			console.log(data);
+			if(data.status == "OPEN")
+				data.isOpen = true;
+			else
+				data.isOpen = false;
 			return data;
 		});
 	}
@@ -56,7 +60,15 @@ App.CandidateRoute = Ember.Route.extend({
 
 	model: function(params){
 		return $.get('/getcandidate/'+params.candidate_id,function(data){
-			console.log(data);
+			if(data.applications){
+				$.each(data.applications,function(i,row){
+					if(data.applications[i].vacancy_status == "OPEN")
+						data.applications[i].isOpen = true;
+					else
+						data.applications[i].isOpen = false;
+				});
+			}
+
 			return data;
 		});
 	}
@@ -66,9 +78,8 @@ App.CandidateRoute = Ember.Route.extend({
 App.ProfileRoute = Ember.Route.extend({
 
 	model:function(){
-		return $.get('/getUserdata',function(data){		
+		return $.get('/getUserdata',function(data){			
 			return data;
 		});				
 	}
-
 });

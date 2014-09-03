@@ -68,8 +68,11 @@ app.get('/applicationbyvid/:vacancy_id',services.applicationbyvid);
 app.get('/apphistorybyid/:application_id',services.apphistorybyid);
 app.get('/getUserdata',services.getUserdata);
 app.post('/updateProfile',services.updateProfile);
+app.post('/updateappstatus',services.updateappstatus);
+app.post('/updatevacancystatus',services.updatevacancystatus);
 app.post('/updateCompany',services.updateCompany);
 app.get('/piechartdetails',services.piechartdetails);
+app.post('/UpdateCandidate',services.UpdateCandidate);
 
 
 
