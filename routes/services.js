@@ -612,6 +612,44 @@ exports.getUserdata = function(req,res){
         }
         con.connect();
         con.query('SELECT *  from user where email = ?', [email],function(err, rows, fields) {
+            if(err) throw err;
+
+            if(rows.length > 0){
+                con.release();
+                var userdata = rows[0];
+                con.query('SELECT *  from candidate where created_by=?',[email],function(err, result, fields) {
+                    if (err) throw err;
+                    if(result.length > 0){
+                        con.release();  
+                        var candidatelist = result;                                   
+                        con.query('SELECT *  from vacancy where created_by=?',[email],function(err, result, fields) {
+                            if (err) throw err;
+                            if(result.length > 0){
+                                con.release();  
+                                var vacancylist = result;                                   
+                                //res.send(result);                 
+                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist});                               
+                            }
+                        }); 
+                    }else{
+                        con.query('SELECT *  from vacancy where created_by=?',[email],function(err, result, fields) {
+                            if (err) throw err;
+                            if(result.length > 0){
+                                con.release();  
+                                var vacancylist = result;                                                                  
+                                res.send({userdata:userdata,vacancylist:vacancylist});                               
+                            }else{
+                                con.release();
+                                res.send({userdata:userdata})
+                            }
+                        });
+                    }
+                }); 
+            }           
+             
+        });
+
+      /*  con.query('SELECT *  from user where email = ?', [email],function(err, rows, fields) {
             if (err) throw err;
             if(rows.length > 0){
                 con.release();   
@@ -640,7 +678,7 @@ exports.getUserdata = function(req,res){
                     }
                 }); 
             }
-        }); 
+        }); */
                  
     });       
 }
