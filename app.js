@@ -73,6 +73,8 @@ app.post('/updatevacancystatus',services.updatevacancystatus);
 app.post('/updateCompany',services.updateCompany);
 app.get('/piechartdetails',services.piechartdetails);
 app.post('/UpdateCandidate',services.UpdateCandidate);
+app.post('/UpdateCandidateResume',services.UpdateCandidateResume);
+
 
 
 

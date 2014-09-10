@@ -213,6 +213,35 @@ App.SearchResultView = Ember.View.extend({
     }
 });
 
+/*
+App.TestRoute = Ember.Route.extend({
+  model: function() {
+    var items = [];
+
+    for(var i = 0; i < 100; i++)
+      items.pushObject(i);
+
+    return items;
+  },
+
+  events: {
+    more: function() {
+      var items = this.modelFor('test'),
+          last  = items.get('lastObject');
+
+      for(var i = last + 1; i < last + 100; i++)
+        items.pushObject(i);
+    }
+  }
+});
+
+*/
+
+App.TestView = Ember.View.extend({
+ 
+});
+
+
 App.TagsView = Ember.View.extend({
     tagName : 'div',
     attributeBindings : [ 'name', 'id','border','width' ],
@@ -247,7 +276,7 @@ App.CVUploadTool = Ember.TextField.extend({
                 var goUpload = true;
                 var file = document.getElementById("uploadcv").value;
                 var uploadFile = data.files[0];
-                if (!(/\.(doc|docx)$/i)
+                if (!(/\.(docx)$/i)
                         .test(uploadFile.name)) {
                     addmessage("danger",'Please select an doc or docx file.');
                     goUpload = false;
@@ -414,7 +443,7 @@ App.GraphChartView = Ember.View.extend({
             labels: ['iPhone', 'iPad', 'iPod Touch'],
             hideHover: 'auto',
             //lineColors: PixelAdmin.settings.consts.COLORS,
-            lineColors: ['#71c73e','#77b7c5','#d54848','yellow'],
+                                         lineColors: ['red','blue','green','yellow'],
             fillOpacity: 0.3,
             behaveLikeLine: true,
             lineWidth: 2,
@@ -447,7 +476,7 @@ App.BarChartView = Ember.View.extend({
             xLabelAngle: 35,
             hideHover: 'auto',
             //barColors: PixelAdmin.settings.consts.COLORS,
-            barColors: ['#71c73e'],
+                                        barColors: ['green'],
             gridLineColor: '#cfcfcf',
             resize: true
         });
@@ -587,18 +616,32 @@ App.PieChartView = Ember.View.extend({
             size: 90,
             trackColor: '#e5e5e5'
         };
-        /*jQuery('#easy-pie-chart-1').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#77b7c5'
-        }));*/
+        jQuery('#easy-pie-chart-1').easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: '#489cdf'
+        }));
         $('#easy-pie-chart-2').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#77b7c5'
+            barColor: '#489cdf'
         }));
         $('#easy-pie-chart-3').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#77b7c5'
+            barColor: '#489cdf'
         }));
         $('#easy-pie-chart-4').easyPieChart($.extend({}, easyPieChartDefaults, {
-            barColor: '#77b7c5'
+            barColor: '#489cdf'
         }));                                
     }
 
+});
+
+App.AddCandidateView = Ember.View.extend({
+
+    didInsertElement: function(){
+        $("input.form-control").val("");
+    }
+});
+
+App.AddVacancyView = Ember.View.extend({
+
+    didInsertElement: function(){
+        $(".form-control input").val("");
+    }
 });

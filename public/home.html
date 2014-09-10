@@ -100,7 +100,9 @@
 										<li>{{#link-to 'profile'}}<i class="dropdown-icon fa fa-user"></i>&nbsp;&nbsp;Profile{{/link-to}}</li>
 										<li><a href="#" {{action configure}}><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Configure</a></li>
 										<li class="divider"></li>
-										<li><a href="#" {{action configure}}><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Statistics</a></li>	
+										<li role="presentation" class="dropdown-header">Insights</li>
+										<li><a href="#" {{action stats}}><i class="dropdown-icon fa  fa-bar-chart-o"></i>&nbsp;&nbsp;Click here ...</a></li>
+										<li class="divider"></li>	
 										<li {{action 'signout'}}><a><i class="dropdown-icon fa fa-power-off" ></i>&nbsp;&nbsp;Log Out</a></li>
 									</ul>
 								</li>
@@ -302,8 +304,9 @@
 	<script type="text/x-handlebars" id="addcandidate">
 		<div class="page-header">
 			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Add Candidate</h1>
-			<button class="pull-right btn btn-outline btn-rounded btn-primary pager" onclick="window.history.back()"> ← &nbsp;Older</button>			
+			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>			
 		</div>
+		{{#view App.AddCandidateView}}
 		<form class="panel form-horizontal"role="form" {{action "savecandidate" on="submit"}}>
 			<div id="alertMsg"></div>
 			<div class="panel-heading">
@@ -398,16 +401,17 @@
               	</div>
             </div>
 		</form>
+		{{/view}}
 	</script>
 
 	<script type="text/x-handlebars" id="addvacancy">
 
 		<div class="page-header">
 			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Add Vacancy</h1>
-			<button class="pull-right btn btn-outline btn-rounded btn-primary pager" onclick="window.history.back()"> ← &nbsp;Older</button>
+			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>	
 		</div>
-
-		<form class="panel form-horizontal"role="form" {{action "saveVacancy" on="submit"}}>
+		{{#view App.AddVacancyView}}
+		<form class="panel form-horizontal"role="form" {{action "savecandidate" on="submit"}}>
 			<div id="alertMsg"></div>
 			<div class="panel-heading">
 				<span class="panel-title">Enter Details</span>
@@ -493,13 +497,14 @@
               	</div>
             </div>
 		</form>
+		{{/view}}
 	</script>
 
 	<script type="text/x-handlebars" id="searchResult">
 		<div class="theme-default main-menu-animated no-main-menu page-search">
 			<div class="page-header">
 				<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Search Results</h1>
-				<button class="pull-right btn btn-outline btn-rounded btn-primary pager" onclick="window.history.back()"> ← &nbsp;Older</button>	
+				<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>		
 			</div>
 			<!-- search results -->
 			
@@ -556,11 +561,9 @@
 
 					<!-- Classic search -->
 					<ul class="search-classic tab-pane fade in active" id="search-tabs-all">
-						{{#each response.docs}}
-							{{format-results this}}
-						{{else}}
-							<li>No Results Found.</li>
-						{{/each}}
+
+						{{format-results content}}
+
 					</ul>
 				<!-- / Classic search -->
 				</div>
@@ -577,7 +580,7 @@
 
 		<div class="page-header">
 			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Vacancy</h1>
-			<button class="pull-right btn btn-outline btn-rounded btn-primary pager" onclick="window.history.back()"> ← &nbsp;Older</button>	
+			<button class="pull-right btn btn-outline btn-primary " onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>	
 		</div>
 
 		<div class="panel panel-info panel-dark widget-profile">
@@ -590,10 +593,10 @@
 				</div>
 			</div> <!-- / .panel-heading -->
 			<div class="widget-profile-counters">
-				<div class="col-xs-3"><span>131</span><br>AVAILABLE</div>
-				<div class="col-xs-3"><span>230</span><br>IN REVIEW</div>
-				<div class="col-xs-3"><span>56</span><br>SHORTLISTED</div>
-				<div class="col-xs-3"><span>56</span><br>IN PROGRESS</div>
+				<div class="col-xs-3"><span>{{format-cstats stats "C02"}}</span><br>REVIEWED</div>
+				<div class="col-xs-3"><span>{{format-cstats stats "C03"}}</span><br>SHORTLISTED</div>
+				<div class="col-xs-3"><span>{{format-cstats stats "C04"}}</span><br>IN-PROGRESS</div>
+				<div class="col-xs-3"><span>{{format-cstats stats "C05"}}</span><br>ACCEPTED</div>
 			</div>			
 			<div class="widget-profile-text">
 				<p></p><h4>Status : &nbsp; &nbsp;{{format-vstatus status}} {{#if isOpen}}<i class="fa fa-edit" {{action updatevacancystatus this}}></i> {{/if}}<p></p>				
@@ -607,7 +610,6 @@
 					<div class="panel-heading">
 						<span class="panel-title"><i class="panel-title-icon fa fa-info"></i>Details</span>
 					<div class="panel-heading-controls">
-						<div class="panel-heading-icon"><i class="fa fa-edit"></i></div>
 					</div>								
 					</div>
 					<div class="panel-body">
@@ -616,7 +618,7 @@
 							<tbody>
 								<tr>
 									<td>Skills</td>
-									<td>{{skills}}</td>
+									<td>{{format-skill skills}}</td>
 								</tr>
 								<tr>
 									<td>Min Expereience</td>
@@ -701,26 +703,26 @@
 	<script type="text/x-handlebars" id="candidate">
 		<div class="page-header">
 			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Candidate</h1>
-			<button class="pull-right btn btn-outline btn-rounded btn-primary pager" onclick="window.history.back()"> ← &nbsp;Older</button>		
+			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>			
 		</div>
 	<!-- candidate -->
 		<div class="panel panel-info panel-dark widget-profile">
 			<div class="panel-heading">
 				<div class="widget-profile-bg-icon"><i class="fa fa-user"></i></div>
 				<div class="widget-profile-header">
-					<span>{{details.title}}</span><br>
-					<a href="#">{{details.name}}</a>
-					<p>{{details.status}}</p>
+					<span>{{details.title}}</span><br/>
+					<a href="#">{{details.name}}</a><br/><br/>
 					<div class="search-tags">
 						{{format-matched details.skills}}
 					</div>								
 				</div>
 			</div> <!-- / .panel-heading -->
 			<div class="widget-profile-counters">
-				<div class="col-xs-3"><span>131</span><br>APPLICABLE</div>
-				<div class="col-xs-3"><span>230</span><br>REVIEWED</div>
-				<div class="col-xs-3"><span>56</span><br>SHORTLISTED</div>
-				<div class="col-xs-3"><span>0</span><br>.</div>
+				<div class="col-xs-2"><span>{{format-cstats stats "C02"}}</span><br>REVIEWED</div>
+				<div class="col-xs-3"><span>{{format-cstats stats "C03"}}</span><br>SHORTLISTED</div>
+				<div class="col-xs-3"><span>{{format-cstats stats "C04"}}</span><br>IN-PROGRESS</div>
+				<div class="col-xs-2"><span>{{format-cstats stats "C05"}}</span><br>ACCEPTED</div>
+				<div class="col-xs-2"><span>{{format-cstats stats "C06"}}</span><br>REJECTED</div>
 			</div>			
 			<div class="widget-profile-text">
 				<p></p><h4>Status : &nbsp; &nbsp;{{format-cstatus details.status}}<p></p>
@@ -783,19 +785,27 @@
 					                    <div class="col-sm-6">
 					                        {{view Ember.Select  classNames="form-control" id="city" value=details.city  content=city}}
 						                </div>
-					    	        </div>	
-					    	        <div class="form-group">
-					                    <label for="" class="col-sm-3 control-label">Resume / CV </label>
-					                    <div class="col-sm-6">
-					                     {{#view App.CVUploadTool name="file" data-url="/uploadcv" id="uploadcv"}}{{/view}}
-					                      <label class="uploadedfile" style="display:none;"></label> 
-						                </div>
-					    	        </div>				              	
+					    	        </div>						    	        			              
 								</form>
-							</div> <!-- / .modal-body -->
+							</div> <!-- / .modal-body1 -->
 							<div class="modal-footer">						
 								<button type="button" class="btn btn-primary" data-dismiss="modal" {{action "UpdateCandidate"}}>Save updates</button>
-							</div>
+							</div><!--/.modal-footer1 -->
+							
+							<div class="modal-body">
+								<div class="form-group">
+				                    <label for="" class="col-sm-3 control-label">Resume / CV </label>
+				                    <div class="col-sm-6">
+				                     {{#view App.CVUploadTool name="file" data-url="/uploadcv" id="uploadcv"}}{{/view}}
+				                      <label class="uploadedfile" style="display:none;"></label> 
+					                </div>
+				    	        </div>	
+							</div> <!--/.modal-body2 -->
+							<div class="modal-footer">						
+								<button type="button" class="btn btn-primary" data-dismiss="modal" {{action "UpdateCandidateResume"}}>Update Resume</button>
+							</div> <!--/.modal-footer2-->
+
+
 						</div> <!-- / .modal-content -->
 					</div> <!-- / .modal-dialog -->
 				</div> <!-- /.modal -->
@@ -970,9 +980,8 @@
 						<span class="panel-title">Statistics</span>
 					</div>
 					<div class="list-group">
-						<a href="#" class="list-group-item"><strong>126</strong> Likes</a>
-						<a href="#" class="list-group-item"><strong>579</strong> Followers</a>
-						<a href="#" class="list-group-item"><strong>100</strong> Following</a>
+						<div class="list-group-item"><strong>{{candidate_len}}</strong>&nbsp;&nbsp;Candidates</div>
+						<div class="list-group-item"><strong>{{accepted}}</strong>&nbsp;&nbsp;Accepted</div>
 					</div>
 				</div>
 
@@ -1070,19 +1079,22 @@
 											<img src="images/user.png" alt="" class="follower-avatar">&nbsp;&nbsp;
 											{{#link-to 'candidate' id class="follower-name"}}{{name}}{{/link-to}}
 										</div>
-										<div class="col-xs-4">
+										<div class="col-xs-3">
 											{{format-skill skills}}
 										</div>
-										<div class="col-xs-3">
+										<div class="col-xs-2">
 											<div class="follower-email">{{email}}</div>
 										</div>
 										<div class="col-xs-2">
 											<div class="follower-phone">{{phone}}</div>
+										</div>										
+										<div class="col-xs-2">
+											<div class="follower-email">{{format-cstatus status}}</div>
 										</div>
 									</li>
-								</ul>	
+								</ul>
 								{{else}}
-								No records found!							
+								No records found!												
 							{{/each}}
 						</div> <!-- / .tab-pane -->		
 
@@ -1101,8 +1113,9 @@
 											<div class="follower-email">STATUS:&nbsp; {{format-vstatus status}}</div>
 										</div>										
 									</li>
-								</ul>			
-								{{else}} No records found!
+								</ul>
+								{{else}}
+								No records found!	
 							{{/each}}
 						</div> <!-- / .tab-pane -->				
 					</div> <!-- / .tab-content -->

@@ -58,11 +58,11 @@ App.SignupController=Ember.Controller.extend({
             var password = $("#signuppassword_id").val();
 
             var emailreg = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-            var namereg =/^[a-zA-Z][a-zA-Z\\s]+$/;
+            var namereg =/^[a-zA-Z][a-zA-Z\\s0-9]+$/;
             if(name == "" || email == "" || username == "" || password == ""){
                 alert('some of the required fields are Empty!!');
             }
-            else if(!namereg.test(name)){
+            else if(!namereg.test(username)){
                 alert('Enter valid Name');
             }
             else if(!emailreg.test(email)){
@@ -80,9 +80,9 @@ App.SignupController=Ember.Controller.extend({
                     data:adddetails,                  
                     success: function(data) {    
                         alert(data); 
-                        var email = data.Result[0].email; 
+/*                        var email = data.Result[0].email; 
                         setCookie("email", email, 30); 
-                        that.transitionTo("login");                
+*/                        that.transitionTo("login");                
                     },
                     error: function(data) {
                         alert("Msg: "+ data.status + ": " + data.statusText);

@@ -18,5 +18,11 @@
     "solr-client": "^0.3.0",
     "mysql": "^2.4.3",
     "cryptr": "^1.0.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-ssh": "^0.11.2",
+    "grunt-git": "^0.2.14",
+    "grunt-contrib-clean": "^0.6.0"
   }
 }

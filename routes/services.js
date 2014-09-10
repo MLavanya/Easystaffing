@@ -4,9 +4,9 @@ var fs = require('fs');
 var mammoth = require("mammoth");
 var solr = require('solr-client');
 var moment = require('moment');
+var solrinfo=require('../solrconfig');
 var Cryptr = require("cryptr"),
     cryptr = new Cryptr('myTotalySecretKey');
-var solrinfo=require('../solrconfig');
 
 
 /*
@@ -268,18 +268,27 @@ exports.getvacancy = function(req, res) {
             if(rows.length > 0){
 
                 var data = rows[0];
+                data.applications = [];
+                data.stats=[];
 
                 con.query('SELECT application.id,application.status,vacancy.name,vacancy.title,candidate.id as candidate_id,candidate.name as candidate_name from application,vacancy,candidate where application.vacancy_id = vacancy.id and application.candidate_id = candidate.id  and application.vacancy_id = ?', [data.id],function(err, rows, fields) {
                     if (err) throw err;
 
-                    if(rows.length > 0){
-                        con.release();
-                        data.applications = rows;
-                        res.send(data);
-                    }else{
-                        con.release();
-                        res.send(data);                
+                    if(rows.length > 0){                        
+                        data.applications = rows;                                       
                     }
+
+                    con.query('SELECT status , count(*) as cnt FROM application WHERE vacancy_id = ? GROUP BY STATUS ', [data.id],function(err, rows, fields) {
+                        if (err) throw err;                                
+
+                        if(rows.length > 0){
+                            data.stats = rows;
+                        }
+
+                        con.release();                                
+                        res.send(data);
+
+                    });                     
                 });  
 
             }else{
@@ -366,8 +375,11 @@ exports.getcandidate = function(req, res) {
                 var docName = rows[0].name;
                 var docPath = rows[0].cvpath;
 
-                var datas = {};
-                datas.details = rows[0];
+                var data_result = {};
+                data_result.details = rows[0];
+                data_result.applications = [];
+                data_result.apphistory = [];
+                data_result.stats = [];
 
                 fs.readFile(docPath, function (err, data) {                   
                     var newFilePath = __dirname+"/uploads/";
@@ -377,22 +389,28 @@ exports.getcandidate = function(req, res) {
                         var html = result.value; // The generated HTML
                         var messages = result.messages; // Any messages, such as warnings during conversion  
 
-                        datas.docFile = html;
+                        data_result.docFile = html;
 
-                        con.query('SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ? ', [datas.details.id],function(err, rows, fields) {
+                        con.query('SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ? ', [data_result.details.id],function(err, rows, fields) {
                             if (err) throw err;
 
                             if(rows.length > 0){
-                                con.release();
-                                datas.applications = rows;
-                                datas.apphistory = [];
-                                res.send(datas);
-                            }else{
-                                con.release();
-                                res.send(datas);                
+                                data_result.applications = rows;
                             }
-                        });                        
 
+                            con.query('SELECT status , count(*) as cnt FROM application WHERE candidate_id = ? GROUP BY STATUS ', [data_result.details.id],function(err, rows, fields) {
+                                if (err) throw err;                                
+
+                                if(rows.length > 0){
+                                    data_result.stats = rows;
+                                }
+
+                                con.release();                                
+                                res.send(data_result);
+
+                            });                        
+
+                        });                        
 
                     })
                     .done();
@@ -439,8 +457,16 @@ exports.applyvacancy = function(req, res) {
                     applydetails.id = result.insertId;
                     var query = con.query('INSERT INTO application_h SET ?', {application_id:applydetails.id,prevstatus:'C01',curstatus:applydetails.status}, function(err, result) {
                         if (err) throw err;                            
-                        con.release();
-                        res.send("succuss");
+
+                        var comment={};
+                        comment.application_h_id = result.insertId;
+                        comment.created_by = req.cookies.email;
+                        comment.comment = "Picked for Review";
+                        con.query('insert into comments set ? ',comment, function(err,result) {
+                          con.release();
+                          res.send("success");
+                        });
+
                     });
                     
                 });
@@ -621,14 +647,20 @@ exports.getUserdata = function(req,res){
                     if (err) throw err;
                     if(result.length > 0){
                         con.release();  
-                        var candidatelist = result;                                   
+                        var candidatelist = result;    
+                        var candidate_len = candidatelist.length;
+                        var accepted;
+                        con.query('SELECT count(status) as cnt from candidate where created_by=? and status="C05" ', [email],function(err, rows, fields) {
+                            if (err) throw err;                                
+                            accepted = rows[0].cnt;                            
+                        });                                
                         con.query('SELECT *  from vacancy where created_by=?',[email],function(err, result, fields) {
                             if (err) throw err;
                             if(result.length > 0){
                                 con.release();  
                                 var vacancylist = result;                                   
                                 //res.send(result);                 
-                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist});                               
+                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist,candidate_len:candidate_len,accepted:accepted});
                             }
                         }); 
                     }else{
@@ -648,40 +680,10 @@ exports.getUserdata = function(req,res){
             }           
              
         });
-
-      /*  con.query('SELECT *  from user where email = ?', [email],function(err, rows, fields) {
-            if (err) throw err;
-            if(rows.length > 0){
-                con.release();   
-                var userdata = rows[0];
-                //res.send(rows[0]);                 
-                con.query('SELECT *  from candidate where created_by=?',[email],function(err, result, fields) {
-                    if (err) throw err;
-                    if(result.length > 0){
-                        con.release();  
-                        var candidatelist = result;                                   
-                        //res.send(result);                 
-                       // res.send({userdata:userdata,candidatelist:candidatelist});
-                        con.query('SELECT *  from vacancy where created_by=?',[email],function(err, result, fields) {
-                            if (err) throw err;
-                            if(result.length > 0){
-                                con.release();  
-                                var vacancylist = result;                                   
-                                //res.send(result);                 
-                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist});                               
-                            }
-                        }); 
-
-                    }else{
-                        con.release();
-                        res.send({userdata:userdata});
-                    }
-                }); 
-            }
-        }); */
                  
     });       
 }
+
 
 exports.updateProfile = function(req,res){    
     
@@ -727,7 +729,6 @@ exports.updateappstatus = function(req,res){
                     });
 
                     req.body.comment.created_by = req.cookies.email;
-                    console.log(req.body);
                     con.query('insert into comments set ? ',req.body.comment, function(err,result) {
                       console.log("inserted" + result);
                       con.release();
@@ -855,9 +856,39 @@ exports.UpdateCandidate = function(req,res){
             if (err) throw err;
                                          
             con.release();
+            exports.solrupdatecandidate({
+                "id":candidateData.id,
+                "ctitle" : {"set": candidateData.title},
+                "cexp" : {"set": candidateData.exp},
+                "cphone" : {"set": candidateData.phone},
+                "ccountry" : {"set": candidateData.country},
+                "ccity" : {"set": candidateData.city}
+            });
             res.send({"status":200,"statusText":"updated Successfully"});
         });
     });
+}
+
+exports.UpdateCandidateResume = function(req,res){
+
+    var resumePath = req.body.updatedata;
+    var id = req.body.updatedata.id;
+
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('UPDATE candidate set ? WHERE id = ?',[resumePath,id], function(err, rows, fields) {
+            if (err) throw err;
+                                         
+            con.release();
+            var data = req.body.content;
+            data.cvpath = resumePath.cvpath;
+            exports.solraddcandidate(data);
+            res.send({"status":200,"statusText":"updated Successfully"});
+        });
+    });    
 }
 
 /*-------------------------------*/
@@ -877,25 +908,26 @@ exports.UpdateCandidate = function(req,res){
 }
 */
 exports.solrclient = function(req,res){
-    var searchtext=req.body.searchtext//+"&fl=*,score&hl=true&hl.fl=content&hl.snippets=10000";
-    console.log(JSON.stringify(req.body));
+    var searchtext=req.body.searchtext;
+
     updateSearchLog(searchtext+"&schema="+req.body.schema,req.cookies.email);
     if(req.body.schema == 'c'){
         console.log("candidate schema");
-        searchtext = searchtext +' AND (cstatus:"C01" OR cstatus:"C02") AND ccreated_by:'+req.cookies.email + '&hl=true&hl.snippets=10000&hl.fl=id&hl.fl=cname&hl.fl=ctitle&hl.fl=cemail&hl.fl=cexp&hl.fl=cphone&hl.fl=cskills&hl.fl=ccountry&hl.fl=ccity&hl.fl=ccompany_id&hl.fl=cstatus&hl.fl=cactive&hl.fl=ccomments&hl.fl=ccreated_by&hl.fl=content';
+        searchtext = searchtext +' AND (cstatus:"C01" OR cstatus:"C02") AND ccreated_by:'+req.cookies.email;
         var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,'','','');
     }
     else if (req.body.schema == 'v'){
         console.log("vacancy schema");
-        searchtext = searchtext +' AND vstatus:"OPEN" AND vcreated_by:'+req.cookies.email;
+        searchtext = searchtext +' & vstatus:"OPEN"';
         var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
     }
     
-    var query2 = client.createQuery()
+/*    var query2 = client.createQuery()
                        .q(searchtext)
                        .start(0)
-                       .rows(1000);
-    client.search(query2,function(err,obj){
+                       .rows(1000);*/
+    
+    client.gethl('select',searchtext,function(err,obj){
        if(err){
         console.log(err);
         res.send(err);
@@ -983,7 +1015,7 @@ exports.solraddcandidate = function(data){
        "literal.cskills":data.skills,
        "literal.ccity":data.city,
        "literal.ccountry":data.country,
-       "literal.ccompany_id":0,
+       "literal.ccompany_id":data.company_id,
        "literal.cactive":data.active,
        "literal.ccomments":data.comments,
        "literal.ccreated_by":data.created_by

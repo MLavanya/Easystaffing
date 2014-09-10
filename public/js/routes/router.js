@@ -12,6 +12,18 @@ App.DashboardRoute = Ember.Route.extend({
 	}
 });
 
+App.AddvacancyRoute = Ember.Route.extend({
+	model:function(){
+		return null;
+	}
+});
+
+App.AddcandidateRoute = Ember.Route.extend({
+	model:function(){
+		return null;
+	}
+});
+
 
 App.SearchResultRoute = Ember.Route.extend({
    
@@ -30,7 +42,6 @@ App.SearchResultRoute = Ember.Route.extend({
 	            search_text="";
 	            data.keyword = params.query;
 	            data.schema = s;
-	            console.log(data);
 	          	return data;  
 	        },
 	        error: function(data) {

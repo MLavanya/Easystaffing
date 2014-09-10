@@ -1,6 +1,52 @@
 mesgs = [];
 var companyList,statusList;
 
+var countries = ["China", "India", "United States", "Indonesia", "Brazil",
+                "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
+                "Mexico", "Philippines", "Vietnam", "Ethiopia", "Egypt",
+                "Germany", "Turkey", "Iran", "Thailand", "D. R. of Congo",
+                "France", "United Kingdom", "Italy", "Myanmar", "South Africa",
+                "South Korea", "Colombia", "Ukraine", "Spain", "Tanzania",
+                "Sudan", "Kenya", "Argentina", "Poland", "Algeria",
+                "Canada", "Uganda", "Morocco", "Iraq", "Nepal",
+                "Peru", "Afghanistan", "Venezuela", "Malaysia", "Uzbekistan",
+                "Saudi Arabia", "Ghana", "Yemen", "North Korea", "Mozambique",
+                "Taiwan", "Syria", "Ivory Coast", "Australia", "Romania",
+                "Sri Lanka", "Madagascar", "Cameroon", "Angola", "Chile",
+                "Netherlands", "Burkina Faso", "Niger", "Kazakhstan", "Malawi",
+                "Cambodia", "Guatemala", "Ecuador", "Mali", "Zambia",
+                "Senegal", "Zimbabwe", "Chad", "Cuba", "Greece",
+                "Portugal", "Belgium", "Czech Republic", "Tunisia", "Guinea",
+                "Rwanda", "Dominican Republic", "Haiti", "Bolivia", "Hungary",
+                "Belarus", "Somalia", "Sweden", "Benin", "Azerbaijan",
+                "Burundi", "Austria", "Honduras", "Switzerland", "Bulgaria",
+                "Serbia", "Israel", "Tajikistan", "Hong Kong", "Papua New Guinea",
+                "Togo", "Libya", "Jordan", "Paraguay", "Laos",
+                "El Salvador", "Sierra Leone", "Nicaragua", "Kyrgyzstan", "Denmark",
+                "Slovakia", "Finland", "Eritrea", "Turkmenistan"];
+
+var cities = ['Cleveland',
+                'New York City',
+                'Brooklyn',
+                'Manhattan',
+                'Queens',
+                'The Bronx',
+                'Staten Island',
+                'San Francisco',
+                'Los Angeles',
+                'Seattle',
+                'London',
+                'Hyderabad',  
+                'Portland',
+                'Chicago',
+                'Boston',
+                'Bangalore',
+                'Delhi',
+                'Pune',
+                'Mumbai',
+                'Chennai'];
+
+
 var addmessage = function(type,msg){
 
 	mesgs.push({
@@ -165,81 +211,112 @@ switch (value) {
   return new Ember.Handlebars.SafeString(res);
 });
 
-Ember.Handlebars.helper('format-results', function(data) {
+Ember.Handlebars.helper('format-results', function(content) {
 
 	var schema = window.App.__container__.lookup('controller:searchResult').get('content').schema;
 	var res = "";
 
-	if(schema == 'v'){
+	var rows = content.response.docs;
+	var hls = content.highlighting;
 
-		var sl = '<button class="btn btn-primary btn-outline btn-xs pull-right" onclick="applyforv('+data.id+',window.location.href,this);"><i class="fa fa-check"></i> Apply</button>';
+	$.each(rows,function(i,data){
 
-		res=res+'<li>';
+		if(schema == 'v'){
 
-		if(getParameterByName('c')){
-			res=res+sl;
+			var sl = '<button class="btn btn-primary btn-outline btn-xs pull-right" onclick="applyforv('+data.id+',window.location.href,this);"><i class="fa fa-check"></i> Apply</button>';
+
+			res=res+'<li>';
+
+			if(getParameterByName('c')){
+				res=res+sl;
+			}
+
+			var hltitle = hls[data.id].vtitle?hls[data.id].vtitle:data.vtitle;
+
+			res=res+'<a href="#/vacancy/'+data.id+'" class="search-title">'+data.vname+'</a>'
+				+'<p>'+hltitle+'</p>'
+				+'<div class="search-content">'
+				+data.vexp_min+' to '+data.vexp_max+' years with '+data.vskills+' skills located in '+data.vcity+' .'
+				+'</div>'
+				+'<div class="search-tags">'
+				+'<span class="search-tags-text">Skills :</span>';
+
+			var r = data.vskills.split(",");
+			for(var i=0;i<r.length;i++){
+				res = res+'<label class="label label-info">'+r[i]+'</label>&nbsp;';
+			}
+
+			res = res + '</div>'+'<div class="search-tags">'
+				  + '<span class="search-tags-text">Matched :</span>';	  
+
+			if(hls[data.id].vskills){
+				var r = $("<div></div>").append(hls[data.id].vskills[0]).find("mark");
+				for(var i=0;i<r.length;i++){
+					res = res+'<label class="label label-success">'+$(r[i]).text()+'</label>&nbsp;';
+				}			  
+			}
+
+			res = res + '</div> </li>';
+
+		}else if(schema == 'c'){
+
+			var sl = '<button class="btn btn-primary btn-outline pull-right btn-flat btn-xs " onclick="shortlist('+data.id+',window.location.href,this);"><i class="fa fa-check"></i> Shortlist</button>';
+
+			res=res+'<li>';
+
+			if(getParameterByName('v')){
+				res=res+sl;
+			}
+
+			var hlcontent = hls[data.id].content?hls[data.id].content:'';
+			var hltitle = hls[data.id].ctitle?hls[data.id].ctitle:data.ctitle;
+
+			res = res +'<a href="#/candidate/'+data.id+'" class="search-title">'+data.cname+'</a>'
+				+'<p>'+hltitle+'</p>'
+				+'<div class="search-content">'
+				+data.cexp+' years with '+data.cskills+' skills located in '+data.ccity+' .'
+				+hlcontent + " score: " + data.score
+				+'</div>'
+				+'<div class="search-tags">'
+				+'<span class="search-tags-text">Skills :</span>';
+
+			var r = data.cskills.split(",");
+			for(var i=0;i<r.length;i++){
+				res = res+'<label class="label label-info">'+r[i]+'</label>&nbsp;';
+			}
+
+			res = res + '</div>'+'<div class="search-tags">'
+				  + '<span class="search-tags-text">Matched :</span>';
+
+			if(hls[data.id].cskills){
+				var r = $("<div></div>").append(hls[data.id].cskills[0]).find("mark");
+				for(var i=0;i<r.length;i++){
+					res = res+'<label class="label label-success">'+$(r[i]).text()+'</label>&nbsp;';
+				}			  
+			}
+			res = res + '</div> </li>';
+
 		}
-
-		res=res+'<a href="#/vacancy/'+data.id+'" class="search-title">'+data.vname+'</a>'
-			+'<p>'+data.vtitle+'</p>'
-			+'<div class="search-content">'
-			+data.vexp_min+' to '+data.vexp_max+' years with '+data.vskills+' skills located in '+data.vcity+' .'
-			+'</div>'
-			+'<div class="search-tags">'
-			+'<span class="search-tags-text">Skills:</span>';
-
-		var r = data.vskills.split(",");
-		for(var i=0;i<r.length;i++){
-			res = res+'<label class="label label-info">'+r[i]+'</label>&nbsp;';
-		}
-
-		res = res + '</div>'+'<div class="search-tags">'
-			  + '<span class="search-tags-text">Keywords:</span>';
-
-		var r = data.vskills.split(",");
-		for(var i=0;i<r.length;i++){
-			res = res+'<label class="label label-success">'+r[i]+'</label>&nbsp;';
-		}			  
-
-		res = res + '</div> </li>';
-
-	}else if(schema == 'c'){
-
-		var sl = '<button class="btn btn-primary btn-outline pull-right btn-flat btn-xs " onclick="shortlist('+data.id+',window.location.href,this);"><i class="fa fa-check"></i> Shortlist</button>';
-
-		res=res+'<li>';
-
-		if(getParameterByName('v')){
-			res=res+sl;
-		}
-
-		res = res +'<a href="#/candidate/'+data.id+'" class="search-title">'+data.cname+'</a>'
-			+'<p>'+data.ctitle+'</p>'
-			+'<div class="search-content">'
-			+data.cexp+' years with '+data.cskills+' skills located in '+data.ccity+' .'
-			+'</div>'
-			+'<div class="search-tags">'
-			+'<span class="search-tags-text">Skills:</span>';
-
-		var r = data.cskills.split(",");
-		for(var i=0;i<r.length;i++){
-			res = res+'<label class="label label-info">'+r[i]+'</label>&nbsp;';
-		}
-
-		res = res + '</div>'+'<div class="search-tags">'
-			  + '<span class="search-tags-text">Keywords:</span>';
-
-		var r = data.cskills.split(",");
-		for(var i=0;i<r.length;i++){
-			res = res+'<label class="label label-success">'+r[i]+'</label>&nbsp;';
-		}			  
-
-		res = res + '</div> </li>';
-
-	}
+	});
 
   return new Ember.Handlebars.SafeString(res);
 });
+
+Ember.Handlebars.helper('format-cstats', function(data,status) {
+
+	var res="0";
+
+	$.each(data,function(i,row){
+		if(data[i].status == status){
+			res = data[i].cnt;
+			return false;
+		}
+
+	});
+
+	return res;
+});
+
 
 /********************************
  * Controllers
@@ -267,44 +344,8 @@ App.AddcandidateController = Ember.Controller.extend({
 
 	needs : [ 'application' ],
 	currentUser : Ember.computed.alias('controllers.application.loggedinUser'),
-	country : ["China", "India", "United States", "Indonesia", "Brazil",
-                "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
-                "Mexico", "Philippines", "Vietnam", "Ethiopia", "Egypt",
-                "Germany", "Turkey", "Iran", "Thailand", "D. R. of Congo",
-                "France", "United Kingdom", "Italy", "Myanmar", "South Africa",
-                "South Korea", "Colombia", "Ukraine", "Spain", "Tanzania",
-                "Sudan", "Kenya", "Argentina", "Poland", "Algeria",
-                "Canada", "Uganda", "Morocco", "Iraq", "Nepal",
-                "Peru", "Afghanistan", "Venezuela", "Malaysia", "Uzbekistan",
-                "Saudi Arabia", "Ghana", "Yemen", "North Korea", "Mozambique",
-                "Taiwan", "Syria", "Ivory Coast", "Australia", "Romania",
-                "Sri Lanka", "Madagascar", "Cameroon", "Angola", "Chile",
-                "Netherlands", "Burkina Faso", "Niger", "Kazakhstan", "Malawi",
-                "Cambodia", "Guatemala", "Ecuador", "Mali", "Zambia",
-                "Senegal", "Zimbabwe", "Chad", "Cuba", "Greece",
-                "Portugal", "Belgium", "Czech Republic", "Tunisia", "Guinea",
-                "Rwanda", "Dominican Republic", "Haiti", "Bolivia", "Hungary",
-                "Belarus", "Somalia", "Sweden", "Benin", "Azerbaijan",
-                "Burundi", "Austria", "Honduras", "Switzerland", "Bulgaria",
-                "Serbia", "Israel", "Tajikistan", "Hong Kong", "Papua New Guinea",
-                "Togo", "Libya", "Jordan", "Paraguay", "Laos",
-                "El Salvador", "Sierra Leone", "Nicaragua", "Kyrgyzstan", "Denmark",
-                "Slovakia", "Finland", "Eritrea", "Turkmenistan"],
-	city	: ['Cleveland',
-                'New York City',
-                'Brooklyn',
-                'Manhattan',
-                'Queens',
-                'The Bronx',
-                'Staten Island',
-                'San Francisco',
-                'Los Angeles',
-                'Seattle',
-                'London',
-                'hyderabad',  
-                'Portland',
-                'Chicago',
-                'Boston'],
+	country : countries,
+	city	: cities,
 
 	init: function(){
 		var statusList =[];
@@ -403,6 +444,7 @@ App.AddcandidateController = Ember.Controller.extend({
 		   		    }
 	   		     });
           	}
+
 		}
 	}
 });
@@ -426,53 +468,16 @@ App.AddvacancyController = Ember.Controller.extend({
             error:function(data){
                 alert("Msg: "+ data.status + ": " + data.statusText);
             }                        
-        }); 
+        });
 	},
 	needs : [ 'application' ],
 	currentUser : Ember.computed.alias('controllers.application.loggedinUser'),
 	companies: companyList,
-	country : ["China", "India", "United States", "Indonesia", "Brazil",
-                "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
-                "Mexico", "Philippines", "Vietnam", "Ethiopia", "Egypt",
-                "Germany", "Turkey", "Iran", "Thailand", "D. R. of Congo",
-                "France", "United Kingdom", "Italy", "Myanmar", "South Africa",
-                "South Korea", "Colombia", "Ukraine", "Spain", "Tanzania",
-                "Sudan", "Kenya", "Argentina", "Poland", "Algeria",
-                "Canada", "Uganda", "Morocco", "Iraq", "Nepal",
-                "Peru", "Afghanistan", "Venezuela", "Malaysia", "Uzbekistan",
-                "Saudi Arabia", "Ghana", "Yemen", "North Korea", "Mozambique",
-                "Taiwan", "Syria", "Ivory Coast", "Australia", "Romania",
-                "Sri Lanka", "Madagascar", "Cameroon", "Angola", "Chile",
-                "Netherlands", "Burkina Faso", "Niger", "Kazakhstan", "Malawi",
-                "Cambodia", "Guatemala", "Ecuador", "Mali", "Zambia",
-                "Senegal", "Zimbabwe", "Chad", "Cuba", "Greece",
-                "Portugal", "Belgium", "Czech Republic", "Tunisia", "Guinea",
-                "Rwanda", "Dominican Republic", "Haiti", "Bolivia", "Hungary",
-                "Belarus", "Somalia", "Sweden", "Benin", "Azerbaijan",
-                "Burundi", "Austria", "Honduras", "Switzerland", "Bulgaria",
-                "Serbia", "Israel", "Tajikistan", "Hong Kong", "Papua New Guinea",
-                "Togo", "Libya", "Jordan", "Paraguay", "Laos",
-                "El Salvador", "Sierra Leone", "Nicaragua", "Kyrgyzstan", "Denmark",
-                "Slovakia", "Finland", "Eritrea", "Turkmenistan"],
-	city	: ['Cleveland',
-                'New York City',
-                'Brooklyn',
-                'Manhattan',
-                'Queens',
-                'The Bronx',
-                'Staten Island',
-                'San Francisco',
-                'Los Angeles',
-                'Seattle',
-                'London',
-                'hyderabad',  
-                'Portland',
-                'Chicago',
-                'Boston'],
+	country : countries,
+	city	: cities,
 	statuses: ['OPEN','CLOSED'],
 	actions :{
 		addCompany: function(){
-			$(".form-control").val("");
 			var that =  this;
 			bootbox.prompt({
 				title: "Enter the company name",
@@ -501,9 +506,7 @@ App.AddvacancyController = Ember.Controller.extend({
 
 		},
 
-		saveVacancy: function(){
-
-			$(".form-control").val("");
+		savecandidate: function(){
 
 			var that = this;
 			var v = true;
@@ -559,22 +562,24 @@ App.AddvacancyController = Ember.Controller.extend({
 		   		    data: {
 		   					"title"			: this.get("jobTitle"),
 		   					"name"			: this.get("vacancy"),
-		   					"country"		: jQuery('#country').val(),
-		   					"city"			: jQuery('#city').val(),
+		   					"country"			: jQuery('#country').val(),
+		   					"city"				: jQuery('#city').val(),
 		   					"exp_min"		: this.get("min_experience"),
 		   					"exp_max"		: this.get("max_experience"),		   					
-		   					"company_id"	: jQuery("#company").val(),	
-		   					"status"		: jQuery("#status").val(),	   					
-		   					"skills"		: text,
-		   					"description"	: this.get("description"),
+		   					"company_id"		: jQuery("#company").val(),	
+		   					"status"			: jQuery("#status").val(),	   					
+		   					"skills"			: text,
+		   					"description"		: this.get("description"),
 		      		    },
-		   		    success: function(data){		   		    			   		    
-		   		    	$(".form-control").val("");
+		   		    success: function(data){
+		   		    	console.log("success");
+		   		    	//bootbox("success", "Vacancy Saved.");
+		   		    	jQuery(".form-control").val("");
 	   					setTimeout(function(){that.transitionTo('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	console.log("error");
-		   		    	confirmbox("danger", "Sorry, Data could not be saved. Server error.");
+		   		    	//confirmbox("danger", "Sorry, Data could not be saved. Server error.");
 		   		    } 
 	   		     });
           	}
@@ -637,8 +642,14 @@ App.VacancyController = Ember.ObjectController.extend({
 									data:{
 										status: $('#newstatus').val(),
 									}
-								},function(data){
-									$('.fa fa-edit').hide();
+								},function(res){
+									return $.get('/getvacancy/'+m.id,function(data){
+										if(data.status == "OPEN")
+											data.isOpen = true;
+										else
+											data.isOpen = false;
+										that.set('content',data);
+									});
 								});
 							}
 						},
@@ -657,45 +668,9 @@ App.VacancyController = Ember.ObjectController.extend({
 });
 
 App.CandidateController = Ember.ObjectController.extend({
-	country : ["China", "India", "United States", "Indonesia", "Brazil",
-                "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
-                "Mexico", "Philippines", "Vietnam", "Ethiopia", "Egypt",
-                "Germany", "Turkey", "Iran", "Thailand", "D. R. of Congo",
-                "France", "United Kingdom", "Italy", "Myanmar", "South Africa",
-                "South Korea", "Colombia", "Ukraine", "Spain", "Tanzania",
-                "Sudan", "Kenya", "Argentina", "Poland", "Algeria",
-                "Canada", "Uganda", "Morocco", "Iraq", "Nepal",
-                "Peru", "Afghanistan", "Venezuela", "Malaysia", "Uzbekistan",
-                "Saudi Arabia", "Ghana", "Yemen", "North Korea", "Mozambique",
-                "Taiwan", "Syria", "Ivory Coast", "Australia", "Romania",
-                "Sri Lanka", "Madagascar", "Cameroon", "Angola", "Chile",
-                "Netherlands", "Burkina Faso", "Niger", "Kazakhstan", "Malawi",
-                "Cambodia", "Guatemala", "Ecuador", "Mali", "Zambia",
-                "Senegal", "Zimbabwe", "Chad", "Cuba", "Greece",
-                "Portugal", "Belgium", "Czech Republic", "Tunisia", "Guinea",
-                "Rwanda", "Dominican Republic", "Haiti", "Bolivia", "Hungary",
-                "Belarus", "Somalia", "Sweden", "Benin", "Azerbaijan",
-                "Burundi", "Austria", "Honduras", "Switzerland", "Bulgaria",
-                "Serbia", "Israel", "Tajikistan", "Hong Kong", "Papua New Guinea",
-                "Togo", "Libya", "Jordan", "Paraguay", "Laos",
-                "El Salvador", "Sierra Leone", "Nicaragua", "Kyrgyzstan", "Denmark",
-                "Slovakia", "Finland", "Eritrea", "Turkmenistan"],
-	city	: ['Cleveland',
-                'New York City',
-                'Brooklyn',
-                'Manhattan',
-                'Queens',
-                'The Bronx',
-                'Staten Island',
-                'San Francisco',
-                'Los Angeles',
-                'Seattle',
-                'London',
-                'hyderabad',  
-                'Portland',
-                'Chicago',
-                'Boston'],
 
+	country : countries,
+	city	: cities,
 	actions:{
 		searchbyc: function(){
 			var m = this.get('content').details;
@@ -759,18 +734,9 @@ App.CandidateController = Ember.ObjectController.extend({
 
 		},
 		UpdateCandidate:function(){
+			
 			var that = this;			
-			var fileName = JSON.parse($(".uploadedfile").text());
-			var cv = fileName.filepath;			
-			var candidateId = $("#candidateId").val();			
-			/*var textarea = $('#tags:last');
-			var textext = textarea.textext()[0];
-
-			var text = textext.hiddenInput().val();
-			text = text.replace("[","");
-			text = text.replace("]","");
-			text = text.replace(/['"]+/g, '');*/
-
+			var candidateId = $("#candidateId").val();
    			$.ajax({
 	   		    type: 'POST',
 	   		    url: "/UpdateCandidate",
@@ -780,11 +746,45 @@ App.CandidateController = Ember.ObjectController.extend({
 	   					"phone"				: $("#phone").val(),
 	   					"exp"				: $("#experience").val(),
 	   					"country"			: $('#country').val(),
-	   					"city"				: $('#city').val(),
-	   					"cvpath"			: cv,
-	   					"company_id"		: $("#company").val(),
-	   				//	"skills"			: text,
+	   					"city"				: $('#city').val(),	   				
+	   					"company_id"		: $("#company").val(),	   				
 	   					"id"				: candidateId	
+	      		    },
+	   		    success: function(data){
+	   		    	alert("Msg: "+ data.status + ": " + data.statusText);
+	   		    	return $.get('/getcandidate/'+candidateId,function(data){
+						if(data.applications){
+							$.each(data.applications,function(i,row){
+								if(data.applications[i].vacancy_status == "OPEN")
+									data.applications[i].isOpen = true;
+								else
+									data.applications[i].isOpen = false;
+							});
+						}
+						that.set('content',data);
+					});
+	   		    },
+	   		    error: function(data){
+	   		    	alert("Msg: "+ data.status + ": " + data.statusText);
+	   		    }
+   		    });
+		},
+		UpdateCandidateResume : function(){
+
+			var that = this;
+			var fileName = JSON.parse($(".uploadedfile").text());
+			var cv = fileName.filepath;			
+			var candidateId = $("#candidateId").val();			
+			$.ajax({
+	   		    type: 'POST',
+	   		    url: "/UpdateCandidateResume",
+	   		    dataType:"json",
+	   		    data: {
+	   		    		updatedata: {	   						   					
+		   					"cvpath"			: cv,
+		   					"id"				: candidateId,
+	   					},
+	   					"content"			: that.get('content').details
 	      		    },
 	   		    success: function(data){
 	   		    	alert("Msg: "+ data.status + ": " + data.statusText);
@@ -807,7 +807,7 @@ App.CandidateController = Ember.ObjectController.extend({
 	   		    error: function(data){
 	   		    	alert("Msg: "+ data.status + ": " + data.statusText);
 	   		    }
-   		    });
+   		    });	
 		},
 		updatecv : function(){
 			$('#uploadcv').show();

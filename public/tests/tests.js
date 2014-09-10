@@ -1,4 +1,4 @@
-App.rootElement = '#ember-testing';
+App.rootElement = '#main-navbar';
 App.setupForTesting();
 App.injectTestHelpers();
 
@@ -13,7 +13,6 @@ module("Integration tests", {
 
 test("/", function() {
   visit("/").then(function() {
-    equal(find("h2").text(), "Welcome to Ember.js", "Application header is rendered");
-    equal(find("li").length, 3, "There are three items in the list");
+    equal(find("h1").text(), "Easy Staffing");
   });
 });

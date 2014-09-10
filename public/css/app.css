@@ -146,6 +146,7 @@ ul.follower li{
 .widget-followers .body {
   line-height: 33px;
 }
+
 .pie-chart {
   display: inline-block !important;
   position: relative !important;
@@ -169,4 +170,25 @@ ul.follower li{
   top: 50%;
   font-weight: 300;
   font-size: 17px;
+}
+
+.morris-hover {
+  position: absolute;
+  z-index: 1000;
+}
+.morris-hover.morris-default-style {
+  text-align: center;
+  border-radius: 2px;
+  background-color: #222222;
+  font-size: 11px;
+  padding: 4px 10px;
+}
+.morris-hover.morris-default-style .morris-hover-row-label {
+  font-weight: bold;
+  margin: 4px 0;
+  color: #aaa;
+}
+.morris-hover.morris-default-style .morris-hover-point {
+  white-space: nowrap;
+  margin: 2px 0;
 }
