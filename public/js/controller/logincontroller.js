@@ -18,26 +18,41 @@ App.LoginController=Ember.Controller.extend({
 
         },
         signinclick:function(){
-            var username=$("#username_id").val();
+            var email_id=$("#email_id").val();
             var password=$("#password_id").val();
-            if(username == "" || password == ""){
-                alert('some of the required fields are Empty!!');
+            if(email_id == "" || password == ""){
+                bootbox.alert('some of the required fields are Empty!!');
             }
             else{
                 var adddetails={};
-                adddetails.email=username;
+                adddetails.email=email_id;
                 adddetails.password=password;
                 $.ajax ({
                     type: "POST",
                     url:'/login', 
                     data:adddetails,                  
-                    success: function(data) {   
-                        var email = data.email; 
-                        setCookie("email", email, 30);
-                        window.location = data.redirectTo; //redirects to the main page
+                    success: function(data) { 
+                        if(data.status ==200){
+                            var email = data.email; 
+                            var region = data.region; 
+                            setCookie("email", email, 30);
+                            setCookie("region", region, 30); 
+                            /*bootbox.alert({
+                                message: "Successfully Logged-In",
+                                callback: function(result) {*/
+                                    window.location = data.redirectTo; //redirects to the main page
+                             /*   }
+                            });*/
+                        } else{
+                            bootbox.alert({
+                                message: "Invalid User",                                                          
+                            });
+                        }                                                                   
+                        
+                       // window.location = data.redirectTo; //redirects to the main page
                     },
                     error: function(data) {
-                        alert("Msg: "+ data.status + ": " + data.statusText);
+                        bootbox.alert(data.statusText);
                     }
                 }); 
             }
@@ -56,17 +71,18 @@ App.SignupController=Ember.Controller.extend({
             var email = $("#email_id").val();
             var username = $("#signupusername_id").val();
             var password = $("#signuppassword_id").val();
+            var region =$(".radio-inline input[type='radio']:checked").val();            
 
-            var emailreg = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+            var emailreg = /^([a-zA-Z0-9_\.\-])+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
             var namereg =/^[a-zA-Z][a-zA-Z\\s0-9]+$/;
             if(name == "" || email == "" || username == "" || password == ""){
-                alert('some of the required fields are Empty!!');
+                bootbox.alert('some of the required fields are Empty!!');
             }
             else if(!namereg.test(username)){
-                alert('Enter valid Name');
+                bootbox.alert('Enter valid Name');
             }
             else if(!emailreg.test(email)){
-                alert('Enter the valid email address');
+                bootbox.alert('Enter the valid email address');
             }
             else{
                 var adddetails={};
@@ -74,18 +90,17 @@ App.SignupController=Ember.Controller.extend({
                 adddetails.email=email;
                 adddetails.username=username;
                 adddetails.password=password;
+                adddetails.region=region;
                 $.ajax ({
                     type: "POST",
                     url:'/register', 
                     data:adddetails,                  
-                    success: function(data) {    
-                        alert(data); 
-/*                        var email = data.Result[0].email; 
-                        setCookie("email", email, 30); 
-*/                        that.transitionTo("login");                
+                    success: function(data) {  
+                        bootbox.alert(data);
+                        that.transitionTo("login");                
                     },
                     error: function(data) {
-                        alert("Msg: "+ data.status + ": " + data.statusText);
+                        bootbox.alert("Msg: "+ data.status + ": " + data.statusText);
                     }
                 }); 
             } 

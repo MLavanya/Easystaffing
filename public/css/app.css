@@ -192,3 +192,20 @@ ul.follower li{
   white-space: nowrap;
   margin: 2px 0;
 }
+
+.employee_table th, tr td{
+  text-align: left;
+}
+.panel-body.employee_table  {
+  height: 386px;
+  overflow: overlay;
+}
+.employee_table small {
+  color: #e66454;
+}
+#else-panel .fa-trophy{
+  color: #77c777;
+}
+.small-font{
+  font-size: 20px;
+}

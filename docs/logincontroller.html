@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>logincontroller.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.js
+              </a>
+            
+              
+              <a class="source" href="homeController.html">
+                homeController.js
+              </a>
+            
+              
+              <a class="source" href="logincontroller.html">
+                logincontroller.js
+              </a>
+            
+              
+              <a class="source" href="model.html">
+                model.js
+              </a>
+            
+              
+              <a class="source" href="router.html">
+                router.js
+              </a>
+            
+              
+              <a class="source" href="view.html">
+                view.js
+              </a>
+            
+              
+              <a class="source" href="databaseconnection.html">
+                databaseconnection.js
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="services.html">
+                services.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>logincontroller.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>App.LoginController=Ember.Controller.extend({
+
+    actions:{
+        checkadm: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+
+            bootbox.prompt({
+                title: <span class="hljs-string">"Authentication"</span>,
+                message: <span class="hljs-string">"Enter the password."</span>,
+                callback: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span> </span>{
+                    $.post(<span class="hljs-string">'/validateadm'</span>,{password:result},<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+                        <span class="hljs-keyword">if</span>(data == <span class="hljs-string">"success"</span>)
+                            that.transitionTo(<span class="hljs-string">'signup'</span>);
+                    });
+                },
+                className: <span class="hljs-string">"bootbox-sm"</span>
+            });
+
+        },
+        signinclick:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+            <span class="hljs-keyword">var</span> username=$(<span class="hljs-string">"#username_id"</span>).val();
+            <span class="hljs-keyword">var</span> password=$(<span class="hljs-string">"#password_id"</span>).val();
+            <span class="hljs-keyword">if</span>(username == <span class="hljs-string">""</span> || password == <span class="hljs-string">""</span>){
+                bootbox.alert(<span class="hljs-string">'some of the required fields are Empty!!'</span>);
+            }
+            <span class="hljs-keyword">else</span>{
+                <span class="hljs-keyword">var</span> adddetails={};
+                adddetails.email=username;
+                adddetails.password=password;
+                $.ajax ({
+                    type: <span class="hljs-string">"POST"</span>,
+                    url:<span class="hljs-string">'/login'</span>, 
+                    data:adddetails,                  
+                    success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{                         
+                        <span class="hljs-keyword">var</span> email = data.email; 
+                        setCookie(<span class="hljs-string">"email"</span>, email, <span class="hljs-number">30</span>);                       
+                        bootbox.alert({
+                            message: <span class="hljs-string">"Successfully Logged-In"</span>,
+                            callback: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span> </span>{
+                                <span class="hljs-built_in">window</span>.location = data.redirectTo; <span class="hljs-comment">//redirects to the main page</span>
+                            }
+                        });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>window.location = data.redirectTo; //redirects to the main page</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                    },
+                    error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{
+                        bootbox.alert(data.statusText);
+                    }
+                }); 
+            }
+        }
+    }
+
+});
+
+App.SignupController=Ember.Controller.extend({
+   
+    actions:{
+        signupclick:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+
+            <span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+            <span class="hljs-keyword">var</span> name = $(<span class="hljs-string">"#name_id"</span>).val();
+            <span class="hljs-keyword">var</span> email = $(<span class="hljs-string">"#email_id"</span>).val();
+            <span class="hljs-keyword">var</span> username = $(<span class="hljs-string">"#signupusername_id"</span>).val();
+            <span class="hljs-keyword">var</span> password = $(<span class="hljs-string">"#signuppassword_id"</span>).val();
+
+            <span class="hljs-keyword">var</span> emailreg = <span class="hljs-regexp">/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/</span>;
+            <span class="hljs-keyword">var</span> namereg =<span class="hljs-regexp">/^[a-zA-Z][a-zA-Z\\s0-9]+$/</span>;
+            <span class="hljs-keyword">if</span>(name == <span class="hljs-string">""</span> || email == <span class="hljs-string">""</span> || username == <span class="hljs-string">""</span> || password == <span class="hljs-string">""</span>){
+                bootbox.alert(<span class="hljs-string">'some of the required fields are Empty!!'</span>);
+            }
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(!namereg.test(username)){
+                bootbox.alert(<span class="hljs-string">'Enter valid Name'</span>);
+            }
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(!emailreg.test(email)){
+                bootbox.alert(<span class="hljs-string">'Enter the valid email address'</span>);
+            }
+            <span class="hljs-keyword">else</span>{
+                <span class="hljs-keyword">var</span> adddetails={};
+                adddetails.name=name;
+                adddetails.email=email;
+                adddetails.username=username;
+                adddetails.password=password;
+                $.ajax ({
+                    type: <span class="hljs-string">"POST"</span>,
+                    url:<span class="hljs-string">'/register'</span>, 
+                    data:adddetails,                  
+                    success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{    
+                        bootbox.alert(data); 
+<span class="hljs-comment">/*                        var email = data.Result[0].email; 
+                        setCookie("email", email, 30); 
+*/</span>                        that.transitionTo(<span class="hljs-string">"login"</span>);                
+                    },
+                    error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{
+                        bootbox.alert(<span class="hljs-string">"Msg: "</span>+ data.status + <span class="hljs-string">": "</span> + data.statusText);
+                    }
+                }); 
+            } 
+
+        }
+    }
+
+});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>set cookie for username</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">setCookie</span><span class="hljs-params">(cname,cvalue,exdays)</span> </span>{
+    <span class="hljs-keyword">var</span> d = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>();
+    d.setTime(d.getTime() + (exdays*<span class="hljs-number">24</span>*<span class="hljs-number">60</span>*<span class="hljs-number">60</span>*<span class="hljs-number">1000</span>));
+    <span class="hljs-keyword">var</span> expires = <span class="hljs-string">"expires="</span> + d.toGMTString();
+    <span class="hljs-built_in">document</span>.cookie = cname+<span class="hljs-string">"="</span>+cvalue+<span class="hljs-string">"; "</span>+expires;
+}</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

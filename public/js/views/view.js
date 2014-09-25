@@ -37,9 +37,7 @@ App.DashboardView = Ember.View.extend({
 
                 facetMatches : function(callback) {
                   callback([
-                    { label: 'freetext',    category: 'generic' },
-                    { label: 'city',       category: 'location' },
-                    { label: 'country',    category: 'location' },
+                    { label: 'freetext',    category: 'generic' },                    
                     { label: 'skills',    category: 'other' },
                     { label: 'company',    category: 'other' }
                   ]);
@@ -51,54 +49,8 @@ App.DashboardView = Ember.View.extend({
                             callback(['java','dotnet','php','nodejs']);
                             break;
                         case 'company':
-                            callback(['srs', 'infosys', 'wipro','capgemini']);
-                            break;               
-                        case 'city':
-                            callback([
-                            'Cleveland',
-                            'New York City',
-                            'Brooklyn',
-                            'Manhattan',
-                            'Queens',
-                            'The Bronx',
-                            'Staten Island',
-                            'San Francisco',
-                            'Los Angeles',
-                            'Seattle',
-                            'London',
-                            'hyderabad',  
-                            'Portland',
-                            'Chicago',
-                            'Boston'
-                          ]);
-                          break;          
-                        case 'country':
-                          callback([
-                            "China", "India", "United States", "Indonesia", "Brazil",
-                            "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
-                            "Mexico", "Philippines", "Vietnam", "Ethiopia", "Egypt",
-                            "Germany", "Turkey", "Iran", "Thailand", "D. R. of Congo",
-                            "France", "United Kingdom", "Italy", "Myanmar", "South Africa",
-                            "South Korea", "Colombia", "Ukraine", "Spain", "Tanzania",
-                            "Sudan", "Kenya", "Argentina", "Poland", "Algeria",
-                            "Canada", "Uganda", "Morocco", "Iraq", "Nepal",
-                            "Peru", "Afghanistan", "Venezuela", "Malaysia", "Uzbekistan",
-                            "Saudi Arabia", "Ghana", "Yemen", "North Korea", "Mozambique",
-                            "Taiwan", "Syria", "Ivory Coast", "Australia", "Romania",
-                            "Sri Lanka", "Madagascar", "Cameroon", "Angola", "Chile",
-                            "Netherlands", "Burkina Faso", "Niger", "Kazakhstan", "Malawi",
-                            "Cambodia", "Guatemala", "Ecuador", "Mali", "Zambia",
-                            "Senegal", "Zimbabwe", "Chad", "Cuba", "Greece",
-                            "Portugal", "Belgium", "Czech Republic", "Tunisia", "Guinea",
-                            "Rwanda", "Dominican Republic", "Haiti", "Bolivia", "Hungary",
-                            "Belarus", "Somalia", "Sweden", "Benin", "Azerbaijan",
-                            "Burundi", "Austria", "Honduras", "Switzerland", "Bulgaria",
-                            "Serbia", "Israel", "Tajikistan", "Hong Kong", "Papua New Guinea",
-                            "Togo", "Libya", "Jordan", "Paraguay", "Laos",
-                            "El Salvador", "Sierra Leone", "Nicaragua", "Kyrgyzstan", "Denmark",
-                            "Slovakia", "Finland", "Eritrea", "Turkmenistan"
-                          ], {preserveOrder: true});
-                          break;
+                            callback(['CISCO','SRS', 'Infosys', 'Wipro','Capgemini']);
+                            break;                                       
                     }
                 }
             }
@@ -144,9 +96,7 @@ App.SearchResultView = Ember.View.extend({
 
                 facetMatches : function(callback) {
                   callback([
-                    { label: 'freetext',    category: 'generic' },
-                    { label: 'city',       category: 'location' },
-                    { label: 'country',    category: 'location' },
+                    { label: 'freetext',    category: 'generic' },                    
                     { label: 'skills',    category: 'other' },
                     { label: 'company',    category: 'other' }
                   ]);
@@ -158,89 +108,14 @@ App.SearchResultView = Ember.View.extend({
                             callback(['java','dotnet','php','nodejs']);
                             break;
                         case 'company':
-                            callback(['srs', 'infosys', 'wipro','capgemini']);
-                            break;               
-                        case 'city':
-                            callback([
-                            'Cleveland',
-                            'New York City',
-                            'Brooklyn',
-                            'Manhattan',
-                            'Queens',
-                            'The Bronx',
-                            'Staten Island',
-                            'San Francisco',
-                            'Los Angeles',
-                            'Seattle',
-                            'London',
-                            'hyderabad',  
-                            'Portland',
-                            'Chicago',
-                            'Boston'
-                          ]);
-                          break;          
-                        case 'country':
-                          callback([
-                            "China", "India", "United States", "Indonesia", "Brazil",
-                            "Pakistan", "Bangladesh", "Nigeria", "Russia", "Japan",
-                            "Mexico", "Philippines", "Vietnam", "Ethiopia", "Egypt",
-                            "Germany", "Turkey", "Iran", "Thailand", "D. R. of Congo",
-                            "France", "United Kingdom", "Italy", "Myanmar", "South Africa",
-                            "South Korea", "Colombia", "Ukraine", "Spain", "Tanzania",
-                            "Sudan", "Kenya", "Argentina", "Poland", "Algeria",
-                            "Canada", "Uganda", "Morocco", "Iraq", "Nepal",
-                            "Peru", "Afghanistan", "Venezuela", "Malaysia", "Uzbekistan",
-                            "Saudi Arabia", "Ghana", "Yemen", "North Korea", "Mozambique",
-                            "Taiwan", "Syria", "Ivory Coast", "Australia", "Romania",
-                            "Sri Lanka", "Madagascar", "Cameroon", "Angola", "Chile",
-                            "Netherlands", "Burkina Faso", "Niger", "Kazakhstan", "Malawi",
-                            "Cambodia", "Guatemala", "Ecuador", "Mali", "Zambia",
-                            "Senegal", "Zimbabwe", "Chad", "Cuba", "Greece",
-                            "Portugal", "Belgium", "Czech Republic", "Tunisia", "Guinea",
-                            "Rwanda", "Dominican Republic", "Haiti", "Bolivia", "Hungary",
-                            "Belarus", "Somalia", "Sweden", "Benin", "Azerbaijan",
-                            "Burundi", "Austria", "Honduras", "Switzerland", "Bulgaria",
-                            "Serbia", "Israel", "Tajikistan", "Hong Kong", "Papua New Guinea",
-                            "Togo", "Libya", "Jordan", "Paraguay", "Laos",
-                            "El Salvador", "Sierra Leone", "Nicaragua", "Kyrgyzstan", "Denmark",
-                            "Slovakia", "Finland", "Eritrea", "Turkmenistan"
-                          ], {preserveOrder: true});
-                          break;
+                            callback(['CISCO','SRS', 'Infosys', 'Wipro','Capgemini']);
+                            break;                                      
                     }
                 }
             }
         });    
     }
 });
-
-/*
-App.TestRoute = Ember.Route.extend({
-  model: function() {
-    var items = [];
-
-    for(var i = 0; i < 100; i++)
-      items.pushObject(i);
-
-    return items;
-  },
-
-  events: {
-    more: function() {
-      var items = this.modelFor('test'),
-          last  = items.get('lastObject');
-
-      for(var i = last + 1; i < last + 100; i++)
-        items.pushObject(i);
-    }
-  }
-});
-
-*/
-
-App.TestView = Ember.View.extend({
- 
-});
-
 
 App.TagsView = Ember.View.extend({
     tagName : 'div',
@@ -278,7 +153,7 @@ App.CVUploadTool = Ember.TextField.extend({
                 var uploadFile = data.files[0];
                 if (!(/\.(docx)$/i)
                         .test(uploadFile.name)) {
-                    addmessage("danger",'Please select an doc or docx file.');
+                    addmessage("danger",'Please select docx file.');
                     goUpload = false;
                 }               
                 if (uploadFile.size > 5000000) { // 2mb
@@ -288,7 +163,7 @@ App.CVUploadTool = Ember.TextField.extend({
                 if (goUpload == true) {
                     $('#uploadcv').hide();
                     $('#addEmpSbmt').attr('disabled',true);
-                    data.context = $('<button/>').text('Upload')
+                    data.context = $('<button/>').text('Click me to Upload')
                     .appendTo($("#uploadcv").parent())
                     .click(function (e) {
                         e.preventDefault();
@@ -407,83 +282,6 @@ App.VacancySuggestionsView = Ember.View.extend({
     }
 
 });
-/*
-App.SetTabView = Ember.View.extend({
-    didInsertElement : function(){
-        var that = this;
-        setTimeout(function(){
-            $("[href='#search-tabs-c']").parent().removeClass('active');    
-            $("[href='#search-tabs-v']").parent().removeClass('active');    
-            $("[href='#search-tabs-co']").parent().removeClass('active');    
-            $("[href='#search-tabs-"+that.get('controller').get('model').schema+"']").parent().addClass('active');    
-        },100);
-    }
-
-});*/
-
-App.GraphChartView = Ember.View.extend({
-
-    didInsertElement:function(){
-        Morris.Area({
-            element: 'hero-area',
-            data: [
-                { period: '2010 Q1', iphone: 2666, ipad: null, itouch: 2647 },
-                { period: '2010 Q2', iphone: 2778, ipad: 2294, itouch: 2441 },
-                { period: '2010 Q3', iphone: 4912, ipad: 1969, itouch: 2501 },
-                { period: '2010 Q4', iphone: 3767, ipad: 3597, itouch: 5689 },
-                { period: '2011 Q1', iphone: 6810, ipad: 1914, itouch: 2293 },
-                { period: '2011 Q2', iphone: 5670, ipad: 4293, itouch: 1881 },
-                { period: '2011 Q3', iphone: 4820, ipad: 3795, itouch: 1588 },
-                { period: '2011 Q4', iphone: 15073, ipad: 5967, itouch: 5175 },
-                { period: '2012 Q1', iphone: 10687, ipad: 4460, itouch: 2028 },
-                { period: '2012 Q2', iphone: 8432, ipad: 5713, itouch: 1791 }
-            ],
-            xkey: 'period',
-            ykeys: ['iphone', 'ipad', 'itouch'],
-            labels: ['iPhone', 'iPad', 'iPod Touch'],
-            hideHover: 'auto',
-            //lineColors: PixelAdmin.settings.consts.COLORS,
-                                         lineColors: ['red','blue','green','yellow'],
-            fillOpacity: 0.3,
-            behaveLikeLine: true,
-            lineWidth: 2,
-            pointSize: 4,
-            gridLineColor: '#cfcfcf',
-            resize: true
-        });
-
-    }
-
-});
-
-App.BarChartView = Ember.View.extend({
-
-    didInsertElement:function(){
-        Morris.Bar({
-            element: 'hero-bar',
-            data: [
-                { device: 'iPhone', geekbench: 136 },
-                { device: 'iPhone 3G', geekbench: 137 },
-                { device: 'iPhone 3GS', geekbench: 275 },
-                { device: 'iPhone 4', geekbench: 380 },
-                { device: 'iPhone 4S', geekbench: 655 },
-                { device: 'iPhone 5', geekbench: 1571 }
-            ],
-            xkey: 'device',
-            ykeys: ['geekbench'],
-            labels: ['Geekbench'],
-            barRatio: 0.4,
-            xLabelAngle: 35,
-            hideHover: 'auto',
-            //barColors: PixelAdmin.settings.consts.COLORS,
-                                        barColors: ['green'],
-            gridLineColor: '#cfcfcf',
-            resize: true
-        });
-
-    }
-
-});
 
 App.JqcloudView = Ember.View.extend({
     didInsertElement: function(){
@@ -515,7 +313,7 @@ App.VSuggestionsView = Ember.View.extend({
         var sug = $('#suggestions');
 
         var m = this.get('controller').get('content').details;
-        var key = m.city+"+"+m.country+"+"+m.skills+"+"+m.title+"+"+m.name+"+"+m.exp;
+        var key = m.city+"+"+m.country+"+"+m.skills;
 
         $.ajax ({
             type: "POST", 
@@ -565,7 +363,7 @@ App.CSuggestionsView = Ember.View.extend({
         var sug = $('#suggestions');
 
         var m = this.get('controller').get('content');
-        var key = m.city+"+"+m.country+"+"+m.skills+"+"+m.title+"+"+m.name+"+"+m.exp_max;
+        var key = m.city+"+"+m.country+"+"+m.skills;
 
         $.ajax ({
             type: "POST", 

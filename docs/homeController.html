@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>homeController.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.js
+              </a>
+            
+              
+              <a class="source" href="homeController.html">
+                homeController.js
+              </a>
+            
+              
+              <a class="source" href="logincontroller.html">
+                logincontroller.js
+              </a>
+            
+              
+              <a class="source" href="model.html">
+                model.js
+              </a>
+            
+              
+              <a class="source" href="router.html">
+                router.js
+              </a>
+            
+              
+              <a class="source" href="view.html">
+                view.js
+              </a>
+            
+              
+              <a class="source" href="databaseconnection.html">
+                databaseconnection.js
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="services.html">
+                services.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>homeController.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>mesgs = [];
+<span class="hljs-keyword">var</span> companyList,statusList;
+
+<span class="hljs-keyword">var</span> countries = [<span class="hljs-string">"China"</span>, <span class="hljs-string">"India"</span>, <span class="hljs-string">"United States"</span>, <span class="hljs-string">"Indonesia"</span>, <span class="hljs-string">"Brazil"</span>,
+                <span class="hljs-string">"Pakistan"</span>, <span class="hljs-string">"Bangladesh"</span>, <span class="hljs-string">"Nigeria"</span>, <span class="hljs-string">"Russia"</span>, <span class="hljs-string">"Japan"</span>,
+                <span class="hljs-string">"Mexico"</span>, <span class="hljs-string">"Philippines"</span>, <span class="hljs-string">"Vietnam"</span>, <span class="hljs-string">"Ethiopia"</span>, <span class="hljs-string">"Egypt"</span>,
+                <span class="hljs-string">"Germany"</span>, <span class="hljs-string">"Turkey"</span>, <span class="hljs-string">"Iran"</span>, <span class="hljs-string">"Thailand"</span>, <span class="hljs-string">"D. R. of Congo"</span>,
+                <span class="hljs-string">"France"</span>, <span class="hljs-string">"United Kingdom"</span>, <span class="hljs-string">"Italy"</span>, <span class="hljs-string">"Myanmar"</span>, <span class="hljs-string">"South Africa"</span>,
+                <span class="hljs-string">"South Korea"</span>, <span class="hljs-string">"Colombia"</span>, <span class="hljs-string">"Ukraine"</span>, <span class="hljs-string">"Spain"</span>, <span class="hljs-string">"Tanzania"</span>,
+                <span class="hljs-string">"Sudan"</span>, <span class="hljs-string">"Kenya"</span>, <span class="hljs-string">"Argentina"</span>, <span class="hljs-string">"Poland"</span>, <span class="hljs-string">"Algeria"</span>,
+                <span class="hljs-string">"Canada"</span>, <span class="hljs-string">"Uganda"</span>, <span class="hljs-string">"Morocco"</span>, <span class="hljs-string">"Iraq"</span>, <span class="hljs-string">"Nepal"</span>,
+                <span class="hljs-string">"Peru"</span>, <span class="hljs-string">"Afghanistan"</span>, <span class="hljs-string">"Venezuela"</span>, <span class="hljs-string">"Malaysia"</span>, <span class="hljs-string">"Uzbekistan"</span>,
+                <span class="hljs-string">"Saudi Arabia"</span>, <span class="hljs-string">"Ghana"</span>, <span class="hljs-string">"Yemen"</span>, <span class="hljs-string">"North Korea"</span>, <span class="hljs-string">"Mozambique"</span>,
+                <span class="hljs-string">"Taiwan"</span>, <span class="hljs-string">"Syria"</span>, <span class="hljs-string">"Ivory Coast"</span>, <span class="hljs-string">"Australia"</span>, <span class="hljs-string">"Romania"</span>,
+                <span class="hljs-string">"Sri Lanka"</span>, <span class="hljs-string">"Madagascar"</span>, <span class="hljs-string">"Cameroon"</span>, <span class="hljs-string">"Angola"</span>, <span class="hljs-string">"Chile"</span>,
+                <span class="hljs-string">"Netherlands"</span>, <span class="hljs-string">"Burkina Faso"</span>, <span class="hljs-string">"Niger"</span>, <span class="hljs-string">"Kazakhstan"</span>, <span class="hljs-string">"Malawi"</span>,
+                <span class="hljs-string">"Cambodia"</span>, <span class="hljs-string">"Guatemala"</span>, <span class="hljs-string">"Ecuador"</span>, <span class="hljs-string">"Mali"</span>, <span class="hljs-string">"Zambia"</span>,
+                <span class="hljs-string">"Senegal"</span>, <span class="hljs-string">"Zimbabwe"</span>, <span class="hljs-string">"Chad"</span>, <span class="hljs-string">"Cuba"</span>, <span class="hljs-string">"Greece"</span>,
+                <span class="hljs-string">"Portugal"</span>, <span class="hljs-string">"Belgium"</span>, <span class="hljs-string">"Czech Republic"</span>, <span class="hljs-string">"Tunisia"</span>, <span class="hljs-string">"Guinea"</span>,
+                <span class="hljs-string">"Rwanda"</span>, <span class="hljs-string">"Dominican Republic"</span>, <span class="hljs-string">"Haiti"</span>, <span class="hljs-string">"Bolivia"</span>, <span class="hljs-string">"Hungary"</span>,
+                <span class="hljs-string">"Belarus"</span>, <span class="hljs-string">"Somalia"</span>, <span class="hljs-string">"Sweden"</span>, <span class="hljs-string">"Benin"</span>, <span class="hljs-string">"Azerbaijan"</span>,
+                <span class="hljs-string">"Burundi"</span>, <span class="hljs-string">"Austria"</span>, <span class="hljs-string">"Honduras"</span>, <span class="hljs-string">"Switzerland"</span>, <span class="hljs-string">"Bulgaria"</span>,
+                <span class="hljs-string">"Serbia"</span>, <span class="hljs-string">"Israel"</span>, <span class="hljs-string">"Tajikistan"</span>, <span class="hljs-string">"Hong Kong"</span>, <span class="hljs-string">"Papua New Guinea"</span>,
+                <span class="hljs-string">"Togo"</span>, <span class="hljs-string">"Libya"</span>, <span class="hljs-string">"Jordan"</span>, <span class="hljs-string">"Paraguay"</span>, <span class="hljs-string">"Laos"</span>,
+                <span class="hljs-string">"El Salvador"</span>, <span class="hljs-string">"Sierra Leone"</span>, <span class="hljs-string">"Nicaragua"</span>, <span class="hljs-string">"Kyrgyzstan"</span>, <span class="hljs-string">"Denmark"</span>,
+                <span class="hljs-string">"Slovakia"</span>, <span class="hljs-string">"Finland"</span>, <span class="hljs-string">"Eritrea"</span>, <span class="hljs-string">"Turkmenistan"</span>];
+
+<span class="hljs-keyword">var</span> cities = [<span class="hljs-string">'Cleveland'</span>,
+                <span class="hljs-string">'New York City'</span>,
+                <span class="hljs-string">'Brooklyn'</span>,
+                <span class="hljs-string">'Manhattan'</span>,
+                <span class="hljs-string">'Queens'</span>,
+                <span class="hljs-string">'The Bronx'</span>,
+                <span class="hljs-string">'Staten Island'</span>,
+                <span class="hljs-string">'San Francisco'</span>,
+                <span class="hljs-string">'Los Angeles'</span>,
+                <span class="hljs-string">'Seattle'</span>,
+                <span class="hljs-string">'London'</span>,
+                <span class="hljs-string">'Hyderabad'</span>,  
+                <span class="hljs-string">'Portland'</span>,
+                <span class="hljs-string">'Chicago'</span>,
+                <span class="hljs-string">'Boston'</span>,
+                <span class="hljs-string">'Bangalore'</span>,
+                <span class="hljs-string">'Delhi'</span>,
+                <span class="hljs-string">'Pune'</span>,
+                <span class="hljs-string">'Mumbai'</span>,
+                <span class="hljs-string">'Chennai'</span>];
+
+<span class="hljs-keyword">var</span> Employee_status = [<span class="hljs-string">'YES'</span>,<span class="hljs-string">'NO'</span>];          
+
+
+<span class="hljs-keyword">var</span> addmessage = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(type,msg)</span></span>{
+
+	mesgs.push({
+		type:type,
+		msg:msg
+	});
+
+}
+
+setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+
+	<span class="hljs-keyword">var</span> cl = <span class="hljs-string">"alert "</span>;
+
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span> ; i &lt; mesgs.length ; i++){
+
+		<span class="hljs-keyword">if</span>(mesgs[i].type == <span class="hljs-string">"success"</span>){
+			cl = cl + <span class="hljs-string">"alert-success"</span>;
+		}<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(mesgs[i].type == <span class="hljs-string">"info"</span>){
+			cl = cl + <span class="hljs-string">"alert-info"</span>;
+		}<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(mesgs[i].type == <span class="hljs-string">"warning"</span>){
+			cl = cl + <span class="hljs-string">"alert-warning"</span>;
+		}<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(mesgs[i].type == <span class="hljs-string">"danger"</span>){
+			cl = cl + <span class="hljs-string">"alert-danger"</span>;
+		}
+
+		$(<span class="hljs-string">"#alertMsg"</span>).prepend(<span class="hljs-string">"&lt;div class='alert alert-dismissable"</span>+cl+<span class="hljs-string">"'&gt;&lt;button type='button' class='close' data-dismiss='alert' aria-hidden='true'&gt;&amp;times;&lt;/button&gt;"</span>+mesgs[i].msg+<span class="hljs-string">"&lt;/div&gt;"</span>)
+
+		mesgs.splice(i, <span class="hljs-number">1</span>);		
+
+	}
+
+}, <span class="hljs-number">1000</span>);  
+
+
+setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+
+	$(<span class="hljs-string">'#gmesg div:first-child'</span>).remove();
+
+}, <span class="hljs-number">5000</span>);  
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getParameterByName</span><span class="hljs-params">(name)</span> </span>{
+    name = name.replace(<span class="hljs-regexp">/[\[]/</span>, <span class="hljs-string">"\\["</span>).replace(<span class="hljs-regexp">/[\]]/</span>, <span class="hljs-string">"\\]"</span>);
+    <span class="hljs-keyword">var</span> regex = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(<span class="hljs-string">"[\\?&amp;]"</span> + name + <span class="hljs-string">"=([^&amp;#]*)"</span>),
+        results = regex.exec(<span class="hljs-built_in">window</span>.location.href);
+    <span class="hljs-keyword">return</span> results == <span class="hljs-literal">null</span> ? <span class="hljs-string">""</span> : <span class="hljs-built_in">decodeURIComponent</span>(results[<span class="hljs-number">1</span>].replace(<span class="hljs-regexp">/\+/g</span>, <span class="hljs-string">" "</span>));
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">appliedforv</span><span class="hljs-params">(cid,vid,callback)</span></span>{
+	$.post(<span class="hljs-string">'/appliedforv'</span>,{company_id:cid,vacancy_id:vid},callback);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">shortlist</span><span class="hljs-params">(cid,url,elem)</span></span>{
+
+	bootbox.confirm({
+		message: <span class="hljs-string">"Are you sure you want to shortlist this candidate for this vacancy ?"</span>,
+		callback: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span> </span>{
+			<span class="hljs-keyword">if</span>(result){
+				$.post(<span class="hljs-string">'/applyvacancy'</span>,{company_id:<span class="hljs-number">0</span>,candidate_id:cid,vacancy_id:getParameterByName(<span class="hljs-string">'v'</span>),status:<span class="hljs-string">'C02'</span>},<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+					$(elem).attr(<span class="hljs-string">'disabled'</span>,<span class="hljs-string">'true'</span>);
+				});
+			}
+		},
+		className: <span class="hljs-string">"bootbox-sm"</span>
+	});
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyforv</span><span class="hljs-params">(vid,url,elem)</span></span>{
+
+	bootbox.confirm({
+		message: <span class="hljs-string">"Are you sure you want to post this candidate for this vacancy ?"</span>,
+		callback: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span> </span>{
+			<span class="hljs-keyword">if</span>(result){
+				$.post(<span class="hljs-string">'/applyvacancy'</span>,{company_id:<span class="hljs-number">0</span>,candidate_id:getParameterByName(<span class="hljs-string">'c'</span>),vacancy_id:vid,status:<span class="hljs-string">'C02'</span>},<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+					$(elem).attr(<span class="hljs-string">'disabled'</span>,<span class="hljs-string">'true'</span>);
+				});
+			}
+		},
+		className: <span class="hljs-string">"bootbox-sm"</span>
+	});
+
+}
+
+<span class="hljs-comment">/********************************
+ * Helpers
+ **********************************/</span>
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-skill'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(skills)</span> </span>{
+	<span class="hljs-keyword">if</span>(!skills){
+		<span class="hljs-keyword">return</span> <span class="hljs-string">""</span>;
+	}	
+	<span class="hljs-keyword">var</span> res = skills.split(<span class="hljs-string">","</span>);
+	<span class="hljs-keyword">var</span> ret = <span class="hljs-string">""</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;res.length;i++){
+		ret = ret+<span class="hljs-string">'&lt;label class="label label-info"&gt;'</span>+res[i]+<span class="hljs-string">'&lt;/label&gt;&amp;nbsp;'</span>;
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Ember.Handlebars.SafeString(ret);
+});
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-matched'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(skills)</span> </span>{
+	<span class="hljs-keyword">if</span>(!skills){
+		<span class="hljs-keyword">return</span> <span class="hljs-string">""</span>;
+	}
+	<span class="hljs-keyword">var</span> res = skills.split(<span class="hljs-string">","</span>);
+	<span class="hljs-keyword">var</span> ret = <span class="hljs-string">""</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;res.length;i++){
+		ret = ret+<span class="hljs-string">'&lt;label class="label label-success"&gt;'</span>+res[i]+<span class="hljs-string">'&lt;/label&gt;&amp;nbsp;'</span>;
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Ember.Handlebars.SafeString(ret);
+});
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-vacancy'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(id)</span> </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-string">"#/vacancy/"</span>+id;
+});
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-date'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(date)</span> </span>{
+	<span class="hljs-keyword">return</span> moment(date).fromNow();
+});
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-cv'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(value)</span> </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Ember.Handlebars.SafeString(value);
+});
+
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-vstatus'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(value)</span> </span>{
+  <span class="hljs-keyword">var</span> res=<span class="hljs-string">""</span>;
+  <span class="hljs-keyword">if</span>(value == <span class="hljs-string">"OPEN"</span>)
+  	res = res + <span class="hljs-string">'&lt;label class="label label-tag label-success"&gt;'</span>+value+<span class="hljs-string">'&lt;/label&gt;'</span>;
+  <span class="hljs-keyword">else</span>
+  	res = res + <span class="hljs-string">'&lt;label class="label label-tag label-warning"&gt;'</span>+value+<span class="hljs-string">'&lt;/label&gt;'</span>;
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Ember.Handlebars.SafeString(res);
+});
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-cstatus'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(value)</span> </span>{
+  <span class="hljs-keyword">var</span> res=<span class="hljs-string">""</span>;
+
+<span class="hljs-keyword">switch</span> (value) {
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"C01"</span>:
+  		res = res + <span class="hljs-string">'&lt;label class="label label-tag label-info"&gt;AVAILABLE&lt;/label&gt;'</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"C02"</span>:
+        res = res + <span class="hljs-string">'&lt;label class="label label-tag label-warning"&gt;IN-REVIEW&lt;/label&gt;'</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"C03"</span>:
+        res = res + <span class="hljs-string">'&lt;label class="label label-tag label-warning"&gt;SHORTLISTED&lt;/label&gt;'</span>;
+        <span class="hljs-keyword">break</span>;        
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"C04"</span>:
+        res = res + <span class="hljs-string">'&lt;label class="label label-tag label-warning"&gt;IN-PROGRESS&lt;/label&gt;'</span>;
+        <span class="hljs-keyword">break</span>;   
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"C05"</span>:
+        res = res + <span class="hljs-string">'&lt;label class="label label-tag label-success"&gt;ACCEPTED&lt;/label&gt;'</span>;
+        <span class="hljs-keyword">break</span>;
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"C06"</span>:
+        res = res + <span class="hljs-string">'&lt;label class="label label-tag label-danger"&gt;REJECTED&lt;/label&gt;'</span>;
+        <span class="hljs-keyword">break</span>;   
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"C07"</span>:
+        res = res + <span class="hljs-string">'&lt;label class="label label-tag label-danger"&gt;FAKE&lt;/label&gt;'</span>;
+        <span class="hljs-keyword">break</span>;  
+    <span class="hljs-keyword">case</span> <span class="hljs-string">"YES"</span>:
+    	res = res + <span class="hljs-string">'&lt;span class="label label-primary"&gt;&lt;i class="fa fa-star"&gt;&lt;/i&gt;&lt;/span&gt;'</span>
+}
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Ember.Handlebars.SafeString(res);
+});
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-results'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(content)</span> </span>{
+
+	<span class="hljs-keyword">var</span> schema = <span class="hljs-built_in">window</span>.App.__container__.lookup(<span class="hljs-string">'controller:searchResult'</span>).get(<span class="hljs-string">'content'</span>).schema;
+	<span class="hljs-keyword">var</span> res = <span class="hljs-string">""</span>;
+
+	<span class="hljs-keyword">var</span> rows = content.response.docs;
+	<span class="hljs-keyword">var</span> hls = content.highlighting;
+
+	$.each(rows,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i,data)</span></span>{
+
+		<span class="hljs-keyword">if</span>(schema == <span class="hljs-string">'v'</span>){
+
+			<span class="hljs-keyword">var</span> sl = <span class="hljs-string">'&lt;button class="btn btn-primary btn-outline btn-xs pull-right" onclick="applyforv('</span>+data.id+<span class="hljs-string">',window.location.href,this);"&gt;&lt;i class="fa fa-check"&gt;&lt;/i&gt; Apply&lt;/button&gt;'</span>;
+
+			res=res+<span class="hljs-string">'&lt;li&gt;'</span>;
+
+			<span class="hljs-keyword">if</span>(getParameterByName(<span class="hljs-string">'c'</span>)){
+				res=res+sl;
+			}
+
+			<span class="hljs-keyword">var</span> hltitle = hls[data.id].vtitle?hls[data.id].vtitle:data.vtitle;
+
+			res=res+<span class="hljs-string">'&lt;a href="#/vacancy/'</span>+data.id+<span class="hljs-string">'" class="search-title"&gt;'</span>+data.vname+<span class="hljs-string">'&lt;/a&gt;'</span>
+				+<span class="hljs-string">'&lt;p&gt;'</span>+hltitle+<span class="hljs-string">'&lt;/p&gt;'</span>
+				+<span class="hljs-string">'&lt;div class="search-content"&gt;'</span>
+				+data.vexp_min+<span class="hljs-string">' to '</span>+data.vexp_max+<span class="hljs-string">' years with '</span>+data.vskills+<span class="hljs-string">' skills located in '</span>+data.vcity+<span class="hljs-string">' .'</span>
+				+<span class="hljs-string">'&lt;/div&gt;'</span>
+				+<span class="hljs-string">'&lt;div class="search-tags"&gt;'</span>
+				+<span class="hljs-string">'&lt;span class="search-tags-text"&gt;Skills :&lt;/span&gt;'</span>;
+
+			<span class="hljs-keyword">var</span> r = data.vskills.split(<span class="hljs-string">","</span>);
+			<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;r.length;i++){
+				res = res+<span class="hljs-string">'&lt;label class="label label-info"&gt;'</span>+r[i]+<span class="hljs-string">'&lt;/label&gt;&amp;nbsp;'</span>;
+			}
+
+			res = res + <span class="hljs-string">'&lt;/div&gt;'</span>+<span class="hljs-string">'&lt;div class="search-tags"&gt;'</span>
+				  + <span class="hljs-string">'&lt;span class="search-tags-text"&gt;Matched :&lt;/span&gt;'</span>;	  
+
+			<span class="hljs-keyword">if</span>(hls[data.id].vskills){
+				<span class="hljs-keyword">var</span> r = $(<span class="hljs-string">"&lt;div&gt;&lt;/div&gt;"</span>).append(hls[data.id].vskills[<span class="hljs-number">0</span>]).find(<span class="hljs-string">"mark"</span>);
+				<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;r.length;i++){
+					res = res+<span class="hljs-string">'&lt;label class="label label-success"&gt;'</span>+$(r[i]).text()+<span class="hljs-string">'&lt;/label&gt;&amp;nbsp;'</span>;
+				}			  
+			}
+
+			res = res + <span class="hljs-string">'&lt;/div&gt; &lt;/li&gt;'</span>;
+
+		}<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(schema == <span class="hljs-string">'c'</span>){
+
+			<span class="hljs-keyword">var</span> sl = <span class="hljs-string">'&lt;button class="btn btn-primary btn-outline pull-right btn-flat btn-xs " onclick="shortlist('</span>+data.id+<span class="hljs-string">',window.location.href,this);"&gt;&lt;i class="fa fa-check"&gt;&lt;/i&gt; Shortlist&lt;/button&gt;'</span>;
+
+			res=res+<span class="hljs-string">'&lt;li&gt;'</span>;
+
+			<span class="hljs-keyword">if</span>(getParameterByName(<span class="hljs-string">'v'</span>)){
+				res=res+sl;
+			}
+
+			<span class="hljs-keyword">var</span> hlcontent = hls[data.id].content?hls[data.id].content:<span class="hljs-string">''</span>;
+			<span class="hljs-keyword">var</span> hltitle = hls[data.id].ctitle?hls[data.id].ctitle:data.ctitle;
+
+			res = res +<span class="hljs-string">'&lt;a href="#/candidate/'</span>+data.id+<span class="hljs-string">'" class="search-title"&gt;'</span>+data.cname+<span class="hljs-string">'&lt;/a&gt;'</span>
+				+<span class="hljs-string">'&lt;p&gt;'</span>+hltitle+<span class="hljs-string">'&lt;/p&gt;'</span>
+				+<span class="hljs-string">'&lt;div class="search-content"&gt;'</span>
+				+data.cexp+<span class="hljs-string">' years with '</span>+data.cskills+<span class="hljs-string">' skills located in '</span>+data.ccity+<span class="hljs-string">' .'</span>
+				+hlcontent + <span class="hljs-string">" score: "</span> + data.score
+				+<span class="hljs-string">'&lt;/div&gt;'</span>
+				+<span class="hljs-string">'&lt;div class="search-tags"&gt;'</span>
+				+<span class="hljs-string">'&lt;span class="search-tags-text"&gt;Skills :&lt;/span&gt;'</span>;
+
+			<span class="hljs-keyword">var</span> r = data.cskills.split(<span class="hljs-string">","</span>);
+			<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;r.length;i++){
+				res = res+<span class="hljs-string">'&lt;label class="label label-info"&gt;'</span>+r[i]+<span class="hljs-string">'&lt;/label&gt;&amp;nbsp;'</span>;
+			}
+
+			res = res + <span class="hljs-string">'&lt;/div&gt;'</span>+<span class="hljs-string">'&lt;div class="search-tags"&gt;'</span>
+				  + <span class="hljs-string">'&lt;span class="search-tags-text"&gt;Matched :&lt;/span&gt;'</span>;
+
+			<span class="hljs-keyword">if</span>(hls[data.id].cskills){
+				<span class="hljs-keyword">var</span> r = $(<span class="hljs-string">"&lt;div&gt;&lt;/div&gt;"</span>).append(hls[data.id].cskills[<span class="hljs-number">0</span>]).find(<span class="hljs-string">"mark"</span>);
+				<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;r.length;i++){
+					res = res+<span class="hljs-string">'&lt;label class="label label-success"&gt;'</span>+$(r[i]).text()+<span class="hljs-string">'&lt;/label&gt;&amp;nbsp;'</span>;
+				}			  
+			}
+			res = res + <span class="hljs-string">'&lt;/div&gt; &lt;/li&gt;'</span>;
+
+		}
+	});
+
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Ember.Handlebars.SafeString(res);
+});
+
+Ember.Handlebars.helper(<span class="hljs-string">'format-cstats'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data,status)</span> </span>{
+
+	<span class="hljs-keyword">var</span> res=<span class="hljs-string">"0"</span>;
+
+	$.each(data,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i,row)</span></span>{
+		<span class="hljs-keyword">if</span>(data[i].status == status){
+			res = data[i].cnt;
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+		}
+
+	});
+
+	<span class="hljs-keyword">return</span> res;
+});
+
+
+<span class="hljs-comment">/********************************
+ * Controllers
+ **********************************/</span>
+
+App.ApplicationController = Ember.Controller.extend({
+	name: <span class="hljs-string">""</span>,
+
+	init: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+		$.get(<span class="hljs-string">'/me'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+			that.set(<span class="hljs-string">'name'</span>,data[<span class="hljs-number">0</span>].name);
+		});
+	},
+
+	actions:{				
+		signout:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{			
+			<span class="hljs-built_in">document</span>.cookie = <span class="hljs-string">"email=; expires=Thu, 01 Jan 1970 00:00:00 GMT"</span>
+    		<span class="hljs-built_in">window</span>.location=<span class="hljs-string">'login.html'</span>;
+		},	
+	}
+});
+
+App.AddcandidateController = Ember.Controller.extend({
+
+	needs : [ <span class="hljs-string">'application'</span> ],
+	currentUser : Ember.computed.alias(<span class="hljs-string">'controllers.application.loggedinUser'</span>),
+	country : countries,
+	city	: cities,
+	employee : Employee_status,
+
+	init: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{		
+		<span class="hljs-keyword">var</span> statusList =[];
+		<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+		$.ajax ({
+            type: <span class="hljs-string">"GET"</span>, 
+            url:<span class="hljs-string">'/statusList'</span>,            
+            success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{                 
+                <span class="hljs-comment">/*for(var i=0;i&lt;data.length;i++){*/</span>
+                	<span class="hljs-keyword">if</span>(data[<span class="hljs-number">0</span>].id.indexOf(<span class="hljs-string">"C0"</span>) &gt; -<span class="hljs-number">1</span>){
+	                    statusList.push({
+	                    	id:data[<span class="hljs-number">0</span>].id,
+	                    	name:data[<span class="hljs-number">0</span>].name
+	                    });
+	                }
+                <span class="hljs-comment">/*}*/</span>                                
+                that.set(<span class="hljs-string">'statuses'</span>,statusList);                
+            },
+            error:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+                bootbox.alert(data.statusText);
+            }                        
+        }); 
+	},
+	statuses: statusList,                
+	actions :{
+		savecandidate: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{			
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			<span class="hljs-keyword">var</span> v = <span class="hljs-literal">true</span>;
+			<span class="hljs-keyword">var</span> fileName = <span class="hljs-built_in">JSON</span>.parse($(<span class="hljs-string">".uploadedfile"</span>).text());
+			<span class="hljs-keyword">var</span> cv = fileName.filepath;
+			
+			<span class="hljs-keyword">var</span> phonereg = <span class="hljs-regexp">/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/</span>;		
+			<span class="hljs-keyword">var</span> emailreg = <span class="hljs-regexp">/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/</span>;
+			<span class="hljs-keyword">var</span> expreg = <span class="hljs-regexp">/^[0-9]{0,2}$/</span>;
+
+			<span class="hljs-keyword">if</span>(($(<span class="hljs-string">"#name"</span>).val() == <span class="hljs-string">""</span>)){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Enter the Name "</span>);
+				v=<span class="hljs-literal">false</span>;
+			}			
+			<span class="hljs-keyword">if</span>(($(<span class="hljs-string">"#title"</span>).val() == <span class="hljs-string">""</span>)){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Enter the Name "</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>(($(<span class="hljs-string">"#experience"</span>).val() == <span class="hljs-string">""</span>)||(!expreg.test($(<span class="hljs-string">'#experience'</span>).val()))){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Check the Experience "</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>(($(<span class="hljs-string">"#email"</span>).val() == <span class="hljs-string">""</span>)||(!emailreg.test($(<span class="hljs-string">'#email'</span>).val()))){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Enter a valid Email"</span>);				
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>(($(<span class="hljs-string">"#phone"</span>).val() == <span class="hljs-string">""</span>)||(!phonereg.test($(<span class="hljs-string">'#phone'</span>).val()))){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Enter valid Mobile number"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#country"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>, <span class="hljs-string">"country has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#city"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>, <span class="hljs-string">"city has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+
+
+			<span class="hljs-keyword">var</span> textarea = $(<span class="hljs-string">'#tags:last'</span>);
+			<span class="hljs-keyword">var</span> textext = textarea.textext()[<span class="hljs-number">0</span>];
+
+			<span class="hljs-keyword">if</span>(textext.hiddenInput().val().length &lt; <span class="hljs-number">3</span>){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Skills has to be specified."</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+
+			<span class="hljs-keyword">var</span> text = textext.hiddenInput().val();
+			text = text.replace(<span class="hljs-string">"["</span>,<span class="hljs-string">""</span>);
+			text = text.replace(<span class="hljs-string">"]"</span>,<span class="hljs-string">""</span>);
+			text = text.replace(<span class="hljs-regexp">/['"]+/g</span>, <span class="hljs-string">''</span>);
+
+			<span class="hljs-keyword">if</span>(v){
+	   			jQuery(<span class="hljs-string">"#addEmpSbmt"</span>).attr(<span class="hljs-string">'disabled'</span>,<span class="hljs-string">'disabled'</span>).html(<span class="hljs-string">"updated"</span>); 
+	   			$.ajax({
+		   		    type: <span class="hljs-string">'POST'</span>,
+		   		    url: <span class="hljs-string">"/saveCandidate"</span>,
+		   		    dataType:<span class="hljs-string">"json"</span>,
+		   		    data: {
+		   					<span class="hljs-string">"name"</span>				: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"firstname"</span>),
+		   					<span class="hljs-string">"title"</span>				: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"title"</span>),
+		   					<span class="hljs-string">"email"</span>				: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"email"</span>),
+		   					<span class="hljs-string">"phone"</span>				: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"phone"</span>),
+		   					<span class="hljs-string">"exp"</span>				: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"experience"</span>),
+		   					<span class="hljs-string">"country"</span>			: jQuery(<span class="hljs-string">'#country'</span>).val(),
+		   					<span class="hljs-string">"city"</span>				: jQuery(<span class="hljs-string">'#city'</span>).val(),
+		   					<span class="hljs-string">"cvpath"</span>			: cv,
+		   					<span class="hljs-string">"company_id"</span>		: jQuery(<span class="hljs-string">"#company"</span>).val(),
+		   					<span class="hljs-string">"status"</span>			: jQuery(<span class="hljs-string">"#status"</span>).val(),
+		   					<span class="hljs-string">"skills"</span>			: text,
+		   					<span class="hljs-string">"comments"</span>			: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"comments"</span>),
+		   					<span class="hljs-string">"active"</span>		   	:jQuery(<span class="hljs-string">'#employee'</span>).val()		
+		      		    },
+		   		    success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+		   		    	bootbox.alert(data.message);
+		   		    	jQuery(<span class="hljs-string">".form-control"</span>).val(<span class="hljs-string">""</span>);
+	   					setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{that.transitionTo(<span class="hljs-string">'dashboard'</span>);},<span class="hljs-number">500</span>);
+		   		    },
+		   		    error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+		   		    	bootbox.alert(data.message);
+		   		    }
+	   		     });
+          	}
+
+		}
+	}
+});
+
+App.AddvacancyController = Ember.Controller.extend({
+
+	init: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-keyword">var</span> companyList =[];
+		<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+		$.ajax ({
+            type: <span class="hljs-string">"GET"</span>, 
+            url:<span class="hljs-string">'/companyList'</span>,            
+            success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{                 
+                <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;data.length;i++){
+                    companyList.push({
+                    	id: data[i].id,
+                    	name:data[i].name});
+                }                                  
+                that.set(<span class="hljs-string">'companies'</span>,companyList);                
+            },
+            error:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+                bootbox.alert(data.statusText);
+            }                        
+        });
+	},
+	needs : [ <span class="hljs-string">'application'</span> ],
+	currentUser : Ember.computed.alias(<span class="hljs-string">'controllers.application.loggedinUser'</span>),
+	companies: companyList,
+	country : countries,
+	city	: cities,
+	statuses: [<span class="hljs-string">'OPEN'</span>,<span class="hljs-string">'CLOSED'</span>],
+	actions :{
+		addCompany: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+			<span class="hljs-keyword">var</span> that =  <span class="hljs-keyword">this</span>;
+			bootbox.prompt({
+				title: <span class="hljs-string">"Enter the company name"</span>,
+				callback: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span> </span>{
+					<span class="hljs-keyword">if</span>(result){
+						$.post(<span class="hljs-string">'/updateCompany'</span>,{<span class="hljs-string">'name'</span>:result},<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+							<span class="hljs-keyword">if</span>(data == <span class="hljs-string">"200"</span>){
+								<span class="hljs-keyword">var</span> companies = [];
+				                $.get(<span class="hljs-string">'/companyList'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{		               		
+									<span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;data.length;i++){
+					                    companies.push({
+					                    	id: data[i].id,
+					                    	name:data[i].name});
+					                }   
+					                that.set(<span class="hljs-string">'companies'</span>,companies);
+								});	
+
+							}<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(data ==<span class="hljs-string">"201"</span>){
+								bootbox.alert(<span class="hljs-string">"Already exists"</span>);
+							}
+						});
+					}					
+				},
+				className: <span class="hljs-string">"bootbox-sm"</span>
+			});
+
+		},
+
+		savevacancy: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			<span class="hljs-keyword">var</span> v = <span class="hljs-literal">true</span>;
+
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#min_experience"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Experience has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#max_experience"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Experience has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#jobTitle"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Email has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#vacancy"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>, <span class="hljs-string">"Phone number has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#country"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>, <span class="hljs-string">"country has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#city"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>, <span class="hljs-string">"city has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+			<span class="hljs-keyword">if</span>($(<span class="hljs-string">"#status"</span>).val() == <span class="hljs-string">""</span>){
+				addmessage(<span class="hljs-string">"danger"</span>, <span class="hljs-string">"status has to be specified"</span>);
+				v=<span class="hljs-literal">false</span>;
+			}
+
+			<span class="hljs-keyword">var</span> textarea = $(<span class="hljs-string">'#tags:last'</span>);
+			<span class="hljs-keyword">var</span> textext = textarea.textext()[<span class="hljs-number">0</span>];
+
+			<span class="hljs-keyword">if</span>(textext.hiddenInput().val().length &lt; <span class="hljs-number">3</span>){
+				addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">"Skills has to be specified."</span>);
+				v=<span class="hljs-literal">false</span>;
+			}		
+
+			<span class="hljs-keyword">var</span> text = textext.hiddenInput().val();
+			text = text.replace(<span class="hljs-string">"["</span>,<span class="hljs-string">""</span>);
+			text = text.replace(<span class="hljs-string">"]"</span>,<span class="hljs-string">""</span>);
+			text = text.replace(<span class="hljs-regexp">/['"]+/g</span>, <span class="hljs-string">''</span>);
+
+			<span class="hljs-keyword">if</span>(v){
+	   			jQuery(<span class="hljs-string">"#addEmpSbmt"</span>).attr(<span class="hljs-string">'disabled'</span>,<span class="hljs-string">'disabled'</span>).html(<span class="hljs-string">"updated"</span>); 
+	   			$.ajax({
+		   		    type: <span class="hljs-string">'POST'</span>,
+		   		    url: <span class="hljs-string">"/saveVacancies"</span>,
+		   		    dataType:<span class="hljs-string">"json"</span>,
+		   		    data: {
+		   					<span class="hljs-string">"title"</span>			: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"jobTitle"</span>),
+		   					<span class="hljs-string">"name"</span>			: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"vacancy"</span>),
+		   					<span class="hljs-string">"country"</span>		: jQuery(<span class="hljs-string">'#country'</span>).val(),
+		   					<span class="hljs-string">"city"</span>			: jQuery(<span class="hljs-string">'#city'</span>).val(),
+		   					<span class="hljs-string">"exp_min"</span>		: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"min_experience"</span>),
+		   					<span class="hljs-string">"exp_max"</span>		: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"max_experience"</span>),		   					
+		   					<span class="hljs-string">"company_id"</span>	: jQuery(<span class="hljs-string">"#company"</span>).val(),	
+		   					<span class="hljs-string">"status"</span>		: jQuery(<span class="hljs-string">"#status"</span>).val(),	   					
+		   					<span class="hljs-string">"skills"</span>		: text,
+		   					<span class="hljs-string">"description"</span>	: <span class="hljs-keyword">this</span>.get(<span class="hljs-string">"description"</span>),
+		      		    },
+		   		    success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{		   		    	
+		   		    	bootbox.alert(data.message);
+		   		    	jQuery(<span class="hljs-string">".form-control"</span>).val(<span class="hljs-string">""</span>);
+	   					setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{that.transitionTo(<span class="hljs-string">'dashboard'</span>);},<span class="hljs-number">500</span>);
+		   		    },
+		   		    error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+		   		    	bootbox.alert(<span class="hljs-string">"error saving the data"</span>);
+		   		    } 
+	   		     });
+          	}
+
+		}
+	}
+});
+
+App.DashboardController = Ember.ObjectController.extend({
+	actions : {		
+		search : <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>{
+			searchtype = $(<span class="hljs-string">"input:radio[name='searchtype']:checked"</span>).val();
+			schema = <span class="hljs-string">"v"</span>;
+			<span class="hljs-keyword">if</span>(searchtype == <span class="hljs-string">'candidate'</span>)
+				schema = <span class="hljs-string">"c"</span>;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(searchtype == <span class="hljs-string">'company'</span>)
+				schema = <span class="hljs-string">"co"</span>
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(searchtype == <span class="hljs-string">'vacancy'</span>)
+				schema = <span class="hljs-string">"v"</span>
+			<span class="hljs-keyword">else</span>
+				<span class="hljs-keyword">return</span>;
+
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			that.transitionTo(<span class="hljs-string">'searchResult'</span>,search_text+<span class="hljs-string">"&amp;schema="</span>+schema);
+
+		}
+	}
+});
+
+App.VacancyController = Ember.ObjectController.extend({
+
+	actions:{
+		searchbyv: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+			<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'content'</span>);
+			<span class="hljs-keyword">var</span> key = m.city+<span class="hljs-string">"+"</span>+m.country+<span class="hljs-string">"+"</span>+m.skills+<span class="hljs-string">"+"</span>+m.title+<span class="hljs-string">"+"</span>+m.name+<span class="hljs-string">"+"</span>+m.exp_max;
+			<span class="hljs-keyword">this</span>.transitionTo(<span class="hljs-string">'searchResult'</span>,key+<span class="hljs-string">'&amp;schema=c'</span>+<span class="hljs-string">'&amp;v='</span>+m.id);
+		},
+		updatevacancystatus: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+
+			<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'content'</span>);
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			$.ajax ({
+	            type: <span class="hljs-string">"GET"</span>, 
+	            url:<span class="hljs-string">'/statusList'</span>,            
+	            success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{                 
+	            	<span class="hljs-keyword">var</span> sel = <span class="hljs-string">"&lt;select class='form-control' id='newstatus'&gt;"</span>;
+
+	                <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;data.length;i++){
+	                	<span class="hljs-keyword">if</span>(data[i].id.indexOf(<span class="hljs-string">"V0"</span>) &gt; -<span class="hljs-number">1</span>){
+	                		sel = sel + <span class="hljs-string">"&lt;option value='"</span>+data[i].name+<span class="hljs-string">"'&gt;"</span>+data[i].name+<span class="hljs-string">"&lt;/option&gt;"</span>;
+		                }
+	                }
+
+					bootbox.confirm({
+						message: <span class="hljs-string">"Select the status : "</span>+sel + <span class="hljs-string">"&lt;/select&gt;"</span>,
+						callback: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span> </span>{
+							<span class="hljs-keyword">if</span>(result){
+								$.post(<span class="hljs-string">'/updatevacancystatus'</span>,{
+									id: m.id,
+									data:{
+										status: $(<span class="hljs-string">'#newstatus'</span>).val(),
+									}
+								},<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(res)</span></span>{
+									<span class="hljs-keyword">return</span> $.get(<span class="hljs-string">'/getvacancy/'</span>+m.id,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+										<span class="hljs-keyword">if</span>(data.status == <span class="hljs-string">"OPEN"</span>)
+											data.isOpen = <span class="hljs-literal">true</span>;
+										<span class="hljs-keyword">else</span>
+											data.isOpen = <span class="hljs-literal">false</span>;
+										that.set(<span class="hljs-string">'content'</span>,data);
+									});
+								});
+							}
+						},
+						className: <span class="hljs-string">"bootbox-sm"</span>
+					});
+
+	            },
+	            error:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+	                bootbox.alert(data.statusText);
+	            }                        
+	        }); 
+
+		}
+	}
+
+});
+
+App.CandidateController = Ember.ObjectController.extend({
+
+	country : countries,
+	city	: cities,
+	actions:{
+		searchbyc: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+			<span class="hljs-keyword">var</span> m = <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'content'</span>).details;
+			<span class="hljs-keyword">var</span> key = m.city+<span class="hljs-string">"+"</span>+m.country+<span class="hljs-string">"+"</span>+m.skills+<span class="hljs-string">"+"</span>+m.title+<span class="hljs-string">"+"</span>+m.name+<span class="hljs-string">"+"</span>+m.exp;
+			<span class="hljs-keyword">this</span>.transitionTo(<span class="hljs-string">'searchResult'</span>,key+<span class="hljs-string">'&amp;schema=v'</span>+<span class="hljs-string">'&amp;c='</span>+m.id);
+		},
+		showHistory: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(m)</span></span>{
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			$.get(<span class="hljs-string">'/apphistorybyid/'</span>+m.id,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span></span>{
+				that.set(<span class="hljs-string">'content.apphistory'</span>,result);
+			});
+		},
+		updateapplication: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(m)</span></span>{
+
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			$.ajax ({
+	            type: <span class="hljs-string">"GET"</span>, 
+	            url:<span class="hljs-string">'/statusList'</span>,            
+	            success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{                 
+	            	<span class="hljs-keyword">var</span> sel = <span class="hljs-string">"&lt;select class='form-control' id='newstatus'&gt;"</span>;
+
+	                <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;data.length;i++){
+	                	<span class="hljs-keyword">if</span>(data[i].id.indexOf(<span class="hljs-string">"C0"</span>) &gt; -<span class="hljs-number">1</span>){
+	                		sel = sel + <span class="hljs-string">"&lt;option value='"</span>+data[i].id+<span class="hljs-string">"'&gt;"</span>+data[i].name+<span class="hljs-string">"&lt;/option&gt;"</span>;
+		                }
+	                }
+
+					bootbox.confirm({
+						message: <span class="hljs-string">"Select the status : "</span>+sel + <span class="hljs-string">"&lt;/select&gt;&lt;br/&gt;Comments: &lt;textarea rows=2 cols=30 class='form-control' id='acomment' /&gt;"</span>,
+						callback: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span> </span>{
+							<span class="hljs-keyword">if</span>(result){
+								$.post(<span class="hljs-string">'/updateappstatus'</span>,{
+									id: m.id,
+									candidate_id: that.get(<span class="hljs-string">'content'</span>).details.id,
+									data:{
+										status: $(<span class="hljs-string">'#newstatus'</span>).val(),
+									},
+									history:{
+										application_id: m.id,
+										prevstatus: m.status,
+										curstatus:  $(<span class="hljs-string">'#newstatus'</span>).val()
+									},
+									comment: {
+										comment: $(<span class="hljs-string">'#acomment'</span>).val()?$(<span class="hljs-string">'#acomment'</span>).val():<span class="hljs-string">"None."</span>
+									}
+								},<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+									$.get(<span class="hljs-string">'/applicationbycid/'</span>+that.get(<span class="hljs-string">'content'</span>).details.id,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(res)</span></span>{
+										that.set(<span class="hljs-string">'content.applications'</span>,res);	
+									});
+								});
+							}
+						},
+						className: <span class="hljs-string">"bootbox-sm"</span>
+					});
+
+	            },
+	            error:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+	                bootbox.alert(data.statusText);
+	            }                        
+	        }); 
+
+		},
+		UpdateCandidate:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+			
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;			
+			<span class="hljs-keyword">var</span> candidateId = $(<span class="hljs-string">"#candidateId"</span>).val();
+   			$.ajax({
+	   		    type: <span class="hljs-string">'POST'</span>,
+	   		    url: <span class="hljs-string">"/UpdateCandidate"</span>,
+	   		    dataType:<span class="hljs-string">"json"</span>,
+	   		    data: {	   					
+	   					<span class="hljs-string">"title"</span>				: $(<span class="hljs-string">"#title"</span>).val(),	   					
+	   					<span class="hljs-string">"phone"</span>				: $(<span class="hljs-string">"#phone"</span>).val(),
+	   					<span class="hljs-string">"exp"</span>				: $(<span class="hljs-string">"#experience"</span>).val(),
+	   					<span class="hljs-string">"country"</span>			: $(<span class="hljs-string">'#country'</span>).val(),
+	   					<span class="hljs-string">"city"</span>				: $(<span class="hljs-string">'#city'</span>).val(),	   				
+	   					<span class="hljs-string">"company_id"</span>		: $(<span class="hljs-string">"#company"</span>).val(),	   				
+	   					<span class="hljs-string">"id"</span>				: candidateId	
+	      		    },
+	   		    success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+	   		    	bootbox.alert(data.statusText);
+	   		    	<span class="hljs-keyword">return</span> $.get(<span class="hljs-string">'/getcandidate/'</span>+candidateId,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+						<span class="hljs-keyword">if</span>(data.applications){
+							$.each(data.applications,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i,row)</span></span>{
+								<span class="hljs-keyword">if</span>(data.applications[i].vacancy_status == <span class="hljs-string">"OPEN"</span>)
+									data.applications[i].isOpen = <span class="hljs-literal">true</span>;
+								<span class="hljs-keyword">else</span>
+									data.applications[i].isOpen = <span class="hljs-literal">false</span>;
+							});
+						}
+						that.set(<span class="hljs-string">'content'</span>,data);
+					});
+	   		    },
+	   		    error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+	   		    	bootbox.alert(data.statusText);
+	   		    }
+   		    });
+		},
+		UpdateCandidateResume : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			<span class="hljs-keyword">var</span> fileName = <span class="hljs-built_in">JSON</span>.parse($(<span class="hljs-string">".uploadedfile"</span>).text());
+			<span class="hljs-keyword">var</span> cv = fileName.filepath;			
+			<span class="hljs-keyword">var</span> candidateId = $(<span class="hljs-string">"#candidateId"</span>).val();			
+			$.ajax({
+	   		    type: <span class="hljs-string">'POST'</span>,
+	   		    url: <span class="hljs-string">"/UpdateCandidateResume"</span>,
+	   		    dataType:<span class="hljs-string">"json"</span>,
+	   		    data: {
+	   		    		updatedata: {	   						   					
+		   					<span class="hljs-string">"cvpath"</span>			: cv,
+		   					<span class="hljs-string">"id"</span>				: candidateId,
+	   					},
+	   					<span class="hljs-string">"content"</span>			: that.get(<span class="hljs-string">'content'</span>).details
+	      		    },
+	   		    success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+	   		    	bootbox.alert(data.statusText);
+	   		    	$(<span class="hljs-string">'#uploadcv'</span>).show();
+	   		    	$(<span class="hljs-string">'.progress-bar'</span>).parent().prev().remove();
+	   		    	$(<span class="hljs-string">'.uploadedfile'</span>).text(<span class="hljs-string">''</span>);
+					<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"#progress"</span>).remove();
+	   		    	<span class="hljs-keyword">return</span> $.get(<span class="hljs-string">'/getcandidate/'</span>+candidateId,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+						<span class="hljs-keyword">if</span>(data.applications){
+							$.each(data.applications,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i,row)</span></span>{
+								<span class="hljs-keyword">if</span>(data.applications[i].vacancy_status == <span class="hljs-string">"OPEN"</span>)
+									data.applications[i].isOpen = <span class="hljs-literal">true</span>;
+								<span class="hljs-keyword">else</span>
+									data.applications[i].isOpen = <span class="hljs-literal">false</span>;
+							});
+						}
+						that.set(<span class="hljs-string">'content'</span>,data);
+					});
+	   		    },
+	   		    error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+	   		    	bootbox.alert(data.statusText);
+	   		    }
+   		    });	
+		},
+		updatecv : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+			$(<span class="hljs-string">'#uploadcv'</span>).show();
+	    	$(<span class="hljs-string">'.progress-bar'</span>).parent().prev().remove();
+	    	$(<span class="hljs-string">'.uploadedfile'</span>).text(<span class="hljs-string">''</span>);
+			<span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"#progress"</span>).remove();
+		}
+	}
+
+});
+
+App.SearchResultController = Ember.ObjectController.extend({
+
+	actions : {		
+		search : <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span></span>{
+
+			searchtype = $(<span class="hljs-string">"input:radio[name='searchtype']:checked"</span>).val();
+			schema = <span class="hljs-string">"v"</span>;
+			<span class="hljs-keyword">if</span>(searchtype == <span class="hljs-string">'candidate'</span>)
+				schema = <span class="hljs-string">"c"</span>;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(searchtype == <span class="hljs-string">'company'</span>)
+				schema = <span class="hljs-string">"co"</span>
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(searchtype == <span class="hljs-string">'vacancy'</span>)
+				schema = <span class="hljs-string">"v"</span>
+			<span class="hljs-keyword">else</span>
+				<span class="hljs-keyword">return</span>;
+
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			that.transitionTo(<span class="hljs-string">'searchResult'</span>,search_text+<span class="hljs-string">"&amp;schema="</span>+schema);
+ 
+		}
+	}
+
+
+});
+
+App.ProfileController = Ember.ObjectController.extend({
+	actions:{
+		updateProfile : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{			
+			<span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+			<span class="hljs-keyword">var</span> description = <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'description'</span>);
+			<span class="hljs-keyword">var</span> mobile_number = <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'mobile_number'</span>);	
+			<span class="hljs-keyword">var</span> phonereg = <span class="hljs-regexp">/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/</span>;
+			<span class="hljs-keyword">if</span>(((description)||(mobile_number))&amp;&amp;(phonereg.test(mobile_number))){
+				$.ajax ({
+	                type: <span class="hljs-string">"POST"</span>, 
+	                url:<span class="hljs-string">'/updateProfile'</span>,
+	                dataType:<span class="hljs-string">'JSON'</span>,
+	                data:{<span class="hljs-string">'description'</span>:description,<span class="hljs-string">'mobile_number'</span>:mobile_number},                   
+	                success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{  
+		                bootbox.alert(data.message);	                
+		               	$.get(<span class="hljs-string">'/getUserdata'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{		               		
+							that.set(<span class="hljs-string">'content'</span>,data);
+						});									
+	                },
+	                error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{
+	                    bootbox.alert(data.statusText);
+	                }
+	            });	  
+			}	
+			<span class="hljs-keyword">else</span>{
+				bootbox.alert(<span class="hljs-string">'Enter the valid data'</span>);
+			}
+			                    
+		}
+	}
+});</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

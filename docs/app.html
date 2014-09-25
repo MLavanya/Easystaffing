@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>app.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.js
+              </a>
+            
+              
+              <a class="source" href="homeController.html">
+                homeController.js
+              </a>
+            
+              
+              <a class="source" href="logincontroller.html">
+                logincontroller.js
+              </a>
+            
+              
+              <a class="source" href="model.html">
+                model.js
+              </a>
+            
+              
+              <a class="source" href="router.html">
+                router.js
+              </a>
+            
+              
+              <a class="source" href="view.html">
+                view.js
+              </a>
+            
+              
+              <a class="source" href="databaseconnection.html">
+                databaseconnection.js
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="services.html">
+                services.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>app.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/**
+ * Module dependencies.
+ */</span>
+<span class="hljs-keyword">var</span> express = <span class="hljs-built_in">require</span>(<span class="hljs-string">'express'</span>), http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>), path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);
+<span class="hljs-keyword">var</span> routes = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./routes'</span>);
+<span class="hljs-keyword">var</span> services = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./routes/services'</span>);
+<span class="hljs-keyword">var</span> config = <span class="hljs-built_in">require</span> (<span class="hljs-string">'./config'</span>); 
+<span class="hljs-keyword">var</span> methodOverride = <span class="hljs-built_in">require</span>(<span class="hljs-string">'method-override'</span>);
+
+<span class="hljs-keyword">var</span> app = express();
+
+<span class="hljs-keyword">var</span> engines = <span class="hljs-built_in">require</span>(<span class="hljs-string">'consolidate'</span>);
+
+app.set(<span class="hljs-string">'views'</span>, __dirname + <span class="hljs-string">'/views'</span>);
+<span class="hljs-comment">/*app.engine('html', engines.mustache);*/</span>
+
+
+app.configure(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>app.set(‘port’, process.env.PORT || 8000);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>app.use(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res, next)</span> </span>{
+    res.header(<span class="hljs-string">'Access-Control-Allow-Credentials'</span>, <span class="hljs-literal">true</span>);
+    res.header(<span class="hljs-string">'Access-Control-Allow-Origin'</span>, req.headers.origin);
+    res.header(<span class="hljs-string">'Access-Control-Allow-Methods'</span>, <span class="hljs-string">'GET,PUT,POST,DELETE'</span>);
+    res.header(<span class="hljs-string">'Access-Control-Allow-Headers'</span>, <span class="hljs-string">'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept'</span>);
+    next();
+  });
+
+
+app.set(<span class="hljs-string">'view engine'</span>, <span class="hljs-string">'html'</span>);
+app.engine(<span class="hljs-string">'html'</span>, <span class="hljs-built_in">require</span>(<span class="hljs-string">'ejs'</span>).renderFile);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>app.set(‘views’, __dirname + ‘/public’);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>app.set(<span class="hljs-string">'views'</span>, path.join(__dirname, <span class="hljs-string">'views'</span>));
+app.use(express.favicon());
+app.use(express.bodyParser());
+app.use(methodOverride());
+app.use(express.cookieParser()); <span class="hljs-comment">// read cookies (needed for auth)</span>
+app.use(app.router);
+app.use(express.static(path.join(__dirname, <span class="hljs-string">'public/'</span>)));
+app.use(<span class="hljs-string">'/coverage'</span>, express.static(__dirname + <span class="hljs-string">'/../test/coverage/reports'</span>));
+});
+
+ 
+
+<span class="hljs-keyword">if</span> (<span class="hljs-string">'development'</span> == app.get(<span class="hljs-string">'env'</span>)) {
+    app.use(express.errorHandler());
+}
+
+app.get(<span class="hljs-string">'/'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+	res.redirect(<span class="hljs-string">"login.html"</span>);
+});
+
+app.post(<span class="hljs-string">'/register'</span>, services.register);
+app.post(<span class="hljs-string">'/login'</span>, services.login);
+app.post(<span class="hljs-string">'/validateadm'</span>, services.validateadm);
+app.post(<span class="hljs-string">'/saveCandidate'</span>,services.saveCandidate);
+app.get(<span class="hljs-string">'/me'</span>,services.me);
+app.post(<span class="hljs-string">'/uploadcv'</span>,services.upload);
+app.post(<span class="hljs-string">'/saveVacancies'</span>,services.saveVacancies);
+app.post(<span class="hljs-string">'/solrclient'</span>, services.solrclient);
+app.get(<span class="hljs-string">'/getvacancy/:vacancy_id'</span>,services.getvacancy);
+app.get(<span class="hljs-string">'/getcandidate/:candidate_id'</span>,services.getcandidate);
+app.post(<span class="hljs-string">'/applyvacancy'</span>,services.applyvacancy);
+app.post(<span class="hljs-string">'/appliedforv'</span>,services.appliedforv);
+app.get(<span class="hljs-string">'/jqcloudCall'</span>,services.jqcloudCall);
+app.get(<span class="hljs-string">'/companyList'</span>,services.companyList);
+app.get(<span class="hljs-string">'/statusList'</span>,services.statusList);
+app.get(<span class="hljs-string">'/applicationbycid/:candidate_id'</span>,services.applicationbycid);
+app.get(<span class="hljs-string">'/applicationbyvid/:vacancy_id'</span>,services.applicationbyvid);
+app.get(<span class="hljs-string">'/apphistorybyid/:application_id'</span>,services.apphistorybyid);
+app.get(<span class="hljs-string">'/getUserdata'</span>,services.getUserdata);
+app.post(<span class="hljs-string">'/updateProfile'</span>,services.updateProfile);
+app.post(<span class="hljs-string">'/updateappstatus'</span>,services.updateappstatus);
+app.post(<span class="hljs-string">'/updatevacancystatus'</span>,services.updatevacancystatus);
+app.post(<span class="hljs-string">'/updateCompany'</span>,services.updateCompany);
+app.get(<span class="hljs-string">'/dashboardDetails'</span>,services.dashboardDetails);
+app.post(<span class="hljs-string">'/UpdateCandidate'</span>,services.UpdateCandidate);
+app.post(<span class="hljs-string">'/UpdateCandidateResume'</span>,services.UpdateCandidateResume);
+
+
+
+
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Express server listening on port '</span>+ config.port);
+
+app.listen(config.port);</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

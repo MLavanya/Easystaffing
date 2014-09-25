@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - routes/services.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>routes/services.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">71.66</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">1129</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">63.94</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">10.80</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">var pool=require(&#039;./databaseconnection&#039;);    
+var fs = require(&#039;fs&#039;);
+var mammoth = require(&quot;mammoth&quot;);
+var solr = require(&#039;solr-client&#039;);
+var moment = require(&#039;moment&#039;);
+var solrinfo=require(&#039;../solrconfig&#039;);
+var Cryptr = require(&quot;cryptr&quot;),
+    cryptr = new Cryptr(&#039;myTotalySecretKey&#039;);
+
+
+/*
+*    Application API
+*/
+
+exports.register = function(req, res) {
+
+    var user = req.body;
+    var email= req.body.email;
+    var pwd = req.body.password;
+    var password = cryptr.encrypt(pwd);     
+
+    var registerdetails = {
+        &quot;email&quot;         :user.email,
+        &quot;username&quot;      :user.username,
+        &quot;name&quot;          :user.name,
+        &quot;password&quot;      :password
+    }
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT *  from user where email=&quot;&#039;+email+&#039;&quot;&#039;, function(err, rows, fields) {
+        if (err) throw err;
+
+           if(rows.length &gt; 0)
+            {
+                con.release();
+                res.send(&quot;user already exist&quot;);                          
+            }
+            else{
+                var query = con.query(&#039;INSERT INTO user SET ?&#039;, registerdetails, function(err, result) {
+                if (err) throw err;
+
+                    con.release();
+                    res.send(&quot;succuss&quot;);
+                });
+            }
+
+        });
+
+    });
+
+ }
+
+exports.login = function(req, res) {
+
+var email=req.body.email;
+var pwd=req.body.password;
+var password = cryptr.encrypt(pwd);
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+
+        con.query(&#039;SELECT *  from user where email=&quot;&#039;+email+&#039;&quot; and password=&quot;&#039;+password+&#039;&quot;&#039;, function(err, rows, fields) {
+           if (err) throw err;
+
+           if(rows.length &lt;= 0)
+                //con.release();
+                res.send(401);
+           else{
+             con.release();
+             res.send({
+                email:rows[0].email,
+                name: rows[0].name,
+                redirectTo : &quot;home.html&quot;
+            });            
+           }
+       });        
+
+    });       
+
+}
+
+exports.validateadm = function(req, res) {
+
+    if(req.body.password == &quot;2014&quot;){
+        res.send(&quot;success&quot;);
+    }else{
+        res.send(&quot;failure&quot;);
+    }
+
+}
+
+exports.me = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT email,name  from user where email = ?&#039;,[req.cookies.email], function(err, rows, fields) {
+        if (err) throw err;
+
+              con.release();
+              res.send(rows);
+        });         
+
+    });       
+
+}
+
+
+exports.upload =function(req,res){  
+    var Details = req.files;
+    //console.log(JSON.stringify(Details));
+    fs.readFile(req.files.file.path, function (err, data) {    
+        var newPath = __dirname+&quot;/uploads/&quot;+req.files.file.name;
+        var fileName = req.files.file.name;
+        fs.writeFile(newPath, data, function (err) {
+            console.log(newPath);           
+            res.send({filepath:newPath});
+        });
+
+
+    });
+};
+
+exports.saveCandidate = function(req, res) {
+
+    var candidatedetails = req.body;
+    var email= req.body.email;
+
+    candidatedetails.created_by=req.cookies.email;
+    candidatedetails.updated_time= moment();
+
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;SELECT *  from candidate where email=?&#039;,[email], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length &gt; 0){
+                con.release();                     
+                res.send({message:&quot;candidate already exist&quot;});                 
+            }
+            else{
+                var query = con.query(&#039;INSERT INTO candidate SET ?&#039;, candidatedetails, function(err, result) {
+                    if (err) throw err;
+                    con.release();
+                    candidatedetails.id = result.insertId;
+                    exports.solraddcandidate(candidatedetails);
+                    res.send({message:&#039;Successfully saved&#039;});
+                });
+            }
+        });
+    });
+
+}
+
+exports.candidateretreive = function(req, res) {
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT *  from candidate&#039;, function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+    });       
+}
+
+exports.candidateupdate = function(req, res) {
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;update candidate set &#039;, function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });       
+    });
+}
+
+exports.saveVacancies = function(req, res) {
+
+    var vacancydetails = req.body;
+
+    vacancydetails.created_by=req.cookies.email;
+    vacancydetails.updated_time= moment();
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+
+        var query = con.query(&#039;INSERT INTO vacancy SET ?&#039;, vacancydetails, function(err, result) {
+                
+            if (err) throw err;
+
+            con.release();
+            vacancydetails.id = result.insertId;
+            exports.solraddvacancy(vacancydetails);
+            res.send({message:&quot;Vacancy saved&quot;});
+            
+        });
+
+    });
+
+}
+
+exports.getvacancy = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT *  from vacancy where id = ?&#039;, [req.params.vacancy_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length &gt; 0){
+
+                var data = rows[0];
+                data.applications = [];
+                data.stats=[];
+
+                con.query(&#039;SELECT application.id,application.status,vacancy.name,vacancy.title,candidate.id as candidate_id,candidate.name as candidate_name from application,vacancy,candidate where application.vacancy_id = vacancy.id and application.candidate_id = candidate.id  and application.vacancy_id = ?&#039;, [data.id],function(err, rows, fields) {
+                    if (err) throw err;
+
+                    if(rows.length &gt; 0){                        
+                        data.applications = rows;                                       
+                    }
+
+                    con.query(&#039;SELECT status , count(*) as cnt FROM application WHERE vacancy_id = ? GROUP BY STATUS &#039;, [data.id],function(err, rows, fields) {
+                        if (err) throw err;                                
+
+                        if(rows.length &gt; 0){
+                            data.stats = rows;
+                        }
+
+                        con.release();                                
+                        res.send(data);
+
+                    });                     
+                });  
+
+            }else{
+                con.release();
+                res.send({});                
+            }
+        });         
+
+    });       
+}
+
+exports.vacancyretreive = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT *  from vacancy&#039;, function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });       
+}
+
+exports.vacancyupdate = function(req, res) {
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+
+        con.query(&#039;update vacancy set &#039;, function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });
+
+}
+
+/*exports.companies = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT *  from company&#039;, function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });       
+}*/
+
+exports.getcandidate = function(req, res) {    
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;SELECT *  from candidate where id = ?&#039;, [req.params.candidate_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length &gt; 0){
+                //con.release();
+
+                var docName = rows[0].name;
+                var docPath = rows[0].cvpath;
+
+                var data_result = {};
+                data_result.details = rows[0];
+                data_result.applications = [];
+                data_result.apphistory = [];
+                data_result.stats = [];
+
+                fs.readFile(docPath, function (err, data) {                   
+                    var newFilePath = __dirname+&quot;/uploads/&quot;;
+
+                    mammoth.convertToHtml({path: docPath})
+                    .then(function(result){
+                        var html = result.value; // The generated HTML
+                        var messages = result.messages; // Any messages, such as warnings during conversion  
+
+                        data_result.docFile = html;
+
+                        con.query(&#039;SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ? &#039;, [data_result.details.id],function(err, rows, fields) {
+                            if (err) throw err;
+
+                            if(rows.length &gt; 0){
+                                data_result.applications = rows;
+                            }
+
+                            con.query(&#039;SELECT status , count(*) as cnt FROM application WHERE candidate_id = ? GROUP BY STATUS &#039;, [data_result.details.id],function(err, rows, fields) {
+                                if (err) throw err;                                
+
+                                if(rows.length &gt; 0){
+                                    data_result.stats = rows;
+                                }
+
+                                con.release();                                
+                                res.send(data_result);
+
+                            });                        
+
+                        });                        
+
+                    })
+                    .done();
+                    
+                });
+//                res.send(rows[0]);
+            }else{
+                con.release();
+                res.send({});                
+            }
+        });         
+    });       
+}
+
+exports.applyvacancy = function(req, res) {
+
+    var applydetails = req.body;
+
+    applydetails.created_by=req.cookies.email;
+    applydetails.updated_time= moment();
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+
+        var query = con.query(&#039;SELECT * from application where candidate_id = ? and vacancy_id = ?&#039;, [applydetails.candidate_id,applydetails.vacancy_id], function(err, rows, fields) {
+                
+            if (err) throw err;
+
+            console.log(rows);
+
+            if(rows.length &gt; 0){
+                con.release();
+                res.send(&#039;Already applied for this vacany&#039;);
+            }else{
+
+                var query = con.query(&#039;INSERT INTO application SET ?&#039;, applydetails, function(err, result) {
+                        
+                    if (err) throw err;
+
+                    applydetails.id = result.insertId;
+                    var query = con.query(&#039;INSERT INTO application_h SET ?&#039;, {application_id:applydetails.id,prevstatus:&#039;C01&#039;,curstatus:applydetails.status}, function(err, result) {
+                        if (err) throw err;                            
+
+                        var comment={};
+                        comment.application_h_id = result.insertId;
+                        comment.created_by = req.cookies.email;
+                        comment.comment = &quot;Picked for Review&quot;;
+                        con.query(&#039;insert into comments set ? &#039;,comment, function(err,result) {
+                          con.release();
+                          res.send(&quot;success&quot;);
+                        });
+
+                    });
+                    
+                });
+
+            }
+            
+        });
+
+    });
+
+}
+
+exports.appliedforv = function(req, res) {
+
+    var applydetails = req.body;
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+
+        var query = con.query(&#039;SELECT * from application where candidate_id = ? and vacancy_id = ?&#039;, [applydetails.candidate_id,applydetails.vacancy_id], function(err, rows, fields) {
+                
+            if (err) throw err;
+
+            if(rows &gt; 0){
+                con.release();
+                res.send({ status: &#039;true&#039;});
+            }else{
+                con.release();
+                res.send({ status: &#039;false&#039;});
+            }
+            
+        });
+
+    });
+
+}
+
+exports.jqcloudCall = function(req,res){
+    
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT *  from search_log where user_id= ?&#039;,[req.cookies.email], function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });        
+}
+
+exports.companyList = function(req,res){
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;SELECT *  from company&#039;,function(err, rows, fields) {
+            if (err) throw err;                                
+            con.release();               
+            res.send(rows);
+        });
+    });
+}
+
+exports.statusList = function(req,res){
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;SELECT *  from status&#039;,function(err, rows, fields) {
+            if (err) throw err;                                
+            con.release();   
+            res.send(rows);
+        });
+    });
+}
+
+exports.applicationbycid = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ?&#039;, [req.params.candidate_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length &gt; 0){
+                con.release();
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+exports.applicationbyvid = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+
+        con.query(&#039;SELECT application.id,application.status,vacancy.name,vacancy.title  from application,vacancy where application.vacancy_id = vacancy.id and application.vacancy_id = ?&#039;, [req.params.vacancy_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length &gt; 0){
+                con.release();
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+exports.apphistorybyid = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+        con.query(&#039;SELECT application_h.id,application_h.application_id,application_h.prevstatus,application_h.curstatus,application_h.updated_time,comments.comment from application_h,comments where application_h.id = comments.application_h_id and application_id = ?&#039;, [req.params.application_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length &gt; 0){
+                con.release();
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+
+exports.getUserdata = function(req,res){
+    
+    var email = req.cookies.email;
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;SELECT *  from user where email = ?&#039;, [email],function(err, rows, fields) {
+            if(err) throw err;
+
+            if(rows.length &gt; 0){
+                con.release();
+                var userdata = rows[0];
+                con.query(&#039;SELECT *  from candidate where created_by=?&#039;,[email],function(err, result, fields) {
+                    if (err) throw err;
+                    if(result.length &gt; 0){
+                        con.release();  
+                        var candidatelist = result; 
+                        var candidate_len = candidatelist.length;
+                        var accepted;
+                        con.query(&#039;SELECT count(status) as cnt from candidate where created_by=? and status=&quot;C05&quot; &#039;, [email],function(err, rows, fields) {
+                            if (err) throw err;                                
+                            accepted = rows[0].cnt;                            
+                        });                                  
+                        con.query(&#039;SELECT *  from vacancy where created_by=?&#039;,[email],function(err, result, fields) {
+                            if (err) throw err;
+                            if(result.length &gt; 0){
+                                con.release();  
+                                var vacancylist = result;                                                                               
+                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist,candidate_len:candidate_len,accepted:accepted});
+                            }else{
+                                con.release();  
+                                var vacancylist = [];                                                                               
+                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist,candidate_len:candidate_len,accepted:accepted});
+                            }
+                        }); 
+                    }else{
+                        con.query(&#039;SELECT *  from vacancy where created_by=?&#039;,[email],function(err, result, fields) {
+                            if (err) throw err;
+                            if(result.length &gt; 0){
+                                con.release();  
+                                var vacancylist = result;                                                                  
+                                res.send({userdata:userdata,vacancylist:vacancylist});                               
+                            }else{
+                                con.release();
+                                res.send({userdata:userdata})
+                            }
+                        });
+                    }
+                }); 
+            }           
+             
+        });
+                 
+    });       
+}
+
+
+exports.updateProfile = function(req,res){    
+    
+    var profileUpdates = req.body;
+    var email = req.cookies.email;
+    
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;SELECT *  from user where email=?&#039;,[email], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length &gt; 0){                                
+                con.query(&#039;UPDATE user set ? WHERE email = ?&#039;,[profileUpdates,email], function(err, rows, fields) {
+                    con.release();
+                    res.send({message:&quot;Updated Successfully&quot;});
+                });                            
+            }            
+        });
+    });
+}
+
+exports.updateappstatus = function(req,res){    
+        
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;UPDATE application set ? WHERE id = ?&#039;,[req.body.data,req.body.id], function(err, rows, fields) {
+            con.query(&#039;insert into application_h set ? &#039;,req.body.history, function(err,result) {
+
+                req.body.comment.application_h_id = result.insertId;
+
+                if(req.body.data.status == &quot;C06&quot;)
+                  req.body.data.status = &quot;C01&quot;;
+                con.query(&#039;UPDATE candidate set ? WHERE id = ?&#039;,[req.body.data,req.body.candidate_id], function(err, rows, fields) {
+                    
+                    exports.solrupdatecandidate({
+                      &quot;id&quot;: req.body.candidate_id,
+                      &quot;cstatus&quot; : {&quot;set&quot;: req.body.data.status}
+                    });
+
+                    req.body.comment.created_by = req.cookies.email;
+                    con.query(&#039;insert into comments set ? &#039;,req.body.comment, function(err,result) {
+                      console.log(&quot;inserted&quot; + result);
+                      con.release();
+                      res.send({message:&quot;Updated Successfully&quot;});
+                    });
+                    
+                });                            
+
+            });
+        });                            
+
+
+
+    });
+}
+
+exports.updatevacancystatus = function(req,res){    
+        
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;UPDATE vacancy set ? WHERE id = ?&#039;,[req.body.data,req.body.id], function(err, rows, fields) {
+
+          con.release();
+          exports.solrupdatevacancy({
+            &quot;id&quot;: req.body.id,
+            &quot;vstatus&quot; : {&quot;set&quot;: req.body.data.status}
+          });
+          res.send({message:&quot;Updated Successfully&quot;});
+
+        });                            
+
+
+
+    });
+}
+
+exports.dashboardDetails = function(req, res) {
+
+    var email =  req.cookies.email;
+    var available,candidates,employee_active,vacancy_active;
+
+    pool.getConnection(function(err,con){
+
+    if(err){
+        console.log(&quot;Error connection to the db.&quot;);
+    }
+    con.connect();
+    con.query(&#039;SELECT *  from candidate&#039;, function(err, rows, fields) {
+        if (err) throw err;
+            candidates=rows.length;
+        });
+        con.query(&#039;SELECT *  from candidate where status=&quot;C01&quot; AND created_by=?&#039;,[email], function(err, rows, fields) {
+            if (err) throw err;
+            available=rows.length;
+        });
+        con.query(&#039;SELECT *  from candidate where active=&quot;YES&quot; and status=&quot;C01&quot; order by created_date asc&#039;, function(err, rows, fields) {
+            if (err) throw err;
+            employee_active = rows;            
+        });
+        con.query(&#039;SELECT *  from vacancy where status=&quot;OPEN&quot;&#039; , function(err, rows, fields) {
+            if (err) throw err;
+            vacancy_active = rows;            
+        });
+        con.query(&#039;SELECT *  from candidate where status=&quot;C04&quot; AND created_by=?&#039;,[email], function(err, rows, fields) {
+            if (err) throw err;
+
+            var inprogress = rows.length;
+            var avb_perc = (available/candidates)*100;
+            var inprg_perc = (inprogress/candidates)*100;
+            //console.log(&#039;avb_perc&#039;+ &quot; &quot;+avb_perc+&quot; &quot;+inprg_perc);
+            con.query(&#039;SELECT *  from vacancy&#039;, function(err, rows, fields) {
+                if (err) throw err;
+
+                var vacancies = rows.length;
+                con.query(&#039;SELECT *  from vacancy WHERE status=&quot;open&quot; AND created_by=?&#039;,[email], function(err, rows, fields) {
+                    if (err) throw err;
+                    con.release();                    
+                    var vac_open = rows.length;
+                    var vac_perc = (vac_open/vacancies)*100;                    
+                    res.send({
+                        candidates:candidates,
+                        available:available,
+                        inprogress:inprogress,
+                        avb_perc:avb_perc,
+                        inprg_perc:inprg_perc,
+                        vacancies:vac_open,
+                        vac_perc:vac_perc,
+                        employee_active:employee_active,
+                        vacancy_active:vacancy_active
+                    });
+                });                   
+            });             
+        });       
+    });
+}
+
+exports.updateCompany = function(req,res){
+    
+    var company = req.body;
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+
+        con.connect();
+
+        con.query(&#039;SELECT * from company where name = ?&#039;, [company], function(err, rows, fields) {
+                
+            if (err) throw err;
+
+            if(rows.length &gt; 0){
+                con.release();   
+                res.send(&#039;201&#039;);
+            }else{
+                con.query(&#039;INSERT INTO company SET ?&#039;, company, function(err, result) {
+                    if (err) throw err;
+                    con.release();   
+                    res.send(&#039;200&#039;);
+                });
+
+            }
+            
+        });
+
+    });
+}
+
+exports.UpdateCandidate = function(req,res){
+    var candidateData = req.body;
+    var id = candidateData.id;
+    console.log(JSON.stringify(candidateData));
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;UPDATE candidate set ? WHERE id = ?&#039;,[candidateData,id], function(err, rows, fields) {
+            if (err) throw err;
+                                         
+            con.release();
+            exports.solrupdatecandidate({
+                &quot;id&quot;:candidateData.id,
+                &quot;ctitle&quot; : {&quot;set&quot;: candidateData.title},
+                &quot;cexp&quot; : {&quot;set&quot;: candidateData.exp},
+                &quot;cphone&quot; : {&quot;set&quot;: candidateData.phone},
+                &quot;ccountry&quot; : {&quot;set&quot;: candidateData.country},
+                &quot;ccity&quot; : {&quot;set&quot;: candidateData.city}
+            });
+            res.send({&quot;status&quot;:200,&quot;statusText&quot;:&quot;updated Successfully&quot;});
+        });
+    });
+}
+
+exports.UpdateCandidateResume = function(req,res){
+
+    var resumePath = req.body.updatedata;
+    var id = req.body.updatedata.id;
+
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;UPDATE candidate set ? WHERE id = ?&#039;,[resumePath,id], function(err, rows, fields) {
+            if (err) throw err;
+                                         
+            con.release();
+            var data = req.body.content;
+            data.cvpath = resumePath.cvpath;
+            exports.solraddcandidate(data);
+            res.send({&quot;status&quot;:200,&quot;statusText&quot;:&quot;updated Successfully&quot;});
+        });
+    });    
+}
+
+/*-------------------------------*/
+// Solr API
+/*-------------------------------*/
+
+
+
+/*exports.solrclient = function(req,res){
+    var searchtext=req.body.searchtext;
+    //console.log(searchtext);
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,&#039;&#039;,&#039;&#039;,&#039;&#039;);
+    console.log(client);
+    client.search(&#039;q=&#039;+searchtext+&#039;&#039;, function(err, obj){
+       res.send(obj);
+    });
+}
+*/
+exports.solrclient = function(req,res){
+    var searchtext=req.body.searchtext;
+
+    updateSearchLog(searchtext+&quot;&amp;schema=&quot;+req.body.schema,req.cookies.email);
+    if(req.body.schema == &#039;c&#039;){
+        console.log(&quot;candidate schema&quot;);
+        searchtext = searchtext +&#039; AND (cstatus:&quot;C01&quot; OR cstatus:&quot;C02&quot;) AND ccreated_by:&#039;+req.cookies.email;
+        var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,&#039;&#039;,&#039;&#039;,&#039;&#039;);
+    }
+    else if (req.body.schema == &#039;v&#039;){
+        console.log(&quot;vacancy schema&quot;);
+        searchtext = searchtext +&#039; &amp; vstatus:&quot;OPEN&quot;&#039;;
+        var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,&#039;&#039;,&#039;&#039;,&#039;&#039;);
+    }
+    
+/*    var query2 = client.createQuery()
+                       .q(searchtext)
+                       .start(0)
+                       .rows(1000);*/
+    
+    client.gethl(&#039;select&#039;,searchtext,function(err,obj){
+       if(err){
+        console.log(err);
+        res.send(err);
+       }else{
+        console.log(obj);
+        res.send(obj);
+       }
+    });
+}
+
+
+exports.solraddvacancy = function(data){
+
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,&#039;&#039;,&#039;&#039;,&#039;&#039;);
+
+    // Switch on &quot;auto commit&quot;, by default `client.autoCommit = false`
+    client.autoCommit = true;
+    /*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */
+    var docs = [];
+
+   var doc = {
+       &quot;id&quot;:data.id,
+       &quot;vtitle&quot;: data.title,
+       &quot;vname&quot;: data.name,
+       &quot;vstatus&quot;:data.status,
+       &quot;vexp_min&quot;:data.exp_min,
+       &quot;vexp_max&quot;:data.exp_max,
+       &quot;vskills&quot;:data.skills,
+       &quot;vcity&quot;:data.city,
+       &quot;vcountry&quot;:data.country,
+       &quot;vcompany_id&quot;:0,
+       &quot;vcreated_date&quot;:data.created_date,
+       &quot;vupdated_time&quot;:data.updated_time,
+       &quot;vcreated_by&quot;:data.created_by
+  }
+    docs.push(doc);
+
+    client.add(docs,function(err,obj){
+       if(err){
+          console.log(err);
+       }else{
+          console.log(obj);
+
+            client.commit(function(err,res){
+               if(err) console.log(err);
+               if(res) console.log(res);
+            });
+
+       }
+    });
+
+
+}
+
+exports.solraddcandidate = function(data){
+
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,&#039;&#039;,&#039;&#039;,&#039;&#039;);
+
+    // Switch on &quot;auto commit&quot;, by default `client.autoCommit = false`
+    client.autoCommit = true;
+    /*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */
+
+   var doc = {
+       &quot;literal.id&quot;:data.id,
+       &quot;literal.ctitle&quot;: data.title,
+       &quot;literal.cname&quot;: data.name,
+       &quot;literal.cemail&quot;: data.name,
+       &quot;literal.cstatus&quot;:data.status,
+       &quot;literal.cexp&quot;:data.exp,
+       &quot;literal.cphone&quot;:data.phone,
+       &quot;literal.cskills&quot;:data.skills,
+       &quot;literal.ccity&quot;:data.city,
+       &quot;literal.ccountry&quot;:data.country,
+       &quot;literal.ccompany_id&quot;:data.company_id,
+       &quot;literal.cactive&quot;:data.active,
+       &quot;literal.ccomments&quot;:data.comments,
+       &quot;literal.ccreated_by&quot;:data.created_by
+  }
+
+    var options = {
+       parameters:doc,
+        format:&#039;extract&#039;,
+        path :data.cvpath,       //path of the candidate cv
+        contentType:&#039;application/msword&#039;   // document type
+    }
+    client.addRemoteResource(options,function(err,obj){
+       if(err){
+            console.log(err);
+       }else{
+            console.log(obj);
+            client.commit(function(err,res){
+               if(err) console.log(err);
+               if(res) console.log(res);
+            });          
+       }
+    });
+
+}
+
+exports.solrupdatecandidate = function(data){
+
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,&#039;&#039;,&#039;&#039;,&#039;&#039;);
+
+    // Switch on &quot;auto commit&quot;, by default `client.autoCommit = false`
+    client.autoCommit = true;
+    /*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */
+
+     client.add(data,function(err,obj){
+       if(err){
+            console.log(err);
+       }else{
+            console.log(obj);
+            client.commit(function(err,res){
+               if(err) console.log(err);
+               if(res) console.log(res);
+            });          
+       }
+    });
+
+}
+
+exports.solrupdatevacancy = function(data){
+
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,&#039;&#039;,&#039;&#039;,&#039;&#039;);
+
+    // Switch on &quot;auto commit&quot;, by default `client.autoCommit = false`
+    client.autoCommit = true;
+    /*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */
+
+     client.add(data,function(err,obj){
+       if(err){
+            console.log(err);
+       }else{
+            console.log(obj);
+            client.commit(function(err,res){
+               if(err) console.log(err);
+               if(res) console.log(res);
+            });          
+       }
+    });
+
+}
+
+function updateSearchLog (searchtext,email,callback){
+    console.log(&quot;SearchLog&quot;+searchtext);
+
+    var search_log = {&quot;user_id&quot;:email,&quot;searchQuery&quot;:searchtext,&quot;count&quot;:1}
+
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log(&quot;Error connection to the db.&quot;);
+        }
+        con.connect();
+        con.query(&#039;SELECT *  from search_log where searchQuery=? and user_id=?&#039;,[searchtext,email], function(err, rows, fields) {
+            if (err) throw err;
+            if(rows.length &gt; 0){                
+                con.query(&#039;UPDATE search_log set count=count+1 where searchQuery=? and user_id=?&#039;,[searchtext,email], function(err, rows, fields) {
+                    con.release();
+                   // res.send({message:&quot;Updated Successfully&quot;})
+                });                            
+            }
+            else{
+                var query = con.query(&#039;INSERT INTO search_log SET ?&#039;, search_log ,function(err, result) {
+                    if (err) throw err;
+                    con.release();                   
+                    //res.send({message:&#039;Successfully saved&#039;});
+                });
+            }
+        });
+    });
+}</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

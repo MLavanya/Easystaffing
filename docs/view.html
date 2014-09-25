@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>view.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.js
+              </a>
+            
+              
+              <a class="source" href="homeController.html">
+                homeController.js
+              </a>
+            
+              
+              <a class="source" href="logincontroller.html">
+                logincontroller.js
+              </a>
+            
+              
+              <a class="source" href="model.html">
+                model.js
+              </a>
+            
+              
+              <a class="source" href="router.html">
+                router.js
+              </a>
+            
+              
+              <a class="source" href="view.html">
+                view.js
+              </a>
+            
+              
+              <a class="source" href="databaseconnection.html">
+                databaseconnection.js
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="services.html">
+                services.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>view.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">var</span> searchQuery=[];
+App.DashboardView = Ember.View.extend({
+	
+	didInsertElement : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-built_in">window</span>.visualSearch = VS.init({
+            container  : $(<span class="hljs-string">'#search_box_container'</span>),
+            showFacets : <span class="hljs-literal">true</span>,
+            unquotable :[],
+            callbacks  : {
+                search : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(query, searchCollection)</span> </span>{
+                    <span class="hljs-keyword">var</span> $query = $(<span class="hljs-string">'#search_query'</span>);
+                    search_text=<span class="hljs-string">""</span>;
+                    <span class="hljs-keyword">var</span> str=query;
+                    <span class="hljs-keyword">if</span>(str != <span class="hljs-string">""</span>){
+                        <span class="hljs-keyword">var</span> stringMatch = str.match(<span class="hljs-regexp">/"(.*?)"/g</span>);
+                        stringMatch=<span class="hljs-string">''</span>+stringMatch+<span class="hljs-string">''</span>;
+                        stringMatch=stringMatch.split(<span class="hljs-string">","</span>);
+                        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;stringMatch.length;i++){
+                            <span class="hljs-keyword">if</span>(i == <span class="hljs-number">0</span>){
+                                search_text = search_text+stringMatch[i].replace(<span class="hljs-regexp">/"/g</span>,<span class="hljs-string">""</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>alert(search_text);                  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                            }
+                            <span class="hljs-keyword">else</span>{
+                                search_text = search_text+<span class="hljs-string">"+"</span>+stringMatch[i].replace(<span class="hljs-regexp">/"/g</span>,<span class="hljs-string">""</span>);
+                                <span class="hljs-comment">/*search_text = search_text+"+"+stringMatch[i];*/</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>alert(search_text);                  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                            }
+                        }
+                    }
+
+                    $query.stop().animate({opacity : <span class="hljs-number">1</span>}, {duration: <span class="hljs-number">300</span>, queue: <span class="hljs-literal">false</span>});
+                    clearTimeout(<span class="hljs-built_in">window</span>.queryHideDelay);
+                    <span class="hljs-built_in">window</span>.queryHideDelay = setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+                        $query.animate({opacity : <span class="hljs-number">0</span> }, {duration: <span class="hljs-number">1000</span>,queue: <span class="hljs-literal">false</span>});
+                    }, <span class="hljs-number">2000</span>);
+                },
+
+                facetMatches : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(callback)</span> </span>{
+                  callback([
+                    { label: <span class="hljs-string">'freetext'</span>,    category: <span class="hljs-string">'generic'</span> },
+                    { label: <span class="hljs-string">'city'</span>,       category: <span class="hljs-string">'location'</span> },
+                    { label: <span class="hljs-string">'country'</span>,    category: <span class="hljs-string">'location'</span> },
+                    { label: <span class="hljs-string">'skills'</span>,    category: <span class="hljs-string">'other'</span> },
+                    { label: <span class="hljs-string">'company'</span>,    category: <span class="hljs-string">'other'</span> }
+                  ]);
+                },
+
+                valueMatches : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(facet, searchTerm, callback)</span> </span>{
+                    <span class="hljs-keyword">switch</span> (facet) {
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'skills'</span>:
+                            callback([<span class="hljs-string">'java'</span>,<span class="hljs-string">'dotnet'</span>,<span class="hljs-string">'php'</span>,<span class="hljs-string">'nodejs'</span>]);
+                            <span class="hljs-keyword">break</span>;
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'company'</span>:
+                            callback([<span class="hljs-string">'srs'</span>, <span class="hljs-string">'infosys'</span>, <span class="hljs-string">'wipro'</span>,<span class="hljs-string">'capgemini'</span>]);
+                            <span class="hljs-keyword">break</span>;               
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'city'</span>:
+                            callback([
+                            <span class="hljs-string">'Cleveland'</span>,
+                            <span class="hljs-string">'New York City'</span>,
+                            <span class="hljs-string">'Brooklyn'</span>,
+                            <span class="hljs-string">'Manhattan'</span>,
+                            <span class="hljs-string">'Queens'</span>,
+                            <span class="hljs-string">'The Bronx'</span>,
+                            <span class="hljs-string">'Staten Island'</span>,
+                            <span class="hljs-string">'San Francisco'</span>,
+                            <span class="hljs-string">'Los Angeles'</span>,
+                            <span class="hljs-string">'Seattle'</span>,
+                            <span class="hljs-string">'London'</span>,
+                            <span class="hljs-string">'hyderabad'</span>,  
+                            <span class="hljs-string">'Portland'</span>,
+                            <span class="hljs-string">'Chicago'</span>,
+                            <span class="hljs-string">'Boston'</span>
+                          ]);
+                          <span class="hljs-keyword">break</span>;          
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'country'</span>:
+                          callback([
+                            <span class="hljs-string">"China"</span>, <span class="hljs-string">"India"</span>, <span class="hljs-string">"United States"</span>, <span class="hljs-string">"Indonesia"</span>, <span class="hljs-string">"Brazil"</span>,
+                            <span class="hljs-string">"Pakistan"</span>, <span class="hljs-string">"Bangladesh"</span>, <span class="hljs-string">"Nigeria"</span>, <span class="hljs-string">"Russia"</span>, <span class="hljs-string">"Japan"</span>,
+                            <span class="hljs-string">"Mexico"</span>, <span class="hljs-string">"Philippines"</span>, <span class="hljs-string">"Vietnam"</span>, <span class="hljs-string">"Ethiopia"</span>, <span class="hljs-string">"Egypt"</span>,
+                            <span class="hljs-string">"Germany"</span>, <span class="hljs-string">"Turkey"</span>, <span class="hljs-string">"Iran"</span>, <span class="hljs-string">"Thailand"</span>, <span class="hljs-string">"D. R. of Congo"</span>,
+                            <span class="hljs-string">"France"</span>, <span class="hljs-string">"United Kingdom"</span>, <span class="hljs-string">"Italy"</span>, <span class="hljs-string">"Myanmar"</span>, <span class="hljs-string">"South Africa"</span>,
+                            <span class="hljs-string">"South Korea"</span>, <span class="hljs-string">"Colombia"</span>, <span class="hljs-string">"Ukraine"</span>, <span class="hljs-string">"Spain"</span>, <span class="hljs-string">"Tanzania"</span>,
+                            <span class="hljs-string">"Sudan"</span>, <span class="hljs-string">"Kenya"</span>, <span class="hljs-string">"Argentina"</span>, <span class="hljs-string">"Poland"</span>, <span class="hljs-string">"Algeria"</span>,
+                            <span class="hljs-string">"Canada"</span>, <span class="hljs-string">"Uganda"</span>, <span class="hljs-string">"Morocco"</span>, <span class="hljs-string">"Iraq"</span>, <span class="hljs-string">"Nepal"</span>,
+                            <span class="hljs-string">"Peru"</span>, <span class="hljs-string">"Afghanistan"</span>, <span class="hljs-string">"Venezuela"</span>, <span class="hljs-string">"Malaysia"</span>, <span class="hljs-string">"Uzbekistan"</span>,
+                            <span class="hljs-string">"Saudi Arabia"</span>, <span class="hljs-string">"Ghana"</span>, <span class="hljs-string">"Yemen"</span>, <span class="hljs-string">"North Korea"</span>, <span class="hljs-string">"Mozambique"</span>,
+                            <span class="hljs-string">"Taiwan"</span>, <span class="hljs-string">"Syria"</span>, <span class="hljs-string">"Ivory Coast"</span>, <span class="hljs-string">"Australia"</span>, <span class="hljs-string">"Romania"</span>,
+                            <span class="hljs-string">"Sri Lanka"</span>, <span class="hljs-string">"Madagascar"</span>, <span class="hljs-string">"Cameroon"</span>, <span class="hljs-string">"Angola"</span>, <span class="hljs-string">"Chile"</span>,
+                            <span class="hljs-string">"Netherlands"</span>, <span class="hljs-string">"Burkina Faso"</span>, <span class="hljs-string">"Niger"</span>, <span class="hljs-string">"Kazakhstan"</span>, <span class="hljs-string">"Malawi"</span>,
+                            <span class="hljs-string">"Cambodia"</span>, <span class="hljs-string">"Guatemala"</span>, <span class="hljs-string">"Ecuador"</span>, <span class="hljs-string">"Mali"</span>, <span class="hljs-string">"Zambia"</span>,
+                            <span class="hljs-string">"Senegal"</span>, <span class="hljs-string">"Zimbabwe"</span>, <span class="hljs-string">"Chad"</span>, <span class="hljs-string">"Cuba"</span>, <span class="hljs-string">"Greece"</span>,
+                            <span class="hljs-string">"Portugal"</span>, <span class="hljs-string">"Belgium"</span>, <span class="hljs-string">"Czech Republic"</span>, <span class="hljs-string">"Tunisia"</span>, <span class="hljs-string">"Guinea"</span>,
+                            <span class="hljs-string">"Rwanda"</span>, <span class="hljs-string">"Dominican Republic"</span>, <span class="hljs-string">"Haiti"</span>, <span class="hljs-string">"Bolivia"</span>, <span class="hljs-string">"Hungary"</span>,
+                            <span class="hljs-string">"Belarus"</span>, <span class="hljs-string">"Somalia"</span>, <span class="hljs-string">"Sweden"</span>, <span class="hljs-string">"Benin"</span>, <span class="hljs-string">"Azerbaijan"</span>,
+                            <span class="hljs-string">"Burundi"</span>, <span class="hljs-string">"Austria"</span>, <span class="hljs-string">"Honduras"</span>, <span class="hljs-string">"Switzerland"</span>, <span class="hljs-string">"Bulgaria"</span>,
+                            <span class="hljs-string">"Serbia"</span>, <span class="hljs-string">"Israel"</span>, <span class="hljs-string">"Tajikistan"</span>, <span class="hljs-string">"Hong Kong"</span>, <span class="hljs-string">"Papua New Guinea"</span>,
+                            <span class="hljs-string">"Togo"</span>, <span class="hljs-string">"Libya"</span>, <span class="hljs-string">"Jordan"</span>, <span class="hljs-string">"Paraguay"</span>, <span class="hljs-string">"Laos"</span>,
+                            <span class="hljs-string">"El Salvador"</span>, <span class="hljs-string">"Sierra Leone"</span>, <span class="hljs-string">"Nicaragua"</span>, <span class="hljs-string">"Kyrgyzstan"</span>, <span class="hljs-string">"Denmark"</span>,
+                            <span class="hljs-string">"Slovakia"</span>, <span class="hljs-string">"Finland"</span>, <span class="hljs-string">"Eritrea"</span>, <span class="hljs-string">"Turkmenistan"</span>
+                          ], {preserveOrder: <span class="hljs-literal">true</span>});
+                          <span class="hljs-keyword">break</span>;
+                    }
+                }
+            }
+        });    
+	}
+});
+
+App.SearchResultView = Ember.View.extend({
+    
+    didInsertElement : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-built_in">window</span>.visualSearch = VS.init({
+            container  : $(<span class="hljs-string">'#search_box_container'</span>),
+            showFacets : <span class="hljs-literal">true</span>,
+            unquotable :[],
+            callbacks  : {
+                search : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(query, searchCollection)</span> </span>{
+                    <span class="hljs-keyword">var</span> $query = $(<span class="hljs-string">'#search_query'</span>);
+                    search_text=<span class="hljs-string">""</span>;
+                    <span class="hljs-keyword">var</span> str=query;
+                    <span class="hljs-keyword">if</span>(str != <span class="hljs-string">""</span>){
+                        <span class="hljs-keyword">var</span> stringMatch = str.match(<span class="hljs-regexp">/"(.*?)"/g</span>);
+                        stringMatch=<span class="hljs-string">''</span>+stringMatch+<span class="hljs-string">''</span>;
+                        stringMatch=stringMatch.split(<span class="hljs-string">","</span>);
+                        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> i=<span class="hljs-number">0</span>;i&lt;stringMatch.length;i++){
+                            <span class="hljs-keyword">if</span>(i == <span class="hljs-number">0</span>){
+                                search_text = search_text+stringMatch[i].replace(<span class="hljs-regexp">/"/g</span>,<span class="hljs-string">""</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>alert(search_text);                  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                            }
+                            <span class="hljs-keyword">else</span>{
+                                search_text = search_text+<span class="hljs-string">"+"</span>+stringMatch[i].replace(<span class="hljs-regexp">/"/g</span>,<span class="hljs-string">""</span>);
+                                <span class="hljs-comment">/*search_text = search_text+"+"+stringMatch[i];*/</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>alert(search_text);                  </p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                            }
+                        }
+                    }
+
+                    $query.stop().animate({opacity : <span class="hljs-number">1</span>}, {duration: <span class="hljs-number">300</span>, queue: <span class="hljs-literal">false</span>});
+                    clearTimeout(<span class="hljs-built_in">window</span>.queryHideDelay);
+                    <span class="hljs-built_in">window</span>.queryHideDelay = setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+                        $query.animate({opacity : <span class="hljs-number">0</span> }, {duration: <span class="hljs-number">1000</span>,queue: <span class="hljs-literal">false</span>});
+                    }, <span class="hljs-number">2000</span>);
+                },
+
+                facetMatches : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(callback)</span> </span>{
+                  callback([
+                    { label: <span class="hljs-string">'freetext'</span>,    category: <span class="hljs-string">'generic'</span> },
+                    { label: <span class="hljs-string">'city'</span>,       category: <span class="hljs-string">'location'</span> },
+                    { label: <span class="hljs-string">'country'</span>,    category: <span class="hljs-string">'location'</span> },
+                    { label: <span class="hljs-string">'skills'</span>,    category: <span class="hljs-string">'other'</span> },
+                    { label: <span class="hljs-string">'company'</span>,    category: <span class="hljs-string">'other'</span> }
+                  ]);
+                },
+
+                valueMatches : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(facet, searchTerm, callback)</span> </span>{
+                    <span class="hljs-keyword">switch</span> (facet) {
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'skills'</span>:
+                            callback([<span class="hljs-string">'java'</span>,<span class="hljs-string">'dotnet'</span>,<span class="hljs-string">'php'</span>,<span class="hljs-string">'nodejs'</span>]);
+                            <span class="hljs-keyword">break</span>;
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'company'</span>:
+                            callback([<span class="hljs-string">'srs'</span>, <span class="hljs-string">'infosys'</span>, <span class="hljs-string">'wipro'</span>,<span class="hljs-string">'capgemini'</span>]);
+                            <span class="hljs-keyword">break</span>;               
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'city'</span>:
+                            callback([
+                            <span class="hljs-string">'Cleveland'</span>,
+                            <span class="hljs-string">'New York City'</span>,
+                            <span class="hljs-string">'Brooklyn'</span>,
+                            <span class="hljs-string">'Manhattan'</span>,
+                            <span class="hljs-string">'Queens'</span>,
+                            <span class="hljs-string">'The Bronx'</span>,
+                            <span class="hljs-string">'Staten Island'</span>,
+                            <span class="hljs-string">'San Francisco'</span>,
+                            <span class="hljs-string">'Los Angeles'</span>,
+                            <span class="hljs-string">'Seattle'</span>,
+                            <span class="hljs-string">'London'</span>,
+                            <span class="hljs-string">'hyderabad'</span>,  
+                            <span class="hljs-string">'Portland'</span>,
+                            <span class="hljs-string">'Chicago'</span>,
+                            <span class="hljs-string">'Boston'</span>
+                          ]);
+                          <span class="hljs-keyword">break</span>;          
+                        <span class="hljs-keyword">case</span> <span class="hljs-string">'country'</span>:
+                          callback([
+                            <span class="hljs-string">"China"</span>, <span class="hljs-string">"India"</span>, <span class="hljs-string">"United States"</span>, <span class="hljs-string">"Indonesia"</span>, <span class="hljs-string">"Brazil"</span>,
+                            <span class="hljs-string">"Pakistan"</span>, <span class="hljs-string">"Bangladesh"</span>, <span class="hljs-string">"Nigeria"</span>, <span class="hljs-string">"Russia"</span>, <span class="hljs-string">"Japan"</span>,
+                            <span class="hljs-string">"Mexico"</span>, <span class="hljs-string">"Philippines"</span>, <span class="hljs-string">"Vietnam"</span>, <span class="hljs-string">"Ethiopia"</span>, <span class="hljs-string">"Egypt"</span>,
+                            <span class="hljs-string">"Germany"</span>, <span class="hljs-string">"Turkey"</span>, <span class="hljs-string">"Iran"</span>, <span class="hljs-string">"Thailand"</span>, <span class="hljs-string">"D. R. of Congo"</span>,
+                            <span class="hljs-string">"France"</span>, <span class="hljs-string">"United Kingdom"</span>, <span class="hljs-string">"Italy"</span>, <span class="hljs-string">"Myanmar"</span>, <span class="hljs-string">"South Africa"</span>,
+                            <span class="hljs-string">"South Korea"</span>, <span class="hljs-string">"Colombia"</span>, <span class="hljs-string">"Ukraine"</span>, <span class="hljs-string">"Spain"</span>, <span class="hljs-string">"Tanzania"</span>,
+                            <span class="hljs-string">"Sudan"</span>, <span class="hljs-string">"Kenya"</span>, <span class="hljs-string">"Argentina"</span>, <span class="hljs-string">"Poland"</span>, <span class="hljs-string">"Algeria"</span>,
+                            <span class="hljs-string">"Canada"</span>, <span class="hljs-string">"Uganda"</span>, <span class="hljs-string">"Morocco"</span>, <span class="hljs-string">"Iraq"</span>, <span class="hljs-string">"Nepal"</span>,
+                            <span class="hljs-string">"Peru"</span>, <span class="hljs-string">"Afghanistan"</span>, <span class="hljs-string">"Venezuela"</span>, <span class="hljs-string">"Malaysia"</span>, <span class="hljs-string">"Uzbekistan"</span>,
+                            <span class="hljs-string">"Saudi Arabia"</span>, <span class="hljs-string">"Ghana"</span>, <span class="hljs-string">"Yemen"</span>, <span class="hljs-string">"North Korea"</span>, <span class="hljs-string">"Mozambique"</span>,
+                            <span class="hljs-string">"Taiwan"</span>, <span class="hljs-string">"Syria"</span>, <span class="hljs-string">"Ivory Coast"</span>, <span class="hljs-string">"Australia"</span>, <span class="hljs-string">"Romania"</span>,
+                            <span class="hljs-string">"Sri Lanka"</span>, <span class="hljs-string">"Madagascar"</span>, <span class="hljs-string">"Cameroon"</span>, <span class="hljs-string">"Angola"</span>, <span class="hljs-string">"Chile"</span>,
+                            <span class="hljs-string">"Netherlands"</span>, <span class="hljs-string">"Burkina Faso"</span>, <span class="hljs-string">"Niger"</span>, <span class="hljs-string">"Kazakhstan"</span>, <span class="hljs-string">"Malawi"</span>,
+                            <span class="hljs-string">"Cambodia"</span>, <span class="hljs-string">"Guatemala"</span>, <span class="hljs-string">"Ecuador"</span>, <span class="hljs-string">"Mali"</span>, <span class="hljs-string">"Zambia"</span>,
+                            <span class="hljs-string">"Senegal"</span>, <span class="hljs-string">"Zimbabwe"</span>, <span class="hljs-string">"Chad"</span>, <span class="hljs-string">"Cuba"</span>, <span class="hljs-string">"Greece"</span>,
+                            <span class="hljs-string">"Portugal"</span>, <span class="hljs-string">"Belgium"</span>, <span class="hljs-string">"Czech Republic"</span>, <span class="hljs-string">"Tunisia"</span>, <span class="hljs-string">"Guinea"</span>,
+                            <span class="hljs-string">"Rwanda"</span>, <span class="hljs-string">"Dominican Republic"</span>, <span class="hljs-string">"Haiti"</span>, <span class="hljs-string">"Bolivia"</span>, <span class="hljs-string">"Hungary"</span>,
+                            <span class="hljs-string">"Belarus"</span>, <span class="hljs-string">"Somalia"</span>, <span class="hljs-string">"Sweden"</span>, <span class="hljs-string">"Benin"</span>, <span class="hljs-string">"Azerbaijan"</span>,
+                            <span class="hljs-string">"Burundi"</span>, <span class="hljs-string">"Austria"</span>, <span class="hljs-string">"Honduras"</span>, <span class="hljs-string">"Switzerland"</span>, <span class="hljs-string">"Bulgaria"</span>,
+                            <span class="hljs-string">"Serbia"</span>, <span class="hljs-string">"Israel"</span>, <span class="hljs-string">"Tajikistan"</span>, <span class="hljs-string">"Hong Kong"</span>, <span class="hljs-string">"Papua New Guinea"</span>,
+                            <span class="hljs-string">"Togo"</span>, <span class="hljs-string">"Libya"</span>, <span class="hljs-string">"Jordan"</span>, <span class="hljs-string">"Paraguay"</span>, <span class="hljs-string">"Laos"</span>,
+                            <span class="hljs-string">"El Salvador"</span>, <span class="hljs-string">"Sierra Leone"</span>, <span class="hljs-string">"Nicaragua"</span>, <span class="hljs-string">"Kyrgyzstan"</span>, <span class="hljs-string">"Denmark"</span>,
+                            <span class="hljs-string">"Slovakia"</span>, <span class="hljs-string">"Finland"</span>, <span class="hljs-string">"Eritrea"</span>, <span class="hljs-string">"Turkmenistan"</span>
+                          ], {preserveOrder: <span class="hljs-literal">true</span>});
+                          <span class="hljs-keyword">break</span>;
+                    }
+                }
+            }
+        });    
+    }
+});
+
+App.TagsView = Ember.View.extend({
+    tagName : <span class="hljs-string">'div'</span>,
+    attributeBindings : [ <span class="hljs-string">'name'</span>, <span class="hljs-string">'id'</span>,<span class="hljs-string">'border'</span>,<span class="hljs-string">'width'</span> ],
+    classNamesBindings : [ <span class="hljs-string">'class'</span> ],
+    didInsertElement : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+        
+        $(<span class="hljs-string">'#tags'</span>).textext({ 
+            plugins : <span class="hljs-string">'tags'</span>
+        });
+        
+    }
+});
+
+
+App.CVUploadTool = Ember.TextField.extend({
+    tagName : <span class="hljs-string">'input'</span>,
+    attributeBindings : [ <span class="hljs-string">'name'</span>, <span class="hljs-string">'data-url'</span> ],
+    classNamesBindings : [ <span class="hljs-string">'class'</span> ],
+    type : <span class="hljs-string">'file'</span>,
+    classNames : <span class="hljs-string">'form-control'</span>,
+    didInsertElement : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+
+        <span class="hljs-comment">/*
+         this.$().fileupload('option', {
+         maxFileSize: 5000000
+         });*/</span>
+
+        <span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+
+        <span class="hljs-keyword">this</span>.$().fileupload({
+            add : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span> </span>{
+                <span class="hljs-keyword">var</span> goUpload = <span class="hljs-literal">true</span>;
+                <span class="hljs-keyword">var</span> file = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">"uploadcv"</span>).value;
+                <span class="hljs-keyword">var</span> uploadFile = data.files[<span class="hljs-number">0</span>];
+                <span class="hljs-keyword">if</span> (!(<span class="hljs-regexp">/\.(docx)$/i</span>)
+                        .test(uploadFile.name)) {
+                    addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">'Please select an doc or docx file.'</span>);
+                    goUpload = <span class="hljs-literal">false</span>;
+                }               
+                <span class="hljs-keyword">if</span> (uploadFile.size &gt; <span class="hljs-number">5000000</span>) { <span class="hljs-comment">// 2mb</span>
+                    addmessage(<span class="hljs-string">"warning"</span>,<span class="hljs-string">'Please upload a smaller file, max size is 5 MB'</span>);
+                    goUpload = <span class="hljs-literal">false</span>;
+                }
+                <span class="hljs-keyword">if</span> (goUpload == <span class="hljs-literal">true</span>) {
+                    $(<span class="hljs-string">'#uploadcv'</span>).hide();
+                    $(<span class="hljs-string">'#addEmpSbmt'</span>).attr(<span class="hljs-string">'disabled'</span>,<span class="hljs-literal">true</span>);
+                    data.context = $(<span class="hljs-string">'&lt;button/&gt;'</span>).text(<span class="hljs-string">'Upload'</span>)
+                    .appendTo($(<span class="hljs-string">"#uploadcv"</span>).parent())
+                    .click(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> </span>{
+                        e.preventDefault();
+                        $(<span class="hljs-keyword">this</span>).parent().append(<span class="hljs-string">'&lt;div class="progress" id="#progress"&gt; &lt;div class="progress-bar progress-bar-aqua" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"&gt; &lt;/div&gt; &lt;/div&gt;'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>addmessage(“info”,”Uploading “+data.files[0].name);
+data.context = $(‘<p/>‘).text(‘Uploading…’).replaceAll($(this));</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                        data.submit();
+                    });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>data.submit();</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                }
+            },
+            dataType : <span class="hljs-string">'text'</span>,
+            progressall: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e, data)</span> </span>{
+                <span class="hljs-keyword">var</span> progress = <span class="hljs-built_in">parseInt</span>(data.loaded / data.total * <span class="hljs-number">100</span>, <span class="hljs-number">10</span>);
+                $(<span class="hljs-string">'.progress-bar'</span>).css(
+                    <span class="hljs-string">'width'</span>,
+                    progress + <span class="hljs-string">'%'</span>
+                );
+            },          
+            done : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span> </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>console.log(JSON.parse(data.result));</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                $(<span class="hljs-string">'.progress-bar'</span>).parent().prev().text(<span class="hljs-string">'Uploaded'</span>).attr(<span class="hljs-string">'disabled'</span>,<span class="hljs-literal">true</span>);
+                $(<span class="hljs-string">'#addEmpSbmt'</span>).attr(<span class="hljs-string">'disabled'</span>,<span class="hljs-literal">false</span>);
+                $(<span class="hljs-string">'.uploadedfile'</span>).text(data.result);
+            }
+
+        });
+
+    }
+
+});
+
+
+App.FileUploadTool = Ember.TextField.extend({
+    tagName : <span class="hljs-string">'input'</span>,
+    attributeBindings : [ <span class="hljs-string">'name'</span>, <span class="hljs-string">'data-url'</span> ],
+    classNamesBindings : [ <span class="hljs-string">'class'</span> ],
+    type : <span class="hljs-string">'file'</span>,
+    classNames : <span class="hljs-string">'form-control'</span>,
+    didInsertElement : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-comment">/*
+         this.$().fileupload('option', {
+         maxFileSize: 5000000
+         });*/</span>
+
+        <span class="hljs-keyword">var</span> that = <span class="hljs-keyword">this</span>;
+
+        <span class="hljs-keyword">this</span>.$().fileupload({
+            add : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span> </span>{
+                <span class="hljs-keyword">var</span> goUpload = <span class="hljs-literal">true</span>;
+                <span class="hljs-keyword">var</span> uploadFile = data.files[<span class="hljs-number">0</span>];
+                <span class="hljs-keyword">if</span> (!(<span class="hljs-regexp">/\.(xls|xlsx)$/i</span>)
+                        .test(uploadFile.name)) {
+                    addmessage(<span class="hljs-string">"danger"</span>,<span class="hljs-string">'Please select an xls or xlsx file.'</span>);
+                    goUpload = <span class="hljs-literal">false</span>;
+                }               
+                <span class="hljs-keyword">if</span> (uploadFile.size &gt; <span class="hljs-number">5000000</span>) { <span class="hljs-comment">// 2mb</span>
+                    addmessage(<span class="hljs-string">"warning"</span>,<span class="hljs-string">'Please upload a smaller file, max size is 5 MB'</span>);
+                    goUpload = <span class="hljs-literal">false</span>;
+                }
+                <span class="hljs-keyword">if</span> (goUpload == <span class="hljs-literal">true</span>) {
+                    $(<span class="hljs-string">'#importcandidatefile'</span>).attr(<span class="hljs-string">'disable'</span>, <span class="hljs-literal">true</span>);
+                    addmessage(<span class="hljs-string">"info"</span>,<span class="hljs-string">"Uploading "</span>+data.files[<span class="hljs-number">0</span>].name);
+                    data.submit();
+                }
+            },
+            dataType : <span class="hljs-string">'text'</span>,
+            done : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e, data)</span> </span>{
+                addmessage(<span class="hljs-string">"success"</span>,<span class="hljs-string">"Upload Complete"</span>);
+                $(<span class="hljs-string">'#importcandidatefile'</span>).attr(<span class="hljs-string">'disable'</span>, <span class="hljs-literal">false</span>);
+                <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.parse(data.result));
+            }
+
+        });
+
+    }
+
+});
+
+
+App.CandidateSuggestionsView = Ember.View.extend({
+
+    didInsertElement : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+<span class="hljs-comment">/*
+        var model = this.get('controller').get('content');
+        var that = this;
+
+        var key = model.city+"+"+model.country+"+"+model.skills+"+"+model.title+"+"+model.name+"+"+model.exp_max+"&amp;fl=*,score";
+
+        $.ajax ({
+            type: "POST", 
+            url:'/solrclient',
+            data:{searchtext:key,schema:'c'},                   
+            success: function(data) {  
+                search_text="";
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>model.candidates = data.response.docs;
+that.get(‘controller’).set(‘content’,model);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                that.set('result',data.response.docs);
+            },
+            error: function(data) {
+                alert("Msg: "+ data.status + ": " + data.statusText);
+            }
+        }); 
+*/
+    }
+
+});
+
+
+App.VacancySuggestionsView = Ember.View.extend({
+
+    didInsertElement : function(){
+        
+    }
+
+});
+/*
+App.SetTabView = Ember.View.extend({
+    didInsertElement : function(){
+        var that = this;
+        setTimeout(function(){
+            $("[href='#search-tabs-c']").parent().removeClass('active');    
+            $("[href='#search-tabs-v']").parent().removeClass('active');    
+            $("[href='#search-tabs-co']").parent().removeClass('active');    
+            $("[href='#search-tabs-"+that.get('controller').get('model').schema+"']").parent().addClass('active');    
+        },100);
+    }
+
+});*/
+
+/*App.GraphChartView = Ember.View.extend({
+
+    didInsertElement:function(){
+        Morris.Area({
+            element: 'hero-area',
+            data: [
+                { period: '2010 Q1', iphone: 2666, ipad: null, itouch: 2647 },
+                { period: '2010 Q2', iphone: 2778, ipad: 2294, itouch: 2441 },
+                { period: '2010 Q3', iphone: 4912, ipad: 1969, itouch: 2501 },
+                { period: '2010 Q4', iphone: 3767, ipad: 3597, itouch: 5689 },
+                { period: '2011 Q1', iphone: 6810, ipad: 1914, itouch: 2293 },
+                { period: '2011 Q2', iphone: 5670, ipad: 4293, itouch: 1881 },
+                { period: '2011 Q3', iphone: 4820, ipad: 3795, itouch: 1588 },
+                { period: '2011 Q4', iphone: 15073, ipad: 5967, itouch: 5175 },
+                { period: '2012 Q1', iphone: 10687, ipad: 4460, itouch: 2028 },
+                { period: '2012 Q2', iphone: 8432, ipad: 5713, itouch: 1791 }
+            ],
+            xkey: 'period',
+            ykeys: ['iphone', 'ipad', 'itouch'],
+            labels: ['iPhone', 'iPad', 'iPod Touch'],
+            hideHover: 'auto',</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>lineColors: PixelAdmin.settings.consts.COLORS,</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                                         lineColors: [<span class="hljs-string">'red'</span>,<span class="hljs-string">'blue'</span>,<span class="hljs-string">'green'</span>,<span class="hljs-string">'yellow'</span>],
+            fillOpacity: <span class="hljs-number">0.3</span>,
+            behaveLikeLine: <span class="hljs-literal">true</span>,
+            lineWidth: <span class="hljs-number">2</span>,
+            pointSize: <span class="hljs-number">4</span>,
+            gridLineColor: <span class="hljs-string">'#cfcfcf'</span>,
+            resize: <span class="hljs-literal">true</span>
+        });
+
+    }
+
+});
+
+App.BarChartView = Ember.View.extend({
+
+    didInsertElement:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        Morris.Bar({
+            element: <span class="hljs-string">'hero-bar'</span>,
+            data: [
+                { device: <span class="hljs-string">'iPhone'</span>, geekbench: <span class="hljs-number">136</span> },
+                { device: <span class="hljs-string">'iPhone 3G'</span>, geekbench: <span class="hljs-number">137</span> },
+                { device: <span class="hljs-string">'iPhone 3GS'</span>, geekbench: <span class="hljs-number">275</span> },
+                { device: <span class="hljs-string">'iPhone 4'</span>, geekbench: <span class="hljs-number">380</span> },
+                { device: <span class="hljs-string">'iPhone 4S'</span>, geekbench: <span class="hljs-number">655</span> },
+                { device: <span class="hljs-string">'iPhone 5'</span>, geekbench: <span class="hljs-number">1571</span> }
+            ],
+            xkey: <span class="hljs-string">'device'</span>,
+            ykeys: [<span class="hljs-string">'geekbench'</span>],
+            labels: [<span class="hljs-string">'Geekbench'</span>],
+            barRatio: <span class="hljs-number">0.4</span>,
+            xLabelAngle: <span class="hljs-number">35</span>,
+            hideHover: <span class="hljs-string">'auto'</span>,</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>barColors: PixelAdmin.settings.consts.COLORS,</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                                        barColors: ['green'],
+            gridLineColor: '#cfcfcf',
+            resize: true
+        });
+
+    }
+
+});
+*/
+App.JqcloudView = Ember.View.extend({
+    didInsertElement: function(){
+        $.ajax ({
+            type: "GET", 
+            url:'/jqcloudCall',            
+            success: function(data) {         
+                searchQuery = [];                            
+                for(var i=0;i&lt;data.length;i++){                                    
+                    searchQuery.push({text: '&lt;a href="#/searchResult/'+data[i].searchQuery+'"&gt;'+data[i].searchQuery+'&lt;/a&gt;', weight: data[i].count});                   
+                }
+                $("#example").jQCloud(searchQuery);     
+            },
+            error:function(data){
+                alert("Msg: "+ data.status + ": " + data.statusText);
+            }                        
+        }); 
+    }
+});
+
+
+App.VSuggestionsView = Ember.View.extend({
+    tagName : 'div',
+    attributeBindings : [ 'name','id' ],
+    classNamesBindings : [ 'class' ],
+
+    didInsertElement : function() {
+
+        var sug = $('#suggestions');
+
+        var m = this.get('controller').get('content').details;
+        var key = m.city+"+"+m.country+"+"+m.skills+"+"+m.title+"+"+m.name+"+"+m.exp;
+
+        $.ajax ({
+            type: "POST", 
+            url:'/solrclient',
+            data:{searchtext:key,schema:'v'},                   
+            success: function(data) {  
+                var cs = data.response.docs;
+                var res="";
+
+                for(var i=0; i&lt;(cs.length&gt;3?3:cs.length); i++){
+
+                    res = res  + '&lt;div class="panel-body"&gt;'
+                        +'&lt;p&gt;&lt;i class="panel-title-icon fa fa-user"&gt;&lt;/i&gt;&lt;strong&gt;'+cs[i].vname+'&lt;/strong&gt;&lt;/p&gt;'
+                        +'&lt;span id="stars-rating-example"&gt;&lt;ul class="widget-rating"&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;'
+                        +'&lt;p&gt; '+cs[i].vexp_min+' to '+cs[i].vexp_min+' years Exp&lt;/p&gt;'
+                        +'&lt;div class="search-tags"&gt;'
+                        +'&lt;span class="search-tags-text"&gt;Tags:&lt;/span&gt;';
+
+                    var r = cs[i].vskills.split(",");
+                    for(var j=0;j&lt;r.length;j++){
+                        res = res+'&lt;label class="label label-success"&gt;'+r[j]+'&lt;/label&gt;&amp;nbsp;';
+                    }
+
+                    res = res + '&lt;/div&gt;&lt;br/&gt;'
+                        +'&lt;/div&gt;';
+                }
+
+                sug.html(res);
+
+            },
+            error: function(data) {
+                sug.html("");
+            }
+        }); 
+
+    }
+
+});
+
+App.CSuggestionsView = Ember.View.extend({
+    tagName : 'div',
+    attributeBindings : [ 'name','id' ],
+    classNamesBindings : [ 'class' ],
+
+    didInsertElement : function() {
+
+        var sug = $('#suggestions');
+
+        var m = this.get('controller').get('content');
+        var key = m.city+"+"+m.country+"+"+m.skills+"+"+m.title+"+"+m.name+"+"+m.exp_max;
+
+        $.ajax ({
+            type: "POST", 
+            url:'/solrclient',
+            data:{searchtext:key,schema:'c'},                   
+            success: function(data) {  
+                var cs = data.response.docs;
+                var res="";
+
+                for(var i=0; i&lt;(cs.length&gt;3?3:cs.length); i++){
+
+                    res = res  + '&lt;div class="panel-body"&gt;'
+                        +'&lt;p&gt;&lt;i class="panel-title-icon fa fa-user"&gt;&lt;/i&gt;&lt;strong&gt;'+cs[i].cname+'&lt;/strong&gt;&lt;/p&gt;'
+                        +'&lt;span id="stars-rating-example"&gt;&lt;ul class="widget-rating"&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class="active"&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#" title="" class="widget-rating-item"&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;'
+                        +'&lt;p&gt; '+cs[i].cexp+' years Exp&lt;/p&gt;'
+                        +'&lt;div class="search-tags"&gt;'
+                        +'&lt;span class="search-tags-text"&gt;Tags:&lt;/span&gt;';
+
+                    var r = cs[i].cskills.split(",");
+                    for(var j=0;j&lt;r.length;j++){
+                        res = res+'&lt;label class="label label-success"&gt;'+r[j]+'&lt;/label&gt;&amp;nbsp;';
+                    }
+
+                    res = res + '&lt;/div&gt;&lt;br/&gt;'
+                        +'&lt;/div&gt;';
+                }
+
+                sug.html(res);
+
+            },
+            error: function(data) {
+                sug.html("");
+            }
+        }); 
+
+    }
+
+});
+
+App.PieChartView = Ember.View.extend({
+    didInsertElement:function(){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Easy Pie Charts</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> easyPieChartDefaults = {
+            animate: <span class="hljs-number">2000</span>,
+            scaleColor: <span class="hljs-literal">false</span>,
+            lineWidth: <span class="hljs-number">6</span>,
+            lineCap: <span class="hljs-string">'square'</span>,
+            size: <span class="hljs-number">90</span>,
+            trackColor: <span class="hljs-string">'#e5e5e5'</span>
+        };
+        jQuery(<span class="hljs-string">'#easy-pie-chart-1'</span>).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: <span class="hljs-string">'#489cdf'</span>
+        }));
+        $(<span class="hljs-string">'#easy-pie-chart-2'</span>).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: <span class="hljs-string">'#489cdf'</span>
+        }));
+        $(<span class="hljs-string">'#easy-pie-chart-3'</span>).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: <span class="hljs-string">'#489cdf'</span>
+        }));
+        $(<span class="hljs-string">'#easy-pie-chart-4'</span>).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: <span class="hljs-string">'#489cdf'</span>
+        }));                                
+    }
+
+});
+
+App.AddCandidateView = Ember.View.extend({
+
+    didInsertElement: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        $(<span class="hljs-string">"input.form-control"</span>).val(<span class="hljs-string">""</span>);
+    }
+});
+
+App.AddVacancyView = Ember.View.extend({
+
+    didInsertElement: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+        $(<span class="hljs-string">".form-control input"</span>).val(<span class="hljs-string">""</span>);
+    }
+});</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

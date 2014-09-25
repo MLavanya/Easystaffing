@@ -154,15 +154,15 @@
 				</div> <!-- / .signin-text -->
 
 				<div class="form-group w-icon">
-					<input type="text" name="signin_username" id="username_id" class="form-control input-lg" placeholder="Email">
+					<input type="text" name="signin_username" id="email_id" class="form-control input-lg" placeholder="Email">
 					<span class="fa fa-user signin-form-icon"></span>
 				</div> <!-- / Username -->
 
 				<div class="form-group w-icon">
 					<input type="password" name="signin_password" id="password_id" class="form-control input-lg" placeholder="Password">
 					<span class="fa fa-lock signin-form-icon"></span>
-				</div> <!-- / Password -->
-
+				</div> <!-- / Password -->				
+			
 				<div class="form-actions">
 					<input type="submit" value="SIGN IN" class="signin-btn bg-primary" {{action 'signinclick'}}>
 					<a href="#" class="forgot-password" id="forgot-password-link">Forgot your password?</a>
@@ -249,7 +249,20 @@
 					<input type="password" name="signup_password" id="signuppassword_id" class="form-control input-lg" placeholder="Password">
 					<span class="fa fa-lock signup-form-icon"></span>
 				</div>
-
+				<br/>
+				<div class="form-group">
+					<label>Select the region you work for :</label><br/>
+					<label class="radio-inline">
+						<input type="radio" value="1" name="single-radio" class="px"> <span class="lbl">United States</span>
+					</label>
+					<label class="radio-inline">
+						<input type="radio" value="2" name="single-radio" class="px"> <span class="lbl">India</span>
+					</label>
+					<label class="radio-inline">
+						<input type="radio" value="3" name="single-radio" class="px"> <span class="lbl">Both</span>
+					</label>
+				</div>					
+				
 				<div class="form-group" style="margin-top: 20px;margin-bottom: 20px;">
 					<label class="checkbox-inline">
 						<input type="checkbox" name="signup_confirm" class="px" id="confirm_id">

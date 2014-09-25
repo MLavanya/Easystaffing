@@ -36,6 +36,7 @@ app.use(methodOverride());
 app.use(express.cookieParser()); // read cookies (needed for auth)
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public/')));
+app.use('/coverage', express.static(__dirname + '/../test/coverage/reports'));
 });
 
  
@@ -54,7 +55,7 @@ app.post('/validateadm', services.validateadm);
 app.post('/saveCandidate',services.saveCandidate);
 app.get('/me',services.me);
 app.post('/uploadcv',services.upload);
-app.post('/saveVacancies',services.vacancyadd);
+app.post('/saveVacancies',services.saveVacancies);
 app.post('/solrclient', services.solrclient);
 app.get('/getvacancy/:vacancy_id',services.getvacancy);
 app.get('/getcandidate/:candidate_id',services.getcandidate);
@@ -63,6 +64,7 @@ app.post('/appliedforv',services.appliedforv);
 app.get('/jqcloudCall',services.jqcloudCall);
 app.get('/companyList',services.companyList);
 app.get('/statusList',services.statusList);
+app.get('/cityList',services.cityList);
 app.get('/applicationbycid/:candidate_id',services.applicationbycid);
 app.get('/applicationbyvid/:vacancy_id',services.applicationbyvid);
 app.get('/apphistorybyid/:application_id',services.apphistorybyid);
@@ -71,10 +73,11 @@ app.post('/updateProfile',services.updateProfile);
 app.post('/updateappstatus',services.updateappstatus);
 app.post('/updatevacancystatus',services.updatevacancystatus);
 app.post('/updateCompany',services.updateCompany);
-app.get('/piechartdetails',services.piechartdetails);
+app.get('/dashboardDetails',services.dashboardDetails);
 app.post('/UpdateCandidate',services.UpdateCandidate);
 app.post('/UpdateCandidateResume',services.UpdateCandidateResume);
-
+app.post('/UpdateVacancy',services.UpdateVacancy);
+app.post('/updateCity',services.updateCity);
 
 
 

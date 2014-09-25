@@ -142,8 +142,7 @@
 	
 
 	<div class="row">
-	 {{#view App.PieChartView}}
-	 	{{#each item in model}}		
+	 {{#view App.PieChartView}}	 	
 		<div class="col-xs-4">
 			<!-- Centered text -->
 			<div class="stat-panel text-center">
@@ -156,8 +155,8 @@
 				<div class="stat-row">
 					<!-- Bordered, without top border, without horizontal padding -->					
 					<div class="stat-cell bordered no-border-t no-padding-hr">
-						<div class="pie-chart" {{bind-attr data-percent=item.inprg_perc}} id="easy-pie-chart-2">
-							<div class="pie-chart-label" id="candidateinprogress">{{item.inprogress}}</div>
+						<div class="pie-chart" {{bind-attr data-percent=inprg_perc}} id="easy-pie-chart-2">
+							<div class="pie-chart-label" id="candidateinprogress">{{inprogress}}</div>
 						</div>
 					</div>					
 				</div> <!-- /.stat-row -->
@@ -175,8 +174,8 @@
 				<div class="stat-row">
 					<!-- Bordered, without top border, without horizontal padding -->					
 					<div class="stat-cell bordered no-border-t no-padding-hr">
-						<div class="pie-chart" {{bind-attr data-percent=item.avb_perc}} id="easy-pie-chart-3">
-							<div class="pie-chart-label" id="candidateavailable">{{item.available}}</div>
+						<div class="pie-chart" {{bind-attr data-percent=avb_perc}} id="easy-pie-chart-3">
+							<div class="pie-chart-label" id="candidateavailable">{{available}}</div>
 						</div>
 					</div>					
 				</div> <!-- /.stat-row -->
@@ -195,14 +194,14 @@
 				<div class="stat-row">
 					<!-- Bordered, without top border, without horizontal padding -->
 					<div class="stat-cell bordered no-border-t no-padding-hr">
-						<div class="pie-chart" {{bind-attr data-percent=item.vac_perc}} id="easy-pie-chart-4">
-							<div class="pie-chart-label" id="vacancydetails">{{item.vacancies}}</div>
+						<div class="pie-chart" {{bind-attr data-percent=vac_perc}} id="easy-pie-chart-4">
+							<div class="pie-chart-label" id="vacancydetails">{{vacancies}}</div>
 						</div>
 					</div>
 				</div> <!-- /.stat-row -->
 			</div> <!-- /.stat-panel -->
 		</div>
-		{{/each}}
+		
 	{{/view}}		
 
 		<div class="col-xs-12">
@@ -228,7 +227,7 @@
 						        <div class="row" id="VS">
 						            <div id="search_box_container" class="col-sm-11" style="margin-left: 15px;margin-top: 10px;"></div>
 						            <div class="col-sm-1" id="search_query"></div>
-						            <button class="btn btn-rounded btn-outline btn-primary" {{action 'search'}} style="margin-top: 10px;">Search</button>	           
+						            <button class="btn btn-rounded btn-outline btn-primary" {{action 'search'}} style="margin-top: 10px;">search</button>	           
 						        </div>    
 						    {{/view}}	  
 						      <!-- / Search form -->
@@ -242,44 +241,99 @@
 			</div> <!-- /.stat-panel -->
 
 			<div class="graph-area" style="text-align:center">
-				<div class="col-sm-4">
-				
-				{{#view App.GraphChartView}}
-
-					<div class="panel">
+				<div class="col-sm-4" >
+					<div class="panel" id="employee_active">
 						<div class="panel-heading">
-							<span class="panel-title">Staffing Trend</span>
+							<span class="panel-title">Available Employees</span>
+							<div class="panel-heading-controls">
+								<span class="label label-danger"><i class="fa fa-star"></i></span>
+							</div>							
 						</div>
-						<div class="panel-body">
-							<div class="graph-container">
-								<div id="hero-area" class="graph"></div>
-							</div>
-						</div>
+						
+						<div class="panel-body employee_table">													
+							<table class="table table-hover employee_table">
+								<!--thead>
+									<tr>
+										<th>#</th>
+										<th>Candidate</th>										
+										<th>Created By</th>
+										<th>Created At</th>
+									</tr>
+								</thead-->	
+							{{#each employee_active}}							
+								<tbody>
+									<tr>
+										<td>{{id}}</td>
+										<td>{{#link-to 'candidate' id}}{{name}}{{/link-to}}</td>
+										<td><small>By:</small>&nbsp;{{created_by}}</td>	
+										<td><small>At:</small>&nbsp;{{format-date created_date}}</td>									
+									</tr>									
+								</tbody>
+								{{else}}
+									<div class="panel-body " id="else-panel">
+										<!-- Bordered, without right border, right aligned text -->
+										<div class="stat-cell col-xs-5 text-left">
+											<!-- Stat panel bg icon -->
+											<i class="fa fa-trophy bg-icon "></i>
+											<!-- Extra small text -->
+											<span class="text-xs"></span><br>
+											<!-- Extra large text -->
+											<span class="text-xlg"><h2>	No records found</h2><br/><p class="small-font"><small>Keep Up <br/>the good work</small></p></span>
+										</div> <!-- /.stat-cell -->
+									</div>
+
+							{{/each}}
+							</table>					
+						</div> <!--/.panel-body -->
+							
 					</div>
 					<!-- /6. $MORRISJS_AREA -->
-              {{/view}}
-
 				</div>
 
-				<div class="col-sm-4">
-
-				{{#view App.BarChartView}}
-
-					<div class="panel">
+				<div class="col-sm-4" >
+					<div class="panel" id="vacancy_active">
 						<div class="panel-heading">
-							<span class="panel-title">Company Wise Placement</span>
-						</div>
-						<div class="panel-body">							
-							<div class="graph-container">
-								<div id="hero-bar" class="graph"></div>
-							</div>
-						</div>
+							<span class="panel-title">Available Vacancies</span>
+							<div class="panel-heading-controls">
+								<span class="label label-danger"><i class="fa fa-star"></i></span>
+							</div>	
+						</div>						
+						<div class="panel-body employee_table">													
+							<table class="table table-hover ">
+								<!--thead>
+									<tr>
+										<th>#</th>
+										<th>Vacancy</th>										
+										<th>Created At</th>
+									</tr>
+								</thead-->	
+							{{#each vacancy_active}}						
+								<tbody>
+									<tr>
+										<td>{{id}}</td>
+										<td>{{#link-to 'vacancy' id }}{{name}} {{/link-to}}</td>
+										<td><small>At :</small>&nbsp;{{format-date created_date}}</td>										
+									</tr>									
+								</tbody>	
+								{{else}}
+									<div class="panel-body " id="else-panel">
+										<!-- Bordered, without right border, right aligned text -->
+										<div class="stat-cell col-xs-5 text-left">
+											<!-- Stat panel bg icon -->
+											<i class="fa fa-trophy bg-icon "></i>
+											<!-- Extra small text -->
+											<span class="text-xs"></span><br>
+											<!-- Extra large text -->
+											<span class="text-xlg"><h2>	No records found</h2><br/><p class="small-font"><small>Keep Up <br/>the good work</small></p></span>
+										</div> <!-- /.stat-cell -->
+									</div>
+
+						{{/each}}														
+							</table>					
+						</div> <!--/.panel-body -->													
 					</div>
-
-                {{/view}}
-
+					<!-- /6. $MORRISJS_AREA -->
 				</div>
-
 				<div class="col-sm-4">
 					<div class="panel">
 						<div class="panel-heading">
@@ -315,45 +369,55 @@
 			<div class="panel-body">
 				<div class="form-group">
                     <label for="name" class="col-sm-2 control-label">Name</label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                       {{input type="text" class="form-control" id="name" placeholder="Name" value=firstname}}
                     </div>
                 </div>
 				
 				<div class="form-group">
                     <label for="title" class="col-sm-2 control-label">Title</label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                       {{input type="text" class="form-control" id="title" placeholder="Title" value=title}}
                     </div>
                 </div>
 
               	<div class="form-group">
                     <label for="email" class="col-sm-2 control-label">Email</label>
-	                <div class="col-sm-6">
+	                <div class="col-sm-4">
     	              {{input type="email" class="form-control" id="email" placeholder="Email" value=email}}
         	        </div>
+        	        <label for="email" class="col-sm-2 control-label">Alternate Email</label>
+        	        <div class="col-sm-4">
+    	              {{input type="email" class="form-control" id="alt_email" placeholder="Alt-Email" value=alt_email}}
+        	        </div>
+
             	</div>
 
               	<div class="form-group">
                     <label for="experience" class="col-sm-2 control-label">Experience</label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                       {{input type="num" class="form-control" id="experience" placeholder="Experience" value=experience}}
                     </div>
               	</div>                  
 
               	<div class="form-group">
                 	<label for="phone" class="col-sm-2 control-label">Phone</label>
-                	<div class="col-sm-6">
+                	<div class="col-sm-4">
                       {{input type="tel" class="form-control" id="phone" placeholder="Phone" value=phone}}
+                    </div>
+                    <label for="alt-phone" class="col-sm-2 control-label">Alternate Phone</label>
+                	<div class="col-sm-4">
+                      {{input type="tel" class="form-control" id="alt_phone" placeholder="Alt-Phone" value=alt_phone}}
                     </div>
               	</div>
 
 
               	<div class="form-group">
                     <label for="skills" class="col-sm-2 control-label">Skills</label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
 	                      {{#view App.TagsView}}
-	                        {{view Ember.TextArea class="" rows="1" cols="80" id="tags" placeholder="Skills" value=skills cols="70"}}
+	                        {{view Ember.TextArea class="" rows="1" cols="80" id="tags" placeholder="Skills" value=skills cols="60"}}
+	                        <p class="help-block"><b>NOTE :</b> Press Enter key after each skill</p>
 	                      {{/view}}                    
 
 	                </div>
@@ -361,20 +425,24 @@
 
     	        <div class="form-group">
                     <label for="skills" class="col-sm-2 control-label">Country</label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         {{view Ember.Select  classNames="form-control" id="country" value=forcountry  content=country}}
 	                </div>
     	        </div>
 
     	        <div class="form-group">
                     <label for="skills" class="col-sm-2 control-label">City</label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         {{view Ember.Select  classNames="form-control" id="city" value=forcity  content=city}}
 	                </div>
+	                <div class="col-sm-2">                     
+                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCity}} ><span class="btn-label icon fa fa-plus"></span>City</button>
+                    </div>
     	        </div>
+
               	<div class="form-group">
                     <label for="" class="col-sm-2 control-label">Resume / CV </label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                      {{#view App.CVUploadTool name="file" data-url="/uploadcv" id="uploadcv"}}{{/view}}
                       <label class="uploadedfile" style="display:none;"></label> 
 	                </div>
@@ -382,14 +450,21 @@
              
               	<div class="form-group">
                     <label for="country" class="col-sm-2 control-label">Prescreening Status</label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                       {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses optionValuePath="content.id" optionLabelPath="content.name"}}
                 	</div>
               	</div>
 
               	<div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">Employee</label>
+                    <div class="col-sm-4">
+                        {{view Ember.Select  classNames="form-control" id="employee" value=foremployee  content=employee}}
+	                </div>
+    	        </div>
+
+              	<div class="form-group">
                     <label for="comments" class="col-sm-2 control-label">Comments</label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                       {{input type="text" class="form-control" id="comments" placeholder="Comments" value=comments}}
                 	</div>
               	</div>
@@ -411,7 +486,7 @@
 			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>	
 		</div>
 		{{#view App.AddVacancyView}}
-		<form class="panel form-horizontal"role="form" {{action "savecandidate" on="submit"}}>
+		<form class="panel form-horizontal"role="form" {{action "savevacancy" on="submit"}}>
 			<div id="alertMsg"></div>
 			<div class="panel-heading">
 				<span class="panel-title">Enter Details</span>
@@ -419,7 +494,7 @@
 			<div class="panel-body">
 				<div class="form-group">
                     <label for="name" class="col-sm-2 control-label">Job Title</label>
-                    <div class="col-sm-3">
+                    <div class="col-sm-4">
                       {{input type="text" class="form-control" id="jobTitle" placeholder="Job Title" value=jobTitle}}
                     </div>
                 </div>
@@ -442,9 +517,9 @@
 
               	<div class="form-group">
                     <label for="experience" class="col-sm-2 control-label">Experience</label>
-                    <div class="col-sm-1">
+                    <div class="col-sm-2">
                       {{input type="num" class="form-control" id="min_experience" placeholder="Min" value=min_experience}}
-                    </div><div class="col-sm-1">
+                    </div><div class="col-sm-2">
                       {{input type="num" class="form-control" id="max_experience" placeholder="Max" value=max_experience}}
                     </div>
               	</div>                  
@@ -453,7 +528,8 @@
                     <label for="skills" class="col-sm-2 control-label">Skills</label>
                     <div class="col-sm-6">
 	                      {{#view App.TagsView}}
-	                        {{view Ember.TextArea class="" rows="1" cols="80" id="tags" placeholder="Skills" value=skills cols="50"}}
+	                        {{view Ember.TextArea class="" rows="1" cols="80" id="tags" placeholder="Skills" value=skills cols="60"}}
+	                        <p class="help-block"><b>NOTE :</b> Press Enter key after each skill</p>
 	                      {{/view}}                    
 
 	                </div>
@@ -461,21 +537,24 @@
 
     	        <div class="form-group">
                     <label for="skills" class="col-sm-2 control-label">Country</label>
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         {{view Ember.Select  classNames="form-control" id="country" value=forcountry  content=country}}
 	                </div>
     	        </div>
 
     	        <div class="form-group">
                     <label for="skills" class="col-sm-2 control-label">City</label>
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                         {{view Ember.Select  classNames="form-control" id="city" value=forcity  content=city}}
 	                </div>
+	                <div class="col-sm-2">                     
+                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCity}} ><span class="btn-label icon fa fa-plus"></span>City</button>
+                    </div>
     	        </div>
 
         	    <div class="form-group">
                     <label for="usertype" class="col-sm-2 control-label">Company Submitted</label>
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                       {{view Ember.Select  classNames="form-control" id="company" value=forcompany  content=companies optionValuePath="content.id"       optionLabelPath="content.name"}}                      
                     </div>	
                     <div class="col-sm-2">                     
@@ -485,7 +564,7 @@
 
                 <div class="form-group">
                     <label for="country" class="col-sm-2 control-label">Status</label>
-                    <div class="col-sm-2">
+                    <div class="col-sm-4">
                       {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses }}
                 	</div>
               	</div>	
@@ -605,12 +684,78 @@
 
 		<div class="row">
 			<div class="col-sm-9">
+				<div id="UpdateVacancyForm" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true"}}>×</button>
+								<h4 class="modal-title" id="myModalLabel">Update Vacancy</h4>
+							</div>
+							<div class="modal-body">	
+								<form class=""role="form">
+									<input type="hidden" id="vacancyId" {{bind-attr value=id}} >
 
+									<div class="form-group">
+					                    <label for="title" class="col-sm-3 control-label">Title</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="title" placeholder="title" value=title}}
+					                    </div>
+					                </div>
+
+					                <div class="form-group">
+					                    <label for="vacancyName" class="col-sm-3 control-label">Vacancy Name</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="vacancyName" placeholder="name" value=name}}
+					                    </div>
+					                </div>
+
+					                <div class="form-group">
+					                    <label for="description" class="col-sm-3 control-label">Description</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="description" placeholder="description" value=description}}
+					                    </div>
+					                </div>
+
+					                <div class="form-group">
+					                    <label for="exp_min" class="col-sm-3 control-label">Min Experience</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="exp_min" placeholder="Min Exp" value=exp_min}}
+					                    </div>
+					                </div>
+
+					                <div class="form-group">
+					                    <label for="exp_max" class="col-sm-3 control-label">Max Experience</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="exp_max" placeholder="Max Exp" value=exp_max}}
+					                    </div>
+					                </div>
+
+					                <div class="form-group">
+					                    <label for="city" class="col-sm-3 control-label">City</label>
+					                    <div class="col-sm-6">
+					                        {{view Ember.Select  classNames="form-control" id="v_city" value=""  content=v_city}}
+						                </div>
+						                <div class="col-sm-2">                     
+					                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCity}} ><span class="btn-label icon fa fa-plus"></span>City</button>
+					                    </div>
+					    	        </div>
+
+								</form>
+							</div> <!-- / .modal-body -->
+							<div class="modal-footer">						
+								<button type="button" class="btn btn-primary" data-dismiss="modal" {{action "UpdateVacancy"}}>Save updates</button>
+							</div><!--/.modal-footer -->
+						
+						</div> <!-- / .modal-content -->
+					</div> <!-- / .modal-dialog -->
+				</div> <!-- /.modal -->
+				<!-- / Modal -->
 				<div class="panel colourable">
 					<div class="panel-heading">
 						<span class="panel-title"><i class="panel-title-icon fa fa-info"></i>Details</span>
-					<div class="panel-heading-controls">
-					</div>								
+						<div class="panel-heading-controls">
+							<div class="btn btn-xs panel-heading-icon" data-toggle="modal" data-target="#UpdateVacancyForm" {{action 'loadCity'}}><i class="fa fa-edit"></i>&nbsp;Edit</div>
+						</div>								
 					</div>
 					<div class="panel-body">
 
@@ -621,11 +766,11 @@
 									<td>{{format-skill skills}}</td>
 								</tr>
 								<tr>
-									<td>Min Expereience</td>
+									<td>Min Experience</td>
 									<td>{{exp_min}}</td>
 								</tr>
 								<tr>
-									<td>Max Expereience</td>
+									<td>Max Experience</td>
 									<td>{{exp_max}}</td>
 								</tr>
 								<tr>
@@ -758,9 +903,30 @@
 					              	</div>                  
 
 					              	<div class="form-group">
+					                	<label for="email" class="col-sm-3 control-label">Email</label>
+					                	<div class="col-sm-6">
+					                      {{input type="email" class="form-control" id="email" placeholder="Email" value=details.email}}
+					                    </div>
+					              	</div>
+
+					              	<div class="form-group">
+					                	<label for="alt_email" class="col-sm-3 control-label">Alternate Email</label>
+					                	<div class="col-sm-6">
+					                      {{input type="email" class="form-control" id="alt_email" placeholder="alt_email" value=details.alt_email}}
+					                    </div>
+					              	</div>
+
+					              	<div class="form-group">
 					                	<label for="phone" class="col-sm-3 control-label">Phone</label>
 					                	<div class="col-sm-6">
 					                      {{input type="tel" class="form-control" id="phone" placeholder="Phone" value=details.phone}}
+					                    </div>
+					              	</div>
+
+					              	<div class="form-group">
+					                	<label for="alt_phone" class="col-sm-3 control-label">Alternate Phone</label>
+					                	<div class="col-sm-6">
+					                      {{input type="tel" class="form-control" id="alt_phone" placeholder="alt_phone" value=details.alt_phone}}
 					                    </div>
 					              	</div>
 
@@ -769,22 +935,19 @@
 					                    <div class="col-sm-6">
 						                      {{#view App.TagsView}}
 						                        {{view Ember.TextArea class="col-sm-12" rows="1" cols="80" id="tags" placeholder="Skills" value=details.skills cols="70"}}
+						                        <p class="help-block"><b>NOTE :</b> Press Enter key after each skill</p>
 						                      {{/view}}
 						                </div>
-					    	        </div-->
-
-					    	        <div class="form-group">
-					                    <label for="country" class="col-sm-3 control-label">Country</label>
-					                    <div class="col-sm-6">
-					                        {{view Ember.Select  classNames="form-control" id="country" value=details.country  content=country}}
-						                </div>
-					    	        </div>
+					    	        </div-->					    	     
 
 					    	        <div class="form-group">
 					                    <label for="city" class="col-sm-3 control-label">City</label>
 					                    <div class="col-sm-6">
 					                        {{view Ember.Select  classNames="form-control" id="city" value=details.city  content=city}}
 						                </div>
+						                <div class="col-sm-2">                     
+					                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCity}} ><span class="btn-label icon fa fa-plus"></span>City</button>
+					                    </div>
 					    	        </div>						    	        			              
 								</form>
 							</div> <!-- / .modal-body1 -->
@@ -814,9 +977,9 @@
 				<div class="panel colourable">
 					<div class="panel-heading">
 						<span class="panel-title"><i class="panel-title-icon fa fa-info"></i>Details</span>
-					<div class="panel-heading-controls">
-						<div class="btn btn-xs panel-heading-icon" data-toggle="modal" data-target="#UpdateCandidateForm"><i class="fa fa-edit"></i>&nbsp;Edit</div>
-					</div>								
+						<div class="panel-heading-controls">
+							<div class="btn btn-xs panel-heading-icon" data-toggle="modal" data-target="#UpdateCandidateForm" {{action 'loadCity'}}><i class="fa fa-edit"></i>&nbsp;Edit</div>
+						</div>								
 					</div>
 					<div class="panel-body">
 						<table id="user" class="table table-bordered table-striped" style="clear: both">
@@ -830,16 +993,24 @@
 									<td><p>{{details.title}}</p></td>
 								</tr>
 								<tr>
-									<td>Email</td>
-									<td><a href="#">{{details.email}}</a></td>
-								</tr>
-								<tr>
 									<td>Experience</td>
 									<td><a href="#">{{details.exp}}</a></td>
 								</tr>
 								<tr>
+									<td>Email</td>
+									<td><a href="#">{{details.email}}</a></td>
+								</tr>
+								<tr>
+									<td>Alternate Email</td>
+									<td><a href="#">{{details.alt_email}}</a></td>
+								</tr>								
+								<tr>
 									<td>Phone</td>
 									<td><a href="#">{{details.phone}}</a></td>
+								</tr>
+								<tr>
+									<td>Alternate Phone</td>
+									<td><a href="#">{{details.alt_phone}}</a></td>
 								</tr>
 								<tr>
 									<td>Skills</td>
@@ -985,7 +1156,7 @@
 					</div>
 				</div>
 
-				<div class="panel panel-transparent profile-skills">
+				<!--div class="panel panel-transparent profile-skills">
 					<div class="panel-heading">
 						<span class="panel-title">Skills</span>
 					</div>
@@ -995,11 +1166,20 @@
 						<span class="label label-primary">HTML</span>
 						<span class="label label-primary">CSS</span>
 					</div>
+				</div-->
+
+				<div class="panel panel-transparent">
+					<div class="panel-heading">
+						<span class="panel-title">Working for</span>
+					</div>
+					<div class="list-group">												
+						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-compass" style="color: #888"></i>{{format-country userdata.region}}</a>						
+					</div>
 				</div>
 
 				<div class="panel panel-transparent">
 					<div class="panel-heading">
-						<span class="panel-title">Social</span>
+						<span class="panel-title">Contact Me</span>
 					</div>
 					<div class="list-group">						
 						<a href="#" class="list-group-item"><i class="profile-list-icon fa fa-mobile icon-large" style="color: #1a7ab9"></i> {{userdata.mobile_number}}</a>
@@ -1015,12 +1195,12 @@
 				<div class="profile-content">
 
 					<ul id="profile-tabs" class="nav nav-tabs">
-						<li class="active">
+						<!--li class="active">
 							<a href="#profile-tabs-board" data-toggle="tab">Board</a>
 						</li>
 						<li>
 							<a href="#profile-tabs-activity" data-toggle="tab">Timeline</a>
-						</li>
+						</li-->
 						<li>
 							<a href="#profile-tabs-followers" data-toggle="tab">My Candidates</a>
 						</li>						
@@ -1030,9 +1210,9 @@
 					</ul>
 
 					<div class="tab-content tab-content-bordered panel-padding">
-						<div class="widget-article-comments tab-pane panel no-padding no-border fade in active" id="profile-tabs-board">
+						<div class="widget-article-comments tab-pane  no-padding no-border fade in active" id="profile-tabs-board"><!--class ="panel" has been removed from the profile-tabs-board since candidatelist is the first tab to be shown  -->
 
-							<hr class="no-panel-padding-h panel-wide">
+							<!--hr class="no-panel-padding-h panel-wide">
 							
 							<div class="comment">
 								<img src="assets/demo/avatars/3.jpg" alt="" class="comment-avatar">
@@ -1050,7 +1230,7 @@
 										<a href="#">Reply</a>
 									</div>
 								</div> <!-- / .comment-body -->
-							</div> <!-- / .comment -->						
+							</div--> <!-- / .comment -->						
 						
 						</div> <!-- / .tab-pane -->
 						<div class="tab-pane fade" id="profile-tabs-activity">
@@ -1071,11 +1251,11 @@
 								
 							</div> <!-- / .timeline -->
 						</div> <!-- / .tab-pane -->
-						<div class="tab-pane fade widget-followers" id="profile-tabs-followers">
+						<div class="tab-pane fade widget-followers in active" id="profile-tabs-followers">
 							{{#each candidatelist}}
 								<ul class="follower">	
 									<li class="body row">									
-										<div class="col-xs-3">
+										<div class="col-xs-2">
 											<img src="images/user.png" alt="" class="follower-avatar">&nbsp;&nbsp;
 											{{#link-to 'candidate' id class="follower-name"}}{{name}}{{/link-to}}
 										</div>
@@ -1088,8 +1268,8 @@
 										<div class="col-xs-2">
 											<div class="follower-phone">{{phone}}</div>
 										</div>										
-										<div class="col-xs-2">
-											<div class="follower-email">{{format-cstatus status}}</div>
+										<div class="col-xs-3">
+											<div class="follower-status">{{format-cstatus status}}&nbsp;&nbsp;{{format-cstatus active "YES"}}</div>
 										</div>
 									</li>
 								</ul>

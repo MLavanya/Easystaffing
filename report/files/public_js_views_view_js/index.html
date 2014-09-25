@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - public/js/views/view.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>public/js/views/view.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.14</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">618</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">37.52</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">5.89</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">var searchQuery=[];
+App.DashboardView = Ember.View.extend({
+	
+	didInsertElement : function() {
+		window.visualSearch = VS.init({
+            container  : $(&#039;#search_box_container&#039;),
+            showFacets : true,
+            unquotable :[],
+            callbacks  : {
+                search : function(query, searchCollection) {
+                    var $query = $(&#039;#search_query&#039;);
+                    search_text=&quot;&quot;;
+                    var str=query;
+                    if(str != &quot;&quot;){
+                        var stringMatch = str.match(/&quot;(.*?)&quot;/g);
+                        stringMatch=&#039;&#039;+stringMatch+&#039;&#039;;
+                        stringMatch=stringMatch.split(&quot;,&quot;);
+                        for(var i=0;i&lt;stringMatch.length;i++){
+                            if(i == 0){
+                                search_text = search_text+stringMatch[i].replace(/&quot;/g,&quot;&quot;); 
+                               // alert(search_text);                  
+                            }
+                            else{
+                                search_text = search_text+&quot;+&quot;+stringMatch[i].replace(/&quot;/g,&quot;&quot;);
+                                /*search_text = search_text+&quot;+&quot;+stringMatch[i];*/
+                                //alert(search_text);                  
+                            }
+                        }
+                    }
+
+                    $query.stop().animate({opacity : 1}, {duration: 300, queue: false});
+                    clearTimeout(window.queryHideDelay);
+                    window.queryHideDelay = setTimeout(function() {
+                        $query.animate({opacity : 0 }, {duration: 1000,queue: false});
+                    }, 2000);
+                },
+
+                facetMatches : function(callback) {
+                  callback([
+                    { label: &#039;freetext&#039;,    category: &#039;generic&#039; },
+                    { label: &#039;city&#039;,       category: &#039;location&#039; },
+                    { label: &#039;country&#039;,    category: &#039;location&#039; },
+                    { label: &#039;skills&#039;,    category: &#039;other&#039; },
+                    { label: &#039;company&#039;,    category: &#039;other&#039; }
+                  ]);
+                },
+
+                valueMatches : function(facet, searchTerm, callback) {
+                    switch (facet) {
+                        case &#039;skills&#039;:
+                            callback([&#039;java&#039;,&#039;dotnet&#039;,&#039;php&#039;,&#039;nodejs&#039;]);
+                            break;
+                        case &#039;company&#039;:
+                            callback([&#039;srs&#039;, &#039;infosys&#039;, &#039;wipro&#039;,&#039;capgemini&#039;]);
+                            break;               
+                        case &#039;city&#039;:
+                            callback([
+                            &#039;Cleveland&#039;,
+                            &#039;New York City&#039;,
+                            &#039;Brooklyn&#039;,
+                            &#039;Manhattan&#039;,
+                            &#039;Queens&#039;,
+                            &#039;The Bronx&#039;,
+                            &#039;Staten Island&#039;,
+                            &#039;San Francisco&#039;,
+                            &#039;Los Angeles&#039;,
+                            &#039;Seattle&#039;,
+                            &#039;London&#039;,
+                            &#039;hyderabad&#039;,  
+                            &#039;Portland&#039;,
+                            &#039;Chicago&#039;,
+                            &#039;Boston&#039;
+                          ]);
+                          break;          
+                        case &#039;country&#039;:
+                          callback([
+                            &quot;China&quot;, &quot;India&quot;, &quot;United States&quot;, &quot;Indonesia&quot;, &quot;Brazil&quot;,
+                            &quot;Pakistan&quot;, &quot;Bangladesh&quot;, &quot;Nigeria&quot;, &quot;Russia&quot;, &quot;Japan&quot;,
+                            &quot;Mexico&quot;, &quot;Philippines&quot;, &quot;Vietnam&quot;, &quot;Ethiopia&quot;, &quot;Egypt&quot;,
+                            &quot;Germany&quot;, &quot;Turkey&quot;, &quot;Iran&quot;, &quot;Thailand&quot;, &quot;D. R. of Congo&quot;,
+                            &quot;France&quot;, &quot;United Kingdom&quot;, &quot;Italy&quot;, &quot;Myanmar&quot;, &quot;South Africa&quot;,
+                            &quot;South Korea&quot;, &quot;Colombia&quot;, &quot;Ukraine&quot;, &quot;Spain&quot;, &quot;Tanzania&quot;,
+                            &quot;Sudan&quot;, &quot;Kenya&quot;, &quot;Argentina&quot;, &quot;Poland&quot;, &quot;Algeria&quot;,
+                            &quot;Canada&quot;, &quot;Uganda&quot;, &quot;Morocco&quot;, &quot;Iraq&quot;, &quot;Nepal&quot;,
+                            &quot;Peru&quot;, &quot;Afghanistan&quot;, &quot;Venezuela&quot;, &quot;Malaysia&quot;, &quot;Uzbekistan&quot;,
+                            &quot;Saudi Arabia&quot;, &quot;Ghana&quot;, &quot;Yemen&quot;, &quot;North Korea&quot;, &quot;Mozambique&quot;,
+                            &quot;Taiwan&quot;, &quot;Syria&quot;, &quot;Ivory Coast&quot;, &quot;Australia&quot;, &quot;Romania&quot;,
+                            &quot;Sri Lanka&quot;, &quot;Madagascar&quot;, &quot;Cameroon&quot;, &quot;Angola&quot;, &quot;Chile&quot;,
+                            &quot;Netherlands&quot;, &quot;Burkina Faso&quot;, &quot;Niger&quot;, &quot;Kazakhstan&quot;, &quot;Malawi&quot;,
+                            &quot;Cambodia&quot;, &quot;Guatemala&quot;, &quot;Ecuador&quot;, &quot;Mali&quot;, &quot;Zambia&quot;,
+                            &quot;Senegal&quot;, &quot;Zimbabwe&quot;, &quot;Chad&quot;, &quot;Cuba&quot;, &quot;Greece&quot;,
+                            &quot;Portugal&quot;, &quot;Belgium&quot;, &quot;Czech Republic&quot;, &quot;Tunisia&quot;, &quot;Guinea&quot;,
+                            &quot;Rwanda&quot;, &quot;Dominican Republic&quot;, &quot;Haiti&quot;, &quot;Bolivia&quot;, &quot;Hungary&quot;,
+                            &quot;Belarus&quot;, &quot;Somalia&quot;, &quot;Sweden&quot;, &quot;Benin&quot;, &quot;Azerbaijan&quot;,
+                            &quot;Burundi&quot;, &quot;Austria&quot;, &quot;Honduras&quot;, &quot;Switzerland&quot;, &quot;Bulgaria&quot;,
+                            &quot;Serbia&quot;, &quot;Israel&quot;, &quot;Tajikistan&quot;, &quot;Hong Kong&quot;, &quot;Papua New Guinea&quot;,
+                            &quot;Togo&quot;, &quot;Libya&quot;, &quot;Jordan&quot;, &quot;Paraguay&quot;, &quot;Laos&quot;,
+                            &quot;El Salvador&quot;, &quot;Sierra Leone&quot;, &quot;Nicaragua&quot;, &quot;Kyrgyzstan&quot;, &quot;Denmark&quot;,
+                            &quot;Slovakia&quot;, &quot;Finland&quot;, &quot;Eritrea&quot;, &quot;Turkmenistan&quot;
+                          ], {preserveOrder: true});
+                          break;
+                    }
+                }
+            }
+        });    
+	}
+});
+
+App.SearchResultView = Ember.View.extend({
+    
+    didInsertElement : function() {
+        window.visualSearch = VS.init({
+            container  : $(&#039;#search_box_container&#039;),
+            showFacets : true,
+            unquotable :[],
+            callbacks  : {
+                search : function(query, searchCollection) {
+                    var $query = $(&#039;#search_query&#039;);
+                    search_text=&quot;&quot;;
+                    var str=query;
+                    if(str != &quot;&quot;){
+                        var stringMatch = str.match(/&quot;(.*?)&quot;/g);
+                        stringMatch=&#039;&#039;+stringMatch+&#039;&#039;;
+                        stringMatch=stringMatch.split(&quot;,&quot;);
+                        for(var i=0;i&lt;stringMatch.length;i++){
+                            if(i == 0){
+                                search_text = search_text+stringMatch[i].replace(/&quot;/g,&quot;&quot;); 
+                               // alert(search_text);                  
+                            }
+                            else{
+                                search_text = search_text+&quot;+&quot;+stringMatch[i].replace(/&quot;/g,&quot;&quot;);
+                                /*search_text = search_text+&quot;+&quot;+stringMatch[i];*/
+                                //alert(search_text);                  
+                            }
+                        }
+                    }
+
+                    $query.stop().animate({opacity : 1}, {duration: 300, queue: false});
+                    clearTimeout(window.queryHideDelay);
+                    window.queryHideDelay = setTimeout(function() {
+                        $query.animate({opacity : 0 }, {duration: 1000,queue: false});
+                    }, 2000);
+                },
+
+                facetMatches : function(callback) {
+                  callback([
+                    { label: &#039;freetext&#039;,    category: &#039;generic&#039; },
+                    { label: &#039;city&#039;,       category: &#039;location&#039; },
+                    { label: &#039;country&#039;,    category: &#039;location&#039; },
+                    { label: &#039;skills&#039;,    category: &#039;other&#039; },
+                    { label: &#039;company&#039;,    category: &#039;other&#039; }
+                  ]);
+                },
+
+                valueMatches : function(facet, searchTerm, callback) {
+                    switch (facet) {
+                        case &#039;skills&#039;:
+                            callback([&#039;java&#039;,&#039;dotnet&#039;,&#039;php&#039;,&#039;nodejs&#039;]);
+                            break;
+                        case &#039;company&#039;:
+                            callback([&#039;srs&#039;, &#039;infosys&#039;, &#039;wipro&#039;,&#039;capgemini&#039;]);
+                            break;               
+                        case &#039;city&#039;:
+                            callback([
+                            &#039;Cleveland&#039;,
+                            &#039;New York City&#039;,
+                            &#039;Brooklyn&#039;,
+                            &#039;Manhattan&#039;,
+                            &#039;Queens&#039;,
+                            &#039;The Bronx&#039;,
+                            &#039;Staten Island&#039;,
+                            &#039;San Francisco&#039;,
+                            &#039;Los Angeles&#039;,
+                            &#039;Seattle&#039;,
+                            &#039;London&#039;,
+                            &#039;hyderabad&#039;,  
+                            &#039;Portland&#039;,
+                            &#039;Chicago&#039;,
+                            &#039;Boston&#039;
+                          ]);
+                          break;          
+                        case &#039;country&#039;:
+                          callback([
+                            &quot;China&quot;, &quot;India&quot;, &quot;United States&quot;, &quot;Indonesia&quot;, &quot;Brazil&quot;,
+                            &quot;Pakistan&quot;, &quot;Bangladesh&quot;, &quot;Nigeria&quot;, &quot;Russia&quot;, &quot;Japan&quot;,
+                            &quot;Mexico&quot;, &quot;Philippines&quot;, &quot;Vietnam&quot;, &quot;Ethiopia&quot;, &quot;Egypt&quot;,
+                            &quot;Germany&quot;, &quot;Turkey&quot;, &quot;Iran&quot;, &quot;Thailand&quot;, &quot;D. R. of Congo&quot;,
+                            &quot;France&quot;, &quot;United Kingdom&quot;, &quot;Italy&quot;, &quot;Myanmar&quot;, &quot;South Africa&quot;,
+                            &quot;South Korea&quot;, &quot;Colombia&quot;, &quot;Ukraine&quot;, &quot;Spain&quot;, &quot;Tanzania&quot;,
+                            &quot;Sudan&quot;, &quot;Kenya&quot;, &quot;Argentina&quot;, &quot;Poland&quot;, &quot;Algeria&quot;,
+                            &quot;Canada&quot;, &quot;Uganda&quot;, &quot;Morocco&quot;, &quot;Iraq&quot;, &quot;Nepal&quot;,
+                            &quot;Peru&quot;, &quot;Afghanistan&quot;, &quot;Venezuela&quot;, &quot;Malaysia&quot;, &quot;Uzbekistan&quot;,
+                            &quot;Saudi Arabia&quot;, &quot;Ghana&quot;, &quot;Yemen&quot;, &quot;North Korea&quot;, &quot;Mozambique&quot;,
+                            &quot;Taiwan&quot;, &quot;Syria&quot;, &quot;Ivory Coast&quot;, &quot;Australia&quot;, &quot;Romania&quot;,
+                            &quot;Sri Lanka&quot;, &quot;Madagascar&quot;, &quot;Cameroon&quot;, &quot;Angola&quot;, &quot;Chile&quot;,
+                            &quot;Netherlands&quot;, &quot;Burkina Faso&quot;, &quot;Niger&quot;, &quot;Kazakhstan&quot;, &quot;Malawi&quot;,
+                            &quot;Cambodia&quot;, &quot;Guatemala&quot;, &quot;Ecuador&quot;, &quot;Mali&quot;, &quot;Zambia&quot;,
+                            &quot;Senegal&quot;, &quot;Zimbabwe&quot;, &quot;Chad&quot;, &quot;Cuba&quot;, &quot;Greece&quot;,
+                            &quot;Portugal&quot;, &quot;Belgium&quot;, &quot;Czech Republic&quot;, &quot;Tunisia&quot;, &quot;Guinea&quot;,
+                            &quot;Rwanda&quot;, &quot;Dominican Republic&quot;, &quot;Haiti&quot;, &quot;Bolivia&quot;, &quot;Hungary&quot;,
+                            &quot;Belarus&quot;, &quot;Somalia&quot;, &quot;Sweden&quot;, &quot;Benin&quot;, &quot;Azerbaijan&quot;,
+                            &quot;Burundi&quot;, &quot;Austria&quot;, &quot;Honduras&quot;, &quot;Switzerland&quot;, &quot;Bulgaria&quot;,
+                            &quot;Serbia&quot;, &quot;Israel&quot;, &quot;Tajikistan&quot;, &quot;Hong Kong&quot;, &quot;Papua New Guinea&quot;,
+                            &quot;Togo&quot;, &quot;Libya&quot;, &quot;Jordan&quot;, &quot;Paraguay&quot;, &quot;Laos&quot;,
+                            &quot;El Salvador&quot;, &quot;Sierra Leone&quot;, &quot;Nicaragua&quot;, &quot;Kyrgyzstan&quot;, &quot;Denmark&quot;,
+                            &quot;Slovakia&quot;, &quot;Finland&quot;, &quot;Eritrea&quot;, &quot;Turkmenistan&quot;
+                          ], {preserveOrder: true});
+                          break;
+                    }
+                }
+            }
+        });    
+    }
+});
+
+App.TagsView = Ember.View.extend({
+    tagName : &#039;div&#039;,
+    attributeBindings : [ &#039;name&#039;, &#039;id&#039;,&#039;border&#039;,&#039;width&#039; ],
+    classNamesBindings : [ &#039;class&#039; ],
+    didInsertElement : function() {
+        
+        $(&#039;#tags&#039;).textext({ 
+            plugins : &#039;tags&#039;
+        });
+        
+    }
+});
+
+
+App.CVUploadTool = Ember.TextField.extend({
+    tagName : &#039;input&#039;,
+    attributeBindings : [ &#039;name&#039;, &#039;data-url&#039; ],
+    classNamesBindings : [ &#039;class&#039; ],
+    type : &#039;file&#039;,
+    classNames : &#039;form-control&#039;,
+    didInsertElement : function() {
+
+        /*
+         this.$().fileupload(&#039;option&#039;, {
+         maxFileSize: 5000000
+         });*/
+
+        var that = this;
+
+        this.$().fileupload({
+            add : function(e, data) {
+                var goUpload = true;
+                var file = document.getElementById(&quot;uploadcv&quot;).value;
+                var uploadFile = data.files[0];
+                if (!(/\.(docx)$/i)
+                        .test(uploadFile.name)) {
+                    addmessage(&quot;danger&quot;,&#039;Please select an doc or docx file.&#039;);
+                    goUpload = false;
+                }               
+                if (uploadFile.size &gt; 5000000) { // 2mb
+                    addmessage(&quot;warning&quot;,&#039;Please upload a smaller file, max size is 5 MB&#039;);
+                    goUpload = false;
+                }
+                if (goUpload == true) {
+                    $(&#039;#uploadcv&#039;).hide();
+                    $(&#039;#addEmpSbmt&#039;).attr(&#039;disabled&#039;,true);
+                    data.context = $(&#039;&lt;button/&gt;&#039;).text(&#039;Upload&#039;)
+                    .appendTo($(&quot;#uploadcv&quot;).parent())
+                    .click(function (e) {
+                        e.preventDefault();
+                        $(this).parent().append(&#039;&lt;div class=&quot;progress&quot; id=&quot;#progress&quot;&gt; &lt;div class=&quot;progress-bar progress-bar-aqua&quot; role=&quot;progressbar&quot; aria-valuenow=&quot;0&quot; aria-valuemin=&quot;0&quot; aria-valuemax=&quot;100&quot; style=&quot;width: 0%&quot;&gt; &lt;/div&gt; &lt;/div&gt;&#039;);
+                
+                        //addmessage(&quot;info&quot;,&quot;Uploading &quot;+data.files[0].name);
+                        //data.context = $(&#039;&lt;p/&gt;&#039;).text(&#039;Uploading...&#039;).replaceAll($(this));
+                        data.submit();
+                    });                 
+                    
+                    //data.submit();
+                }
+            },
+            dataType : &#039;text&#039;,
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $(&#039;.progress-bar&#039;).css(
+                    &#039;width&#039;,
+                    progress + &#039;%&#039;
+                );
+            },          
+            done : function(e, data) {
+                //console.log(JSON.parse(data.result));
+                $(&#039;.progress-bar&#039;).parent().prev().text(&#039;Uploaded&#039;).attr(&#039;disabled&#039;,true);
+                $(&#039;#addEmpSbmt&#039;).attr(&#039;disabled&#039;,false);
+                $(&#039;.uploadedfile&#039;).text(data.result);
+            }
+
+        });
+
+    }
+
+});
+
+
+App.FileUploadTool = Ember.TextField.extend({
+    tagName : &#039;input&#039;,
+    attributeBindings : [ &#039;name&#039;, &#039;data-url&#039; ],
+    classNamesBindings : [ &#039;class&#039; ],
+    type : &#039;file&#039;,
+    classNames : &#039;form-control&#039;,
+    didInsertElement : function() {
+        /*
+         this.$().fileupload(&#039;option&#039;, {
+         maxFileSize: 5000000
+         });*/
+
+        var that = this;
+
+        this.$().fileupload({
+            add : function(e, data) {
+                var goUpload = true;
+                var uploadFile = data.files[0];
+                if (!(/\.(xls|xlsx)$/i)
+                        .test(uploadFile.name)) {
+                    addmessage(&quot;danger&quot;,&#039;Please select an xls or xlsx file.&#039;);
+                    goUpload = false;
+                }               
+                if (uploadFile.size &gt; 5000000) { // 2mb
+                    addmessage(&quot;warning&quot;,&#039;Please upload a smaller file, max size is 5 MB&#039;);
+                    goUpload = false;
+                }
+                if (goUpload == true) {
+                    $(&#039;#importcandidatefile&#039;).attr(&#039;disable&#039;, true);
+                    addmessage(&quot;info&quot;,&quot;Uploading &quot;+data.files[0].name);
+                    data.submit();
+                }
+            },
+            dataType : &#039;text&#039;,
+            done : function(e, data) {
+                addmessage(&quot;success&quot;,&quot;Upload Complete&quot;);
+                $(&#039;#importcandidatefile&#039;).attr(&#039;disable&#039;, false);
+                console.log(JSON.parse(data.result));
+            }
+
+        });
+
+    }
+
+});
+
+
+App.CandidateSuggestionsView = Ember.View.extend({
+
+    didInsertElement : function(){
+/*
+        var model = this.get(&#039;controller&#039;).get(&#039;content&#039;);
+        var that = this;
+
+        var key = model.city+&quot;+&quot;+model.country+&quot;+&quot;+model.skills+&quot;+&quot;+model.title+&quot;+&quot;+model.name+&quot;+&quot;+model.exp_max+&quot;&amp;fl=*,score&quot;;
+
+        $.ajax ({
+            type: &quot;POST&quot;, 
+            url:&#039;/solrclient&#039;,
+            data:{searchtext:key,schema:&#039;c&#039;},                   
+            success: function(data) {  
+                search_text=&quot;&quot;;
+                // model.candidates = data.response.docs;
+                //that.get(&#039;controller&#039;).set(&#039;content&#039;,model);
+                that.set(&#039;result&#039;,data.response.docs);
+            },
+            error: function(data) {
+                alert(&quot;Msg: &quot;+ data.status + &quot;: &quot; + data.statusText);
+            }
+        }); 
+*/
+    }
+
+});
+
+
+App.VacancySuggestionsView = Ember.View.extend({
+
+    didInsertElement : function(){
+        
+    }
+
+});
+/*
+App.SetTabView = Ember.View.extend({
+    didInsertElement : function(){
+        var that = this;
+        setTimeout(function(){
+            $(&quot;[href=&#039;#search-tabs-c&#039;]&quot;).parent().removeClass(&#039;active&#039;);    
+            $(&quot;[href=&#039;#search-tabs-v&#039;]&quot;).parent().removeClass(&#039;active&#039;);    
+            $(&quot;[href=&#039;#search-tabs-co&#039;]&quot;).parent().removeClass(&#039;active&#039;);    
+            $(&quot;[href=&#039;#search-tabs-&quot;+that.get(&#039;controller&#039;).get(&#039;model&#039;).schema+&quot;&#039;]&quot;).parent().addClass(&#039;active&#039;);    
+        },100);
+    }
+
+});*/
+
+/*App.GraphChartView = Ember.View.extend({
+
+    didInsertElement:function(){
+        Morris.Area({
+            element: &#039;hero-area&#039;,
+            data: [
+                { period: &#039;2010 Q1&#039;, iphone: 2666, ipad: null, itouch: 2647 },
+                { period: &#039;2010 Q2&#039;, iphone: 2778, ipad: 2294, itouch: 2441 },
+                { period: &#039;2010 Q3&#039;, iphone: 4912, ipad: 1969, itouch: 2501 },
+                { period: &#039;2010 Q4&#039;, iphone: 3767, ipad: 3597, itouch: 5689 },
+                { period: &#039;2011 Q1&#039;, iphone: 6810, ipad: 1914, itouch: 2293 },
+                { period: &#039;2011 Q2&#039;, iphone: 5670, ipad: 4293, itouch: 1881 },
+                { period: &#039;2011 Q3&#039;, iphone: 4820, ipad: 3795, itouch: 1588 },
+                { period: &#039;2011 Q4&#039;, iphone: 15073, ipad: 5967, itouch: 5175 },
+                { period: &#039;2012 Q1&#039;, iphone: 10687, ipad: 4460, itouch: 2028 },
+                { period: &#039;2012 Q2&#039;, iphone: 8432, ipad: 5713, itouch: 1791 }
+            ],
+            xkey: &#039;period&#039;,
+            ykeys: [&#039;iphone&#039;, &#039;ipad&#039;, &#039;itouch&#039;],
+            labels: [&#039;iPhone&#039;, &#039;iPad&#039;, &#039;iPod Touch&#039;],
+            hideHover: &#039;auto&#039;,
+            //lineColors: PixelAdmin.settings.consts.COLORS,
+                                         lineColors: [&#039;red&#039;,&#039;blue&#039;,&#039;green&#039;,&#039;yellow&#039;],
+            fillOpacity: 0.3,
+            behaveLikeLine: true,
+            lineWidth: 2,
+            pointSize: 4,
+            gridLineColor: &#039;#cfcfcf&#039;,
+            resize: true
+        });
+
+    }
+
+});
+
+App.BarChartView = Ember.View.extend({
+
+    didInsertElement:function(){
+        Morris.Bar({
+            element: &#039;hero-bar&#039;,
+            data: [
+                { device: &#039;iPhone&#039;, geekbench: 136 },
+                { device: &#039;iPhone 3G&#039;, geekbench: 137 },
+                { device: &#039;iPhone 3GS&#039;, geekbench: 275 },
+                { device: &#039;iPhone 4&#039;, geekbench: 380 },
+                { device: &#039;iPhone 4S&#039;, geekbench: 655 },
+                { device: &#039;iPhone 5&#039;, geekbench: 1571 }
+            ],
+            xkey: &#039;device&#039;,
+            ykeys: [&#039;geekbench&#039;],
+            labels: [&#039;Geekbench&#039;],
+            barRatio: 0.4,
+            xLabelAngle: 35,
+            hideHover: &#039;auto&#039;,
+            //barColors: PixelAdmin.settings.consts.COLORS,
+                                        barColors: [&#039;green&#039;],
+            gridLineColor: &#039;#cfcfcf&#039;,
+            resize: true
+        });
+
+    }
+
+});
+*/
+App.JqcloudView = Ember.View.extend({
+    didInsertElement: function(){
+        $.ajax ({
+            type: &quot;GET&quot;, 
+            url:&#039;/jqcloudCall&#039;,            
+            success: function(data) {         
+                searchQuery = [];                            
+                for(var i=0;i&lt;data.length;i++){                                    
+                    searchQuery.push({text: &#039;&lt;a href=&quot;#/searchResult/&#039;+data[i].searchQuery+&#039;&quot;&gt;&#039;+data[i].searchQuery+&#039;&lt;/a&gt;&#039;, weight: data[i].count});                   
+                }
+                $(&quot;#example&quot;).jQCloud(searchQuery);     
+            },
+            error:function(data){
+                alert(&quot;Msg: &quot;+ data.status + &quot;: &quot; + data.statusText);
+            }                        
+        }); 
+    }
+});
+
+
+App.VSuggestionsView = Ember.View.extend({
+    tagName : &#039;div&#039;,
+    attributeBindings : [ &#039;name&#039;,&#039;id&#039; ],
+    classNamesBindings : [ &#039;class&#039; ],
+
+    didInsertElement : function() {
+
+        var sug = $(&#039;#suggestions&#039;);
+
+        var m = this.get(&#039;controller&#039;).get(&#039;content&#039;).details;
+        var key = m.city+&quot;+&quot;+m.country+&quot;+&quot;+m.skills+&quot;+&quot;+m.title+&quot;+&quot;+m.name+&quot;+&quot;+m.exp;
+
+        $.ajax ({
+            type: &quot;POST&quot;, 
+            url:&#039;/solrclient&#039;,
+            data:{searchtext:key,schema:&#039;v&#039;},                   
+            success: function(data) {  
+                var cs = data.response.docs;
+                var res=&quot;&quot;;
+
+                for(var i=0; i&lt;(cs.length&gt;3?3:cs.length); i++){
+
+                    res = res  + &#039;&lt;div class=&quot;panel-body&quot;&gt;&#039;
+                        +&#039;&lt;p&gt;&lt;i class=&quot;panel-title-icon fa fa-user&quot;&gt;&lt;/i&gt;&lt;strong&gt;&#039;+cs[i].vname+&#039;&lt;/strong&gt;&lt;/p&gt;&#039;
+                        +&#039;&lt;span id=&quot;stars-rating-example&quot;&gt;&lt;ul class=&quot;widget-rating&quot;&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;&#039;
+                        +&#039;&lt;p&gt; &#039;+cs[i].vexp_min+&#039; to &#039;+cs[i].vexp_min+&#039; years Exp&lt;/p&gt;&#039;
+                        +&#039;&lt;div class=&quot;search-tags&quot;&gt;&#039;
+                        +&#039;&lt;span class=&quot;search-tags-text&quot;&gt;Tags:&lt;/span&gt;&#039;;
+
+                    var r = cs[i].vskills.split(&quot;,&quot;);
+                    for(var j=0;j&lt;r.length;j++){
+                        res = res+&#039;&lt;label class=&quot;label label-success&quot;&gt;&#039;+r[j]+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+                    }
+
+                    res = res + &#039;&lt;/div&gt;&lt;br/&gt;&#039;
+                        +&#039;&lt;/div&gt;&#039;;
+                }
+
+                sug.html(res);
+
+            },
+            error: function(data) {
+                sug.html(&quot;&quot;);
+            }
+        }); 
+
+    }
+
+});
+
+App.CSuggestionsView = Ember.View.extend({
+    tagName : &#039;div&#039;,
+    attributeBindings : [ &#039;name&#039;,&#039;id&#039; ],
+    classNamesBindings : [ &#039;class&#039; ],
+
+    didInsertElement : function() {
+
+        var sug = $(&#039;#suggestions&#039;);
+
+        var m = this.get(&#039;controller&#039;).get(&#039;content&#039;);
+        var key = m.city+&quot;+&quot;+m.country+&quot;+&quot;+m.skills+&quot;+&quot;+m.title+&quot;+&quot;+m.name+&quot;+&quot;+m.exp_max;
+
+        $.ajax ({
+            type: &quot;POST&quot;, 
+            url:&#039;/solrclient&#039;,
+            data:{searchtext:key,schema:&#039;c&#039;},                   
+            success: function(data) {  
+                var cs = data.response.docs;
+                var res=&quot;&quot;;
+
+                for(var i=0; i&lt;(cs.length&gt;3?3:cs.length); i++){
+
+                    res = res  + &#039;&lt;div class=&quot;panel-body&quot;&gt;&#039;
+                        +&#039;&lt;p&gt;&lt;i class=&quot;panel-title-icon fa fa-user&quot;&gt;&lt;/i&gt;&lt;strong&gt;&#039;+cs[i].cname+&#039;&lt;/strong&gt;&lt;/p&gt;&#039;
+                        +&#039;&lt;span id=&quot;stars-rating-example&quot;&gt;&lt;ul class=&quot;widget-rating&quot;&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li class=&quot;active&quot;&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href=&quot;#&quot; title=&quot;&quot; class=&quot;widget-rating-item&quot;&gt;&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;&#039;
+                        +&#039;&lt;p&gt; &#039;+cs[i].cexp+&#039; years Exp&lt;/p&gt;&#039;
+                        +&#039;&lt;div class=&quot;search-tags&quot;&gt;&#039;
+                        +&#039;&lt;span class=&quot;search-tags-text&quot;&gt;Tags:&lt;/span&gt;&#039;;
+
+                    var r = cs[i].cskills.split(&quot;,&quot;);
+                    for(var j=0;j&lt;r.length;j++){
+                        res = res+&#039;&lt;label class=&quot;label label-success&quot;&gt;&#039;+r[j]+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+                    }
+
+                    res = res + &#039;&lt;/div&gt;&lt;br/&gt;&#039;
+                        +&#039;&lt;/div&gt;&#039;;
+                }
+
+                sug.html(res);
+
+            },
+            error: function(data) {
+                sug.html(&quot;&quot;);
+            }
+        }); 
+
+    }
+
+});
+
+App.PieChartView = Ember.View.extend({
+    didInsertElement:function(){
+        // Easy Pie Charts
+        var easyPieChartDefaults = {
+            animate: 2000,
+            scaleColor: false,
+            lineWidth: 6,
+            lineCap: &#039;square&#039;,
+            size: 90,
+            trackColor: &#039;#e5e5e5&#039;
+        };
+        jQuery(&#039;#easy-pie-chart-1&#039;).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: &#039;#489cdf&#039;
+        }));
+        $(&#039;#easy-pie-chart-2&#039;).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: &#039;#489cdf&#039;
+        }));
+        $(&#039;#easy-pie-chart-3&#039;).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: &#039;#489cdf&#039;
+        }));
+        $(&#039;#easy-pie-chart-4&#039;).easyPieChart($.extend({}, easyPieChartDefaults, {
+            barColor: &#039;#489cdf&#039;
+        }));                                
+    }
+
+});
+
+App.AddCandidateView = Ember.View.extend({
+
+    didInsertElement: function(){
+        $(&quot;input.form-control&quot;).val(&quot;&quot;);
+    }
+});
+
+App.AddVacancyView = Ember.View.extend({
+
+    didInsertElement: function(){
+        $(&quot;.form-control input&quot;).val(&quot;&quot;);
+    }
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>

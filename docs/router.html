@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>router.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.js
+              </a>
+            
+              
+              <a class="source" href="homeController.html">
+                homeController.js
+              </a>
+            
+              
+              <a class="source" href="logincontroller.html">
+                logincontroller.js
+              </a>
+            
+              
+              <a class="source" href="model.html">
+                model.js
+              </a>
+            
+              
+              <a class="source" href="router.html">
+                router.js
+              </a>
+            
+              
+              <a class="source" href="view.html">
+                view.js
+              </a>
+            
+              
+              <a class="source" href="databaseconnection.html">
+                databaseconnection.js
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="services.html">
+                services.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>router.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>App.IndexRoute = Ember.Route.extend({
+	afterModel : <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-keyword">this</span>.transitionTo(<span class="hljs-string">"dashboard"</span>);
+	}
+});
+
+App.DashboardRoute = Ember.Route.extend({
+	model:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-keyword">return</span> $.get(<span class="hljs-string">'/dashboardDetails'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{				
+			<span class="hljs-keyword">return</span> data;
+		});
+	}
+});
+
+App.AddvacancyRoute = Ember.Route.extend({
+	model:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+	}
+});
+
+App.AddcandidateRoute = Ember.Route.extend({
+	model:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+	}
+});
+
+
+App.SearchResultRoute = Ember.Route.extend({
+   
+	model: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(params)</span></span>{
+
+		<span class="hljs-keyword">var</span> q = params.query.split(<span class="hljs-string">"&amp;"</span>)[<span class="hljs-number">0</span>];
+		<span class="hljs-keyword">var</span> s = params.query.split(<span class="hljs-string">"&amp;"</span>)[<span class="hljs-number">1</span>].split(<span class="hljs-string">"="</span>)[<span class="hljs-number">1</span>];
+
+		<span class="hljs-keyword">this</span>.set(<span class="hljs-string">'schema'</span>,s);
+
+		<span class="hljs-keyword">return</span> $.ajax ({
+	        type: <span class="hljs-string">"POST"</span>, 
+	        url:<span class="hljs-string">'/solrclient'</span>,
+	        data:{searchtext:q,schema:s},                   
+	        success: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{  
+	            search_text=<span class="hljs-string">""</span>;
+	            data.keyword = params.query;
+	            data.schema = s;
+	          	<span class="hljs-keyword">return</span> data;  
+	        },
+	        error: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span> </span>{
+	            alert(<span class="hljs-string">"Msg: "</span>+ data.status + <span class="hljs-string">": "</span> + data.statusText);
+	        }
+	    }); 		
+	}
+
+});
+
+
+App.VacancyRoute = Ember.Route.extend({
+
+	model: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(params)</span></span>{
+		<span class="hljs-keyword">return</span> $.get(<span class="hljs-string">'/getvacancy/'</span>+params.vacancy_id,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+			<span class="hljs-keyword">if</span>(data.status == <span class="hljs-string">"OPEN"</span>)
+				data.isOpen = <span class="hljs-literal">true</span>;
+			<span class="hljs-keyword">else</span>
+				data.isOpen = <span class="hljs-literal">false</span>;
+			<span class="hljs-keyword">return</span> data;
+		});
+	}
+
+});
+
+App.CandidateRoute = Ember.Route.extend({
+
+	model: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(params)</span></span>{
+		<span class="hljs-keyword">return</span> $.get(<span class="hljs-string">'/getcandidate/'</span>+params.candidate_id,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+			<span class="hljs-keyword">if</span>(data.applications){
+				$.each(data.applications,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(i,row)</span></span>{
+					<span class="hljs-keyword">if</span>(data.applications[i].vacancy_status == <span class="hljs-string">"OPEN"</span>)
+						data.applications[i].isOpen = <span class="hljs-literal">true</span>;
+					<span class="hljs-keyword">else</span>
+						data.applications[i].isOpen = <span class="hljs-literal">false</span>;
+				});
+			}
+
+			<span class="hljs-keyword">return</span> data;
+		});
+	}
+
+});
+
+App.ProfileRoute = Ember.Route.extend({
+
+	model:<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-keyword">return</span> $.get(<span class="hljs-string">'/getUserdata'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{				
+			<span class="hljs-keyword">return</span> data;
+		});				
+	}
+});</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

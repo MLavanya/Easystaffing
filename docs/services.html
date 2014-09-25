@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>services.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="app.html">
+                app.js
+              </a>
+            
+              
+              <a class="source" href="homeController.html">
+                homeController.js
+              </a>
+            
+              
+              <a class="source" href="logincontroller.html">
+                logincontroller.js
+              </a>
+            
+              
+              <a class="source" href="model.html">
+                model.js
+              </a>
+            
+              
+              <a class="source" href="router.html">
+                router.js
+              </a>
+            
+              
+              <a class="source" href="view.html">
+                view.js
+              </a>
+            
+              
+              <a class="source" href="databaseconnection.html">
+                databaseconnection.js
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="services.html">
+                services.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>services.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    
+<span class="hljs-keyword">var</span> pool=<span class="hljs-built_in">require</span>(<span class="hljs-string">'./databaseconnection'</span>);    
+<span class="hljs-keyword">var</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+<span class="hljs-keyword">var</span> mammoth = <span class="hljs-built_in">require</span>(<span class="hljs-string">"mammoth"</span>);
+<span class="hljs-keyword">var</span> solr = <span class="hljs-built_in">require</span>(<span class="hljs-string">'solr-client'</span>);
+<span class="hljs-keyword">var</span> moment = <span class="hljs-built_in">require</span>(<span class="hljs-string">'moment'</span>);
+<span class="hljs-keyword">var</span> solrinfo=<span class="hljs-built_in">require</span>(<span class="hljs-string">'../solrconfig'</span>);
+<span class="hljs-keyword">var</span> Cryptr = <span class="hljs-built_in">require</span>(<span class="hljs-string">"cryptr"</span>),
+    cryptr = <span class="hljs-keyword">new</span> Cryptr(<span class="hljs-string">'myTotalySecretKey'</span>);
+
+
+<span class="hljs-comment">/*
+*    Application API
+*/</span>
+
+exports.register = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    <span class="hljs-keyword">var</span> user = req.body;
+    <span class="hljs-keyword">var</span> email= req.body.email;
+    <span class="hljs-keyword">var</span> pwd = req.body.password;
+    <span class="hljs-keyword">var</span> password = cryptr.encrypt(pwd);     
+
+    <span class="hljs-keyword">var</span> registerdetails = {
+        <span class="hljs-string">"email"</span>         :user.email,
+        <span class="hljs-string">"username"</span>      :user.username,
+        <span class="hljs-string">"name"</span>          :user.name,
+        <span class="hljs-string">"password"</span>      :password
+    }
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from user where email="'</span>+email+<span class="hljs-string">'"'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+           <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>)
+            {
+                con.release();
+                res.send(<span class="hljs-string">"user already exist"</span>);                          
+            }
+            <span class="hljs-keyword">else</span>{
+                <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'INSERT INTO user SET ?'</span>, registerdetails, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result)</span> </span>{
+                <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+                    con.release();
+                    res.send(<span class="hljs-string">"succuss"</span>);
+                });
+            }
+
+        });
+
+    });
+
+ }
+
+exports.login = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+<span class="hljs-keyword">var</span> email=req.body.email;
+<span class="hljs-keyword">var</span> pwd=req.body.password;
+<span class="hljs-keyword">var</span> password = cryptr.encrypt(pwd);
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+
+        con.query(<span class="hljs-string">'SELECT *  from user where email="'</span>+email+<span class="hljs-string">'" and password="'</span>+password+<span class="hljs-string">'"'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+           <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+           <span class="hljs-keyword">if</span>(rows.length &lt;= <span class="hljs-number">0</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>con.release();</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                res.send(<span class="hljs-number">401</span>);
+           <span class="hljs-keyword">else</span>{
+             con.release();
+             res.send({
+                email:rows[<span class="hljs-number">0</span>].email,
+                name: rows[<span class="hljs-number">0</span>].name,
+                redirectTo : <span class="hljs-string">"home.html"</span>
+            });            
+           }
+       });        
+
+    });       
+
+}
+
+exports.validateadm = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    <span class="hljs-keyword">if</span>(req.body.password == <span class="hljs-string">"2014"</span>){
+        res.send(<span class="hljs-string">"success"</span>);
+    }<span class="hljs-keyword">else</span>{
+        res.send(<span class="hljs-string">"failure"</span>);
+    }
+
+}
+
+exports.me = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT email,name  from user where email = ?'</span>,[req.cookies.email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+              con.release();
+              res.send(rows);
+        });         
+
+    });       
+
+}
+
+
+exports.upload =<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{  
+    <span class="hljs-keyword">var</span> Details = req.files;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>console.log(JSON.stringify(Details));</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    fs.readFile(req.files.file.path, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, data)</span> </span>{    
+        <span class="hljs-keyword">var</span> newPath = __dirname+<span class="hljs-string">"/uploads/"</span>+req.files.file.name;
+        <span class="hljs-keyword">var</span> fileName = req.files.file.name;
+        fs.writeFile(newPath, data, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err)</span> </span>{
+            <span class="hljs-built_in">console</span>.log(newPath);           
+            res.send({filepath:newPath});
+        });
+
+
+    });
+};
+
+exports.saveCandidate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    <span class="hljs-keyword">var</span> candidatedetails = req.body;
+    <span class="hljs-keyword">var</span> email= req.body.email;
+
+    candidatedetails.created_by=req.cookies.email;
+    candidatedetails.updated_time= moment();
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from candidate where email=?'</span>,[email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                con.release();                     
+                res.send({message:<span class="hljs-string">"candidate already exist"</span>});                 
+            }
+            <span class="hljs-keyword">else</span>{
+                <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'INSERT INTO candidate SET ?'</span>, candidatedetails, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result)</span> </span>{
+                    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                    con.release();
+                    candidatedetails.id = result.insertId;
+                    exports.solraddcandidate(candidatedetails);
+                    res.send({message:<span class="hljs-string">'Successfully saved'</span>});
+                });
+            }
+        });
+    });
+
+}
+
+exports.candidateretreive = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from candidate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            con.release();
+            res.send(rows);
+        });         
+    });       
+}
+
+exports.candidateupdate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'update candidate set '</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            con.release();
+            res.send(rows);
+        });       
+    });
+}
+
+exports.saveVacancies = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    <span class="hljs-keyword">var</span> vacancydetails = req.body;
+
+    vacancydetails.created_by=req.cookies.email;
+    vacancydetails.updated_time= moment();
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+
+        <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'INSERT INTO vacancy SET ?'</span>, vacancydetails, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result)</span> </span>{
+                
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            con.release();
+            vacancydetails.id = result.insertId;
+            exports.solraddvacancy(vacancydetails);
+            res.send({message:<span class="hljs-string">"Vacancy saved"</span>});
+            
+        });
+
+    });
+
+}
+
+exports.getvacancy = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from vacancy where id = ?'</span>, [req.params.vacancy_id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+
+                <span class="hljs-keyword">var</span> data = rows[<span class="hljs-number">0</span>];
+                data.applications = [];
+                data.stats=[];
+
+                con.query(<span class="hljs-string">'SELECT application.id,application.status,vacancy.name,vacancy.title,candidate.id as candidate_id,candidate.name as candidate_name from application,vacancy,candidate where application.vacancy_id = vacancy.id and application.candidate_id = candidate.id  and application.vacancy_id = ?'</span>, [data.id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+                    <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){                        
+                        data.applications = rows;                                       
+                    }
+
+                    con.query(<span class="hljs-string">'SELECT status , count(*) as cnt FROM application WHERE vacancy_id = ? GROUP BY STATUS '</span>, [data.id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;                                
+
+                        <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                            data.stats = rows;
+                        }
+
+                        con.release();                                
+                        res.send(data);
+
+                    });                     
+                });  
+
+            }<span class="hljs-keyword">else</span>{
+                con.release();
+                res.send({});                
+            }
+        });         
+
+    });       
+}
+
+exports.vacancyretreive = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from vacancy'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });       
+}
+
+exports.vacancyupdate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+
+        con.query(<span class="hljs-string">'update vacancy set '</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });
+
+}
+
+<span class="hljs-comment">/*exports.companies = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT *  from company', function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });       
+}*/</span>
+
+exports.getcandidate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{    
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from candidate where id = ?'</span>, [req.params.candidate_id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>con.release();</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+                <span class="hljs-keyword">var</span> docName = rows[<span class="hljs-number">0</span>].name;
+                <span class="hljs-keyword">var</span> docPath = rows[<span class="hljs-number">0</span>].cvpath;
+
+                <span class="hljs-keyword">var</span> data_result = {};
+                data_result.details = rows[<span class="hljs-number">0</span>];
+                data_result.applications = [];
+                data_result.apphistory = [];
+                data_result.stats = [];
+
+                fs.readFile(docPath, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err, data)</span> </span>{                   
+                    <span class="hljs-keyword">var</span> newFilePath = __dirname+<span class="hljs-string">"/uploads/"</span>;
+
+                    mammoth.convertToHtml({path: docPath})
+                    .then(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(result)</span></span>{
+                        <span class="hljs-keyword">var</span> html = result.value; <span class="hljs-comment">// The generated HTML</span>
+                        <span class="hljs-keyword">var</span> messages = result.messages; <span class="hljs-comment">// Any messages, such as warnings during conversion  </span>
+
+                        data_result.docFile = html;
+
+                        con.query(<span class="hljs-string">'SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ? '</span>, [data_result.details.id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+                            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                                data_result.applications = rows;
+                            }
+
+                            con.query(<span class="hljs-string">'SELECT status , count(*) as cnt FROM application WHERE candidate_id = ? GROUP BY STATUS '</span>, [data_result.details.id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                                <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;                                
+
+                                <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                                    data_result.stats = rows;
+                                }
+
+                                con.release();                                
+                                res.send(data_result);
+
+                            });                        
+
+                        });                        
+
+                    })
+                    .done();
+                    
+                });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <pre><code>           res.send(rows[<span class="hljs-number">0</span>]);
+</code></pre>
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            }<span class="hljs-keyword">else</span>{
+                con.release();
+                res.send({});                
+            }
+        });         
+    });       
+}
+
+exports.applyvacancy = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    <span class="hljs-keyword">var</span> applydetails = req.body;
+
+    applydetails.created_by=req.cookies.email;
+    applydetails.updated_time= moment();
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+
+        <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'SELECT * from application where candidate_id = ? and vacancy_id = ?'</span>, [applydetails.candidate_id,applydetails.vacancy_id], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-built_in">console</span>.log(rows);
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                con.release();
+                res.send(<span class="hljs-string">'Already applied for this vacany'</span>);
+            }<span class="hljs-keyword">else</span>{
+
+                <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'INSERT INTO application SET ?'</span>, applydetails, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result)</span> </span>{
+                        
+                    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+                    applydetails.id = result.insertId;
+                    <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'INSERT INTO application_h SET ?'</span>, {application_id:applydetails.id,prevstatus:<span class="hljs-string">'C01'</span>,curstatus:applydetails.status}, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result)</span> </span>{
+                        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;                            
+
+                        <span class="hljs-keyword">var</span> comment={};
+                        comment.application_h_id = result.insertId;
+                        comment.created_by = req.cookies.email;
+                        comment.comment = <span class="hljs-string">"Picked for Review"</span>;
+                        con.query(<span class="hljs-string">'insert into comments set ? '</span>,comment, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,result)</span> </span>{
+                          con.release();
+                          res.send(<span class="hljs-string">"success"</span>);
+                        });
+
+                    });
+                    
+                });
+
+            }
+            
+        });
+
+    });
+
+}
+
+exports.appliedforv = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    <span class="hljs-keyword">var</span> applydetails = req.body;
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+
+        <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'SELECT * from application where candidate_id = ? and vacancy_id = ?'</span>, [applydetails.candidate_id,applydetails.vacancy_id], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows &gt; <span class="hljs-number">0</span>){
+                con.release();
+                res.send({ status: <span class="hljs-string">'true'</span>});
+            }<span class="hljs-keyword">else</span>{
+                con.release();
+                res.send({ status: <span class="hljs-string">'false'</span>});
+            }
+            
+        });
+
+    });
+
+}
+
+exports.jqcloudCall = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+    
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from search_log where user_id= ?'</span>,[req.cookies.email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            con.release();
+            res.send(rows);
+        });         
+
+    });        
+}
+
+exports.companyList = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from company'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;                                
+            con.release();               
+            res.send(rows);
+        });
+    });
+}
+
+exports.statusList = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from status'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;                                
+            con.release();   
+            res.send(rows);
+        });
+    });
+}
+
+exports.applicationbycid = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ?'</span>, [req.params.candidate_id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                con.release();
+                res.send(rows);
+            }<span class="hljs-keyword">else</span>{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+exports.applicationbyvid = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+
+        con.query(<span class="hljs-string">'SELECT application.id,application.status,vacancy.name,vacancy.title  from application,vacancy where application.vacancy_id = vacancy.id and application.vacancy_id = ?'</span>, [req.params.vacancy_id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                con.release();
+                res.send(rows);
+            }<span class="hljs-keyword">else</span>{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+exports.apphistorybyid = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT application_h.id,application_h.application_id,application_h.prevstatus,application_h.curstatus,application_h.updated_time,comments.comment from application_h,comments where application_h.id = comments.application_h_id and application_id = ?'</span>, [req.params.application_id],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                con.release();
+                res.send(rows);
+            }<span class="hljs-keyword">else</span>{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
+
+exports.getUserdata = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+    
+    <span class="hljs-keyword">var</span> email = req.cookies.email;
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from user where email = ?'</span>, [email],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span>(err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                con.release();
+                <span class="hljs-keyword">var</span> userdata = rows[<span class="hljs-number">0</span>];
+                con.query(<span class="hljs-string">'SELECT *  from candidate where created_by=?'</span>,[email],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result, fields)</span> </span>{
+                    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                    <span class="hljs-keyword">if</span>(result.length &gt; <span class="hljs-number">0</span>){
+                        con.release();  
+                        <span class="hljs-keyword">var</span> candidatelist = result; 
+                        <span class="hljs-keyword">var</span> candidate_len = candidatelist.length;
+                        <span class="hljs-keyword">var</span> accepted;
+                        con.query(<span class="hljs-string">'SELECT count(status) as cnt from candidate where created_by=? and status="C05" '</span>, [email],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;                                
+                            accepted = rows[<span class="hljs-number">0</span>].cnt;                            
+                        });                                  
+                        con.query(<span class="hljs-string">'SELECT *  from vacancy where created_by=?'</span>,[email],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result, fields)</span> </span>{
+                            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                            <span class="hljs-keyword">if</span>(result.length &gt; <span class="hljs-number">0</span>){
+                                con.release();  
+                                <span class="hljs-keyword">var</span> vacancylist = result;                                                                               
+                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist,candidate_len:candidate_len,accepted:accepted});
+                            }<span class="hljs-keyword">else</span>{
+                                con.release();  
+                                <span class="hljs-keyword">var</span> vacancylist = [];                                                                               
+                                res.send({userdata:userdata,candidatelist:candidatelist,vacancylist:vacancylist,candidate_len:candidate_len,accepted:accepted});
+                            }
+                        }); 
+                    }<span class="hljs-keyword">else</span>{
+                        con.query(<span class="hljs-string">'SELECT *  from vacancy where created_by=?'</span>,[email],<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result, fields)</span> </span>{
+                            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                            <span class="hljs-keyword">if</span>(result.length &gt; <span class="hljs-number">0</span>){
+                                con.release();  
+                                <span class="hljs-keyword">var</span> vacancylist = result;                                                                  
+                                res.send({userdata:userdata,vacancylist:vacancylist});                               
+                            }<span class="hljs-keyword">else</span>{
+                                con.release();
+                                res.send({userdata:userdata})
+                            }
+                        });
+                    }
+                }); 
+            }           
+             
+        });
+                 
+    });       
+}
+
+
+exports.updateProfile = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{    
+    
+    <span class="hljs-keyword">var</span> profileUpdates = req.body;
+    <span class="hljs-keyword">var</span> email = req.cookies.email;
+    
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from user where email=?'</span>,[email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){                                
+                con.query(<span class="hljs-string">'UPDATE user set ? WHERE email = ?'</span>,[profileUpdates,email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                    con.release();
+                    res.send({message:<span class="hljs-string">"Updated Successfully"</span>});
+                });                            
+            }            
+        });
+    });
+}
+
+exports.updateappstatus = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{    
+        
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'UPDATE application set ? WHERE id = ?'</span>,[req.body.data,req.body.id], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            con.query(<span class="hljs-string">'insert into application_h set ? '</span>,req.body.history, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,result)</span> </span>{
+
+                req.body.comment.application_h_id = result.insertId;
+
+                <span class="hljs-keyword">if</span>(req.body.data.status == <span class="hljs-string">"C06"</span>)
+                  req.body.data.status = <span class="hljs-string">"C01"</span>;
+                con.query(<span class="hljs-string">'UPDATE candidate set ? WHERE id = ?'</span>,[req.body.data,req.body.candidate_id], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                    
+                    exports.solrupdatecandidate({
+                      <span class="hljs-string">"id"</span>: req.body.candidate_id,
+                      <span class="hljs-string">"cstatus"</span> : {<span class="hljs-string">"set"</span>: req.body.data.status}
+                    });
+
+                    req.body.comment.created_by = req.cookies.email;
+                    con.query(<span class="hljs-string">'insert into comments set ? '</span>,req.body.comment, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,result)</span> </span>{
+                      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"inserted"</span> + result);
+                      con.release();
+                      res.send({message:<span class="hljs-string">"Updated Successfully"</span>});
+                    });
+                    
+                });                            
+
+            });
+        });                            
+
+
+
+    });
+}
+
+exports.updatevacancystatus = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{    
+        
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'UPDATE vacancy set ? WHERE id = ?'</span>,[req.body.data,req.body.id], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+
+          con.release();
+          exports.solrupdatevacancy({
+            <span class="hljs-string">"id"</span>: req.body.id,
+            <span class="hljs-string">"vstatus"</span> : {<span class="hljs-string">"set"</span>: req.body.data.status}
+          });
+          res.send({message:<span class="hljs-string">"Updated Successfully"</span>});
+
+        });                            
+
+
+
+    });
+}
+
+exports.dashboardDetails = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req, res)</span> </span>{
+
+    <span class="hljs-keyword">var</span> email =  req.cookies.email;
+    <span class="hljs-keyword">var</span> available,candidates,employee_active,vacancy_active;
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+    <span class="hljs-keyword">if</span>(err){
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+    }
+    con.connect();
+    con.query(<span class="hljs-string">'SELECT *  from candidate'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+            candidates=rows.length;
+        });
+        con.query(<span class="hljs-string">'SELECT *  from candidate where status="C01" AND created_by=?'</span>,[email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+            available=rows.length;
+        });
+        con.query(<span class="hljs-string">'SELECT *  from candidate where active="YES" and status="C01" order by created_date asc'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+            employee_active = rows;            
+        });
+        con.query(<span class="hljs-string">'SELECT *  from vacancy where status="OPEN"'</span> , <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+            vacancy_active = rows;            
+        });
+        con.query(<span class="hljs-string">'SELECT *  from candidate where status="C04" AND created_by=?'</span>,[email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">var</span> inprogress = rows.length;
+            <span class="hljs-keyword">var</span> avb_perc = (available/candidates)*<span class="hljs-number">100</span>;
+            <span class="hljs-keyword">var</span> inprg_perc = (inprogress/candidates)*<span class="hljs-number">100</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>console.log(‘avb_perc’+ “ “+avb_perc+” “+inprg_perc);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            con.query(<span class="hljs-string">'SELECT *  from vacancy'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+                <span class="hljs-keyword">var</span> vacancies = rows.length;
+                con.query(<span class="hljs-string">'SELECT *  from vacancy WHERE status="open" AND created_by=?'</span>,[email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                    con.release();                    
+                    <span class="hljs-keyword">var</span> vac_open = rows.length;
+                    <span class="hljs-keyword">var</span> vac_perc = (vac_open/vacancies)*<span class="hljs-number">100</span>;                    
+                    res.send({
+                        candidates:candidates,
+                        available:available,
+                        inprogress:inprogress,
+                        avb_perc:avb_perc,
+                        inprg_perc:inprg_perc,
+                        vacancies:vac_open,
+                        vac_perc:vac_perc,
+                        employee_active:employee_active,
+                        vacancy_active:vacancy_active
+                    });
+                });                   
+            });             
+        });       
+    });
+}
+
+exports.updateCompany = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+    
+    <span class="hljs-keyword">var</span> company = req.body;
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+
+        con.connect();
+
+        con.query(<span class="hljs-string">'SELECT * from company where name = ?'</span>, [company], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){
+                con.release();   
+                res.send(<span class="hljs-string">'201'</span>);
+            }<span class="hljs-keyword">else</span>{
+                con.query(<span class="hljs-string">'INSERT INTO company SET ?'</span>, company, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result)</span> </span>{
+                    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                    con.release();   
+                    res.send(<span class="hljs-string">'200'</span>);
+                });
+
+            }
+            
+        });
+
+    });
+}
+
+exports.UpdateCandidate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+    <span class="hljs-keyword">var</span> candidateData = req.body;
+    <span class="hljs-keyword">var</span> id = candidateData.id;
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(candidateData));
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'UPDATE candidate set ? WHERE id = ?'</span>,[candidateData,id], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                                         
+            con.release();
+            exports.solrupdatecandidate({
+                <span class="hljs-string">"id"</span>:candidateData.id,
+                <span class="hljs-string">"ctitle"</span> : {<span class="hljs-string">"set"</span>: candidateData.title},
+                <span class="hljs-string">"cexp"</span> : {<span class="hljs-string">"set"</span>: candidateData.exp},
+                <span class="hljs-string">"cphone"</span> : {<span class="hljs-string">"set"</span>: candidateData.phone},
+                <span class="hljs-string">"ccountry"</span> : {<span class="hljs-string">"set"</span>: candidateData.country},
+                <span class="hljs-string">"ccity"</span> : {<span class="hljs-string">"set"</span>: candidateData.city}
+            });
+            res.send({<span class="hljs-string">"status"</span>:<span class="hljs-number">200</span>,<span class="hljs-string">"statusText"</span>:<span class="hljs-string">"updated Successfully"</span>});
+        });
+    });
+}
+
+exports.UpdateCandidateResume = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(req,res)</span></span>{
+
+    <span class="hljs-keyword">var</span> resumePath = req.body.updatedata;
+    <span class="hljs-keyword">var</span> id = req.body.updatedata.id;
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'UPDATE candidate set ? WHERE id = ?'</span>,[resumePath,id], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                                         
+            con.release();
+            <span class="hljs-keyword">var</span> data = req.body.content;
+            data.cvpath = resumePath.cvpath;
+            exports.solraddcandidate(data);
+            res.send({<span class="hljs-string">"status"</span>:<span class="hljs-number">200</span>,<span class="hljs-string">"statusText"</span>:<span class="hljs-string">"updated Successfully"</span>});
+        });
+    });    
+}
+
+<span class="hljs-comment">/*-------------------------------*/</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Solr API</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/*-------------------------------*/</span>
+
+
+
+<span class="hljs-comment">/*exports.solrclient = function(req,res){
+    var searchtext=req.body.searchtext;
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>console.log(searchtext);</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
+    console.log(client);
+    client.search('q='+searchtext+'', function(err, obj){
+       res.send(obj);
+    });
+}
+*/
+exports.solrclient = function(req,res){
+    var searchtext=req.body.searchtext;
+
+    updateSearchLog(searchtext+"&amp;schema="+req.body.schema,req.cookies.email);
+    if(req.body.schema == 'c'){
+        console.log("candidate schema");
+        searchtext = searchtext +' AND (cstatus:"C01" OR cstatus:"C02") AND ccreated_by:'+req.cookies.email;
+        var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,'','','');
+    }
+    else if (req.body.schema == 'v'){
+        console.log("vacancy schema");
+        searchtext = searchtext +' &amp; vstatus:"OPEN"';
+        var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');
+    }
+    
+/*    var query2 = client.createQuery()
+                       .q(searchtext)
+                       .start(0)
+                       .rows(1000);*/
+    
+    client.gethl('select',searchtext,function(err,obj){
+       if(err){
+        console.log(err);
+        res.send(err);
+       }else{
+        console.log(obj);
+        res.send(obj);
+       }
+    });
+}
+
+
+exports.solraddvacancy = function(data){
+
+    var client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,'','','');</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Switch on “auto commit”, by default <code>client.autoCommit = false</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    client.autoCommit = <span class="hljs-literal">true</span>;
+    <span class="hljs-comment">/*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */</span>
+    <span class="hljs-keyword">var</span> docs = [];
+
+   <span class="hljs-keyword">var</span> doc = {
+       <span class="hljs-string">"id"</span>:data.id,
+       <span class="hljs-string">"vtitle"</span>: data.title,
+       <span class="hljs-string">"vname"</span>: data.name,
+       <span class="hljs-string">"vstatus"</span>:data.status,
+       <span class="hljs-string">"vexp_min"</span>:data.exp_min,
+       <span class="hljs-string">"vexp_max"</span>:data.exp_max,
+       <span class="hljs-string">"vskills"</span>:data.skills,
+       <span class="hljs-string">"vcity"</span>:data.city,
+       <span class="hljs-string">"vcountry"</span>:data.country,
+       <span class="hljs-string">"vcompany_id"</span>:<span class="hljs-number">0</span>,
+       <span class="hljs-string">"vcreated_date"</span>:data.created_date,
+       <span class="hljs-string">"vupdated_time"</span>:data.updated_time,
+       <span class="hljs-string">"vcreated_by"</span>:data.created_by
+  }
+    docs.push(doc);
+
+    client.add(docs,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,obj)</span></span>{
+       <span class="hljs-keyword">if</span>(err){
+          <span class="hljs-built_in">console</span>.log(err);
+       }<span class="hljs-keyword">else</span>{
+          <span class="hljs-built_in">console</span>.log(obj);
+
+            client.commit(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,res)</span></span>{
+               <span class="hljs-keyword">if</span>(err) <span class="hljs-built_in">console</span>.log(err);
+               <span class="hljs-keyword">if</span>(res) <span class="hljs-built_in">console</span>.log(res);
+            });
+
+       }
+    });
+
+
+}
+
+exports.solraddcandidate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+
+    <span class="hljs-keyword">var</span> client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Switch on “auto commit”, by default <code>client.autoCommit = false</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    client.autoCommit = <span class="hljs-literal">true</span>;
+    <span class="hljs-comment">/*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */</span>
+
+   <span class="hljs-keyword">var</span> doc = {
+       <span class="hljs-string">"literal.id"</span>:data.id,
+       <span class="hljs-string">"literal.ctitle"</span>: data.title,
+       <span class="hljs-string">"literal.cname"</span>: data.name,
+       <span class="hljs-string">"literal.cemail"</span>: data.name,
+       <span class="hljs-string">"literal.cstatus"</span>:data.status,
+       <span class="hljs-string">"literal.cexp"</span>:data.exp,
+       <span class="hljs-string">"literal.cphone"</span>:data.phone,
+       <span class="hljs-string">"literal.cskills"</span>:data.skills,
+       <span class="hljs-string">"literal.ccity"</span>:data.city,
+       <span class="hljs-string">"literal.ccountry"</span>:data.country,
+       <span class="hljs-string">"literal.ccompany_id"</span>:data.company_id,
+       <span class="hljs-string">"literal.cactive"</span>:data.active,
+       <span class="hljs-string">"literal.ccomments"</span>:data.comments,
+       <span class="hljs-string">"literal.ccreated_by"</span>:data.created_by
+  }
+
+    <span class="hljs-keyword">var</span> options = {
+       parameters:doc,
+        format:<span class="hljs-string">'extract'</span>,
+        path :data.cvpath,       <span class="hljs-comment">//path of the candidate cv</span>
+        contentType:<span class="hljs-string">'application/msword'</span>   <span class="hljs-comment">// document type</span>
+    }
+    client.addRemoteResource(options,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,obj)</span></span>{
+       <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(err);
+       }<span class="hljs-keyword">else</span>{
+            <span class="hljs-built_in">console</span>.log(obj);
+            client.commit(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,res)</span></span>{
+               <span class="hljs-keyword">if</span>(err) <span class="hljs-built_in">console</span>.log(err);
+               <span class="hljs-keyword">if</span>(res) <span class="hljs-built_in">console</span>.log(res);
+            });          
+       }
+    });
+
+}
+
+exports.solrupdatecandidate = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+
+    <span class="hljs-keyword">var</span> client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.candidate_core,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Switch on “auto commit”, by default <code>client.autoCommit = false</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    client.autoCommit = <span class="hljs-literal">true</span>;
+    <span class="hljs-comment">/*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */</span>
+
+     client.add(data,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,obj)</span></span>{
+       <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(err);
+       }<span class="hljs-keyword">else</span>{
+            <span class="hljs-built_in">console</span>.log(obj);
+            client.commit(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,res)</span></span>{
+               <span class="hljs-keyword">if</span>(err) <span class="hljs-built_in">console</span>.log(err);
+               <span class="hljs-keyword">if</span>(res) <span class="hljs-built_in">console</span>.log(res);
+            });          
+       }
+    });
+
+}
+
+exports.solrupdatevacancy = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(data)</span></span>{
+
+    <span class="hljs-keyword">var</span> client = solr.createClient(solrinfo.ip,solrinfo.portnum,solrinfo.vacancy_core,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>,<span class="hljs-string">''</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Switch on “auto commit”, by default <code>client.autoCommit = false</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    client.autoCommit = <span class="hljs-literal">true</span>;
+    <span class="hljs-comment">/*
+          *********************************                     *********************************
+          The following parameters are the info about candidate.
+          pass the values to the respective fields.
+          change the content type based on the document format. Example for doc/docx application/msword for pdf application/pdf....etc.
+          Give the CV path value to the parameter path.
+          *********************************                     *********************************
+    */</span>
+
+     client.add(data,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,obj)</span></span>{
+       <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(err);
+       }<span class="hljs-keyword">else</span>{
+            <span class="hljs-built_in">console</span>.log(obj);
+            client.commit(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,res)</span></span>{
+               <span class="hljs-keyword">if</span>(err) <span class="hljs-built_in">console</span>.log(err);
+               <span class="hljs-keyword">if</span>(res) <span class="hljs-built_in">console</span>.log(res);
+            });          
+       }
+    });
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">updateSearchLog</span> <span class="hljs-params">(searchtext,email,callback)</span></span>{
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"SearchLog"</span>+searchtext);
+
+    <span class="hljs-keyword">var</span> search_log = {<span class="hljs-string">"user_id"</span>:email,<span class="hljs-string">"searchQuery"</span>:searchtext,<span class="hljs-string">"count"</span>:<span class="hljs-number">1</span>}
+
+    pool.getConnection(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err,con)</span></span>{
+        <span class="hljs-keyword">if</span>(err){
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Error connection to the db."</span>);
+        }
+        con.connect();
+        con.query(<span class="hljs-string">'SELECT *  from search_log where searchQuery=? and user_id=?'</span>,[searchtext,email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+            <span class="hljs-keyword">if</span>(rows.length &gt; <span class="hljs-number">0</span>){                
+                con.query(<span class="hljs-string">'UPDATE search_log set count=count+1 where searchQuery=? and user_id=?'</span>,[searchtext,email], <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, rows, fields)</span> </span>{
+                    con.release();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>res.send({message:”Updated Successfully”})</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                });                            
+            }
+            <span class="hljs-keyword">else</span>{
+                <span class="hljs-keyword">var</span> query = con.query(<span class="hljs-string">'INSERT INTO search_log SET ?'</span>, search_log ,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(err, result)</span> </span>{
+                    <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+                    con.release();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>res.send({message:’Successfully saved’});</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                });
+            }
+        });
+    });
+}</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

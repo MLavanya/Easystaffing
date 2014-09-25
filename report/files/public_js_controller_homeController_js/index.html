@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - public/js/controller/homeController.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>public/js/controller/homeController.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">66.64</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">891</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">49.28</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">11.41</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">mesgs = [];
+var companyList,statusList;
+
+var countries = [&quot;China&quot;, &quot;India&quot;, &quot;United States&quot;, &quot;Indonesia&quot;, &quot;Brazil&quot;,
+                &quot;Pakistan&quot;, &quot;Bangladesh&quot;, &quot;Nigeria&quot;, &quot;Russia&quot;, &quot;Japan&quot;,
+                &quot;Mexico&quot;, &quot;Philippines&quot;, &quot;Vietnam&quot;, &quot;Ethiopia&quot;, &quot;Egypt&quot;,
+                &quot;Germany&quot;, &quot;Turkey&quot;, &quot;Iran&quot;, &quot;Thailand&quot;, &quot;D. R. of Congo&quot;,
+                &quot;France&quot;, &quot;United Kingdom&quot;, &quot;Italy&quot;, &quot;Myanmar&quot;, &quot;South Africa&quot;,
+                &quot;South Korea&quot;, &quot;Colombia&quot;, &quot;Ukraine&quot;, &quot;Spain&quot;, &quot;Tanzania&quot;,
+                &quot;Sudan&quot;, &quot;Kenya&quot;, &quot;Argentina&quot;, &quot;Poland&quot;, &quot;Algeria&quot;,
+                &quot;Canada&quot;, &quot;Uganda&quot;, &quot;Morocco&quot;, &quot;Iraq&quot;, &quot;Nepal&quot;,
+                &quot;Peru&quot;, &quot;Afghanistan&quot;, &quot;Venezuela&quot;, &quot;Malaysia&quot;, &quot;Uzbekistan&quot;,
+                &quot;Saudi Arabia&quot;, &quot;Ghana&quot;, &quot;Yemen&quot;, &quot;North Korea&quot;, &quot;Mozambique&quot;,
+                &quot;Taiwan&quot;, &quot;Syria&quot;, &quot;Ivory Coast&quot;, &quot;Australia&quot;, &quot;Romania&quot;,
+                &quot;Sri Lanka&quot;, &quot;Madagascar&quot;, &quot;Cameroon&quot;, &quot;Angola&quot;, &quot;Chile&quot;,
+                &quot;Netherlands&quot;, &quot;Burkina Faso&quot;, &quot;Niger&quot;, &quot;Kazakhstan&quot;, &quot;Malawi&quot;,
+                &quot;Cambodia&quot;, &quot;Guatemala&quot;, &quot;Ecuador&quot;, &quot;Mali&quot;, &quot;Zambia&quot;,
+                &quot;Senegal&quot;, &quot;Zimbabwe&quot;, &quot;Chad&quot;, &quot;Cuba&quot;, &quot;Greece&quot;,
+                &quot;Portugal&quot;, &quot;Belgium&quot;, &quot;Czech Republic&quot;, &quot;Tunisia&quot;, &quot;Guinea&quot;,
+                &quot;Rwanda&quot;, &quot;Dominican Republic&quot;, &quot;Haiti&quot;, &quot;Bolivia&quot;, &quot;Hungary&quot;,
+                &quot;Belarus&quot;, &quot;Somalia&quot;, &quot;Sweden&quot;, &quot;Benin&quot;, &quot;Azerbaijan&quot;,
+                &quot;Burundi&quot;, &quot;Austria&quot;, &quot;Honduras&quot;, &quot;Switzerland&quot;, &quot;Bulgaria&quot;,
+                &quot;Serbia&quot;, &quot;Israel&quot;, &quot;Tajikistan&quot;, &quot;Hong Kong&quot;, &quot;Papua New Guinea&quot;,
+                &quot;Togo&quot;, &quot;Libya&quot;, &quot;Jordan&quot;, &quot;Paraguay&quot;, &quot;Laos&quot;,
+                &quot;El Salvador&quot;, &quot;Sierra Leone&quot;, &quot;Nicaragua&quot;, &quot;Kyrgyzstan&quot;, &quot;Denmark&quot;,
+                &quot;Slovakia&quot;, &quot;Finland&quot;, &quot;Eritrea&quot;, &quot;Turkmenistan&quot;];
+
+var cities = [&#039;Cleveland&#039;,
+                &#039;New York City&#039;,
+                &#039;Brooklyn&#039;,
+                &#039;Manhattan&#039;,
+                &#039;Queens&#039;,
+                &#039;The Bronx&#039;,
+                &#039;Staten Island&#039;,
+                &#039;San Francisco&#039;,
+                &#039;Los Angeles&#039;,
+                &#039;Seattle&#039;,
+                &#039;London&#039;,
+                &#039;Hyderabad&#039;,  
+                &#039;Portland&#039;,
+                &#039;Chicago&#039;,
+                &#039;Boston&#039;,
+                &#039;Bangalore&#039;,
+                &#039;Delhi&#039;,
+                &#039;Pune&#039;,
+                &#039;Mumbai&#039;,
+                &#039;Chennai&#039;];
+
+var Employee_status = [&#039;YES&#039;,&#039;NO&#039;];          
+
+
+var addmessage = function(type,msg){
+
+	mesgs.push({
+		type:type,
+		msg:msg
+	});
+
+}
+
+setInterval(function() {
+
+	var cl = &quot;alert &quot;;
+
+	for(var i=0 ; i &lt; mesgs.length ; i++){
+
+		if(mesgs[i].type == &quot;success&quot;){
+			cl = cl + &quot;alert-success&quot;;
+		}else if(mesgs[i].type == &quot;info&quot;){
+			cl = cl + &quot;alert-info&quot;;
+		}else if(mesgs[i].type == &quot;warning&quot;){
+			cl = cl + &quot;alert-warning&quot;;
+		}else if(mesgs[i].type == &quot;danger&quot;){
+			cl = cl + &quot;alert-danger&quot;;
+		}
+
+		$(&quot;#alertMsg&quot;).prepend(&quot;&lt;div class=&#039;alert alert-dismissable&quot;+cl+&quot;&#039;&gt;&lt;button type=&#039;button&#039; class=&#039;close&#039; data-dismiss=&#039;alert&#039; aria-hidden=&#039;true&#039;&gt;&amp;times;&lt;/button&gt;&quot;+mesgs[i].msg+&quot;&lt;/div&gt;&quot;)
+
+		mesgs.splice(i, 1);		
+
+	}
+
+}, 1000);  
+
+
+setInterval(function() {
+
+	$(&#039;#gmesg div:first-child&#039;).remove();
+
+}, 5000);  
+
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, &quot;\\[&quot;).replace(/[\]]/, &quot;\\]&quot;);
+    var regex = new RegExp(&quot;[\\?&amp;]&quot; + name + &quot;=([^&amp;#]*)&quot;),
+        results = regex.exec(window.location.href);
+    return results == null ? &quot;&quot; : decodeURIComponent(results[1].replace(/\+/g, &quot; &quot;));
+}
+
+function appliedforv(cid,vid,callback){
+	$.post(&#039;/appliedforv&#039;,{company_id:cid,vacancy_id:vid},callback);
+}
+
+function shortlist(cid,url,elem){
+
+	bootbox.confirm({
+		message: &quot;Are you sure you want to shortlist this candidate for this vacancy ?&quot;,
+		callback: function(result) {
+			if(result){
+				$.post(&#039;/applyvacancy&#039;,{company_id:0,candidate_id:cid,vacancy_id:getParameterByName(&#039;v&#039;),status:&#039;C02&#039;},function(data){
+					$(elem).attr(&#039;disabled&#039;,&#039;true&#039;);
+				});
+			}
+		},
+		className: &quot;bootbox-sm&quot;
+	});
+
+}
+
+function applyforv(vid,url,elem){
+
+	bootbox.confirm({
+		message: &quot;Are you sure you want to post this candidate for this vacancy ?&quot;,
+		callback: function(result) {
+			if(result){
+				$.post(&#039;/applyvacancy&#039;,{company_id:0,candidate_id:getParameterByName(&#039;c&#039;),vacancy_id:vid,status:&#039;C02&#039;},function(data){
+					$(elem).attr(&#039;disabled&#039;,&#039;true&#039;);
+				});
+			}
+		},
+		className: &quot;bootbox-sm&quot;
+	});
+
+}
+
+/********************************
+ * Helpers
+ **********************************/
+
+Ember.Handlebars.helper(&#039;format-skill&#039;, function(skills) {
+	if(!skills){
+		return &quot;&quot;;
+	}	
+	var res = skills.split(&quot;,&quot;);
+	var ret = &quot;&quot;;
+	for(var i=0;i&lt;res.length;i++){
+		ret = ret+&#039;&lt;label class=&quot;label label-info&quot;&gt;&#039;+res[i]+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+	}
+	return new Ember.Handlebars.SafeString(ret);
+});
+
+Ember.Handlebars.helper(&#039;format-matched&#039;, function(skills) {
+	if(!skills){
+		return &quot;&quot;;
+	}
+	var res = skills.split(&quot;,&quot;);
+	var ret = &quot;&quot;;
+	for(var i=0;i&lt;res.length;i++){
+		ret = ret+&#039;&lt;label class=&quot;label label-success&quot;&gt;&#039;+res[i]+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+	}
+	return new Ember.Handlebars.SafeString(ret);
+});
+
+Ember.Handlebars.helper(&#039;format-vacancy&#039;, function(id) {
+	return &quot;#/vacancy/&quot;+id;
+});
+
+Ember.Handlebars.helper(&#039;format-date&#039;, function(date) {
+	return moment(date).fromNow();
+});
+
+Ember.Handlebars.helper(&#039;format-cv&#039;, function(value) {
+  return new Ember.Handlebars.SafeString(value);
+});
+
+
+Ember.Handlebars.helper(&#039;format-vstatus&#039;, function(value) {
+  var res=&quot;&quot;;
+  if(value == &quot;OPEN&quot;)
+  	res = res + &#039;&lt;label class=&quot;label label-tag label-success&quot;&gt;&#039;+value+&#039;&lt;/label&gt;&#039;;
+  else
+  	res = res + &#039;&lt;label class=&quot;label label-tag label-warning&quot;&gt;&#039;+value+&#039;&lt;/label&gt;&#039;;
+
+  return new Ember.Handlebars.SafeString(res);
+});
+
+Ember.Handlebars.helper(&#039;format-cstatus&#039;, function(value) {
+  var res=&quot;&quot;;
+
+switch (value) {
+    case &quot;C01&quot;:
+  		res = res + &#039;&lt;label class=&quot;label label-tag label-info&quot;&gt;AVAILABLE&lt;/label&gt;&#039;;
+        break;
+    case &quot;C02&quot;:
+        res = res + &#039;&lt;label class=&quot;label label-tag label-warning&quot;&gt;IN-REVIEW&lt;/label&gt;&#039;;
+        break;
+    case &quot;C03&quot;:
+        res = res + &#039;&lt;label class=&quot;label label-tag label-warning&quot;&gt;SHORTLISTED&lt;/label&gt;&#039;;
+        break;        
+    case &quot;C04&quot;:
+        res = res + &#039;&lt;label class=&quot;label label-tag label-warning&quot;&gt;IN-PROGRESS&lt;/label&gt;&#039;;
+        break;   
+    case &quot;C05&quot;:
+        res = res + &#039;&lt;label class=&quot;label label-tag label-success&quot;&gt;ACCEPTED&lt;/label&gt;&#039;;
+        break;
+    case &quot;C06&quot;:
+        res = res + &#039;&lt;label class=&quot;label label-tag label-danger&quot;&gt;REJECTED&lt;/label&gt;&#039;;
+        break;   
+    case &quot;C07&quot;:
+        res = res + &#039;&lt;label class=&quot;label label-tag label-danger&quot;&gt;FAKE&lt;/label&gt;&#039;;
+        break;  
+    case &quot;YES&quot;:
+    	res = res + &#039;&lt;span class=&quot;label label-primary&quot;&gt;&lt;i class=&quot;fa fa-star&quot;&gt;&lt;/i&gt;&lt;/span&gt;&#039;
+}
+
+  return new Ember.Handlebars.SafeString(res);
+});
+
+Ember.Handlebars.helper(&#039;format-results&#039;, function(content) {
+
+	var schema = window.App.__container__.lookup(&#039;controller:searchResult&#039;).get(&#039;content&#039;).schema;
+	var res = &quot;&quot;;
+
+	var rows = content.response.docs;
+	var hls = content.highlighting;
+
+	$.each(rows,function(i,data){
+
+		if(schema == &#039;v&#039;){
+
+			var sl = &#039;&lt;button class=&quot;btn btn-primary btn-outline btn-xs pull-right&quot; onclick=&quot;applyforv(&#039;+data.id+&#039;,window.location.href,this);&quot;&gt;&lt;i class=&quot;fa fa-check&quot;&gt;&lt;/i&gt; Apply&lt;/button&gt;&#039;;
+
+			res=res+&#039;&lt;li&gt;&#039;;
+
+			if(getParameterByName(&#039;c&#039;)){
+				res=res+sl;
+			}
+
+			var hltitle = hls[data.id].vtitle?hls[data.id].vtitle:data.vtitle;
+
+			res=res+&#039;&lt;a href=&quot;#/vacancy/&#039;+data.id+&#039;&quot; class=&quot;search-title&quot;&gt;&#039;+data.vname+&#039;&lt;/a&gt;&#039;
+				+&#039;&lt;p&gt;&#039;+hltitle+&#039;&lt;/p&gt;&#039;
+				+&#039;&lt;div class=&quot;search-content&quot;&gt;&#039;
+				+data.vexp_min+&#039; to &#039;+data.vexp_max+&#039; years with &#039;+data.vskills+&#039; skills located in &#039;+data.vcity+&#039; .&#039;
+				+&#039;&lt;/div&gt;&#039;
+				+&#039;&lt;div class=&quot;search-tags&quot;&gt;&#039;
+				+&#039;&lt;span class=&quot;search-tags-text&quot;&gt;Skills :&lt;/span&gt;&#039;;
+
+			var r = data.vskills.split(&quot;,&quot;);
+			for(var i=0;i&lt;r.length;i++){
+				res = res+&#039;&lt;label class=&quot;label label-info&quot;&gt;&#039;+r[i]+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+			}
+
+			res = res + &#039;&lt;/div&gt;&#039;+&#039;&lt;div class=&quot;search-tags&quot;&gt;&#039;
+				  + &#039;&lt;span class=&quot;search-tags-text&quot;&gt;Matched :&lt;/span&gt;&#039;;	  
+
+			if(hls[data.id].vskills){
+				var r = $(&quot;&lt;div&gt;&lt;/div&gt;&quot;).append(hls[data.id].vskills[0]).find(&quot;mark&quot;);
+				for(var i=0;i&lt;r.length;i++){
+					res = res+&#039;&lt;label class=&quot;label label-success&quot;&gt;&#039;+$(r[i]).text()+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+				}			  
+			}
+
+			res = res + &#039;&lt;/div&gt; &lt;/li&gt;&#039;;
+
+		}else if(schema == &#039;c&#039;){
+
+			var sl = &#039;&lt;button class=&quot;btn btn-primary btn-outline pull-right btn-flat btn-xs &quot; onclick=&quot;shortlist(&#039;+data.id+&#039;,window.location.href,this);&quot;&gt;&lt;i class=&quot;fa fa-check&quot;&gt;&lt;/i&gt; Shortlist&lt;/button&gt;&#039;;
+
+			res=res+&#039;&lt;li&gt;&#039;;
+
+			if(getParameterByName(&#039;v&#039;)){
+				res=res+sl;
+			}
+
+			var hlcontent = hls[data.id].content?hls[data.id].content:&#039;&#039;;
+			var hltitle = hls[data.id].ctitle?hls[data.id].ctitle:data.ctitle;
+
+			res = res +&#039;&lt;a href=&quot;#/candidate/&#039;+data.id+&#039;&quot; class=&quot;search-title&quot;&gt;&#039;+data.cname+&#039;&lt;/a&gt;&#039;
+				+&#039;&lt;p&gt;&#039;+hltitle+&#039;&lt;/p&gt;&#039;
+				+&#039;&lt;div class=&quot;search-content&quot;&gt;&#039;
+				+data.cexp+&#039; years with &#039;+data.cskills+&#039; skills located in &#039;+data.ccity+&#039; .&#039;
+				+hlcontent + &quot; score: &quot; + data.score
+				+&#039;&lt;/div&gt;&#039;
+				+&#039;&lt;div class=&quot;search-tags&quot;&gt;&#039;
+				+&#039;&lt;span class=&quot;search-tags-text&quot;&gt;Skills :&lt;/span&gt;&#039;;
+
+			var r = data.cskills.split(&quot;,&quot;);
+			for(var i=0;i&lt;r.length;i++){
+				res = res+&#039;&lt;label class=&quot;label label-info&quot;&gt;&#039;+r[i]+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+			}
+
+			res = res + &#039;&lt;/div&gt;&#039;+&#039;&lt;div class=&quot;search-tags&quot;&gt;&#039;
+				  + &#039;&lt;span class=&quot;search-tags-text&quot;&gt;Matched :&lt;/span&gt;&#039;;
+
+			if(hls[data.id].cskills){
+				var r = $(&quot;&lt;div&gt;&lt;/div&gt;&quot;).append(hls[data.id].cskills[0]).find(&quot;mark&quot;);
+				for(var i=0;i&lt;r.length;i++){
+					res = res+&#039;&lt;label class=&quot;label label-success&quot;&gt;&#039;+$(r[i]).text()+&#039;&lt;/label&gt;&amp;nbsp;&#039;;
+				}			  
+			}
+			res = res + &#039;&lt;/div&gt; &lt;/li&gt;&#039;;
+
+		}
+	});
+
+  return new Ember.Handlebars.SafeString(res);
+});
+
+Ember.Handlebars.helper(&#039;format-cstats&#039;, function(data,status) {
+
+	var res=&quot;0&quot;;
+
+	$.each(data,function(i,row){
+		if(data[i].status == status){
+			res = data[i].cnt;
+			return false;
+		}
+
+	});
+
+	return res;
+});
+
+
+/********************************
+ * Controllers
+ **********************************/
+
+App.ApplicationController = Ember.Controller.extend({
+	name: &quot;&quot;,
+
+	init: function(){
+		var that = this;
+		$.get(&#039;/me&#039;,function(data){
+			that.set(&#039;name&#039;,data[0].name);
+		});
+	},
+
+	actions:{				
+		signout:function(){			
+			document.cookie = &quot;email=; expires=Thu, 01 Jan 1970 00:00:00 GMT&quot;
+    		window.location=&#039;login.html&#039;;
+		},	
+	}
+});
+
+App.AddcandidateController = Ember.Controller.extend({
+
+	needs : [ &#039;application&#039; ],
+	currentUser : Ember.computed.alias(&#039;controllers.application.loggedinUser&#039;),
+	country : countries,
+	city	: cities,
+	employee : Employee_status,
+
+	init: function(){		
+		var statusList =[];
+		var that = this;
+		$.ajax ({
+            type: &quot;GET&quot;, 
+            url:&#039;/statusList&#039;,            
+            success: function(data) {                 
+                /*for(var i=0;i&lt;data.length;i++){*/
+                	if(data[0].id.indexOf(&quot;C0&quot;) &gt; -1){
+	                    statusList.push({
+	                    	id:data[0].id,
+	                    	name:data[0].name
+	                    });
+	                }
+                /*}*/                                
+                that.set(&#039;statuses&#039;,statusList);                
+            },
+            error:function(data){
+                bootbox.alert(data.statusText);
+            }                        
+        }); 
+	},
+	statuses: statusList,                
+	actions :{
+		savecandidate: function(){			
+			var that = this;
+			var v = true;
+			var fileName = JSON.parse($(&quot;.uploadedfile&quot;).text());
+			var cv = fileName.filepath;
+			
+			var phonereg = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;		
+			var emailreg = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+			var expreg = /^[0-9]{0,2}$/;
+
+			if(($(&quot;#name&quot;).val() == &quot;&quot;)){
+				addmessage(&quot;danger&quot;,&quot;Enter the Name &quot;);
+				v=false;
+			}			
+			if(($(&quot;#title&quot;).val() == &quot;&quot;)){
+				addmessage(&quot;danger&quot;,&quot;Enter the Name &quot;);
+				v=false;
+			}
+			if(($(&quot;#experience&quot;).val() == &quot;&quot;)||(!expreg.test($(&#039;#experience&#039;).val()))){
+				addmessage(&quot;danger&quot;,&quot;Check the Experience &quot;);
+				v=false;
+			}
+			if(($(&quot;#email&quot;).val() == &quot;&quot;)||(!emailreg.test($(&#039;#email&#039;).val()))){
+				addmessage(&quot;danger&quot;,&quot;Enter a valid Email&quot;);				
+				v=false;
+			}
+			if(($(&quot;#phone&quot;).val() == &quot;&quot;)||(!phonereg.test($(&#039;#phone&#039;).val()))){
+				addmessage(&quot;danger&quot;,&quot;Enter valid Mobile number&quot;);
+				v=false;
+			}
+			if($(&quot;#country&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;, &quot;country has to be specified&quot;);
+				v=false;
+			}
+			if($(&quot;#city&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;, &quot;city has to be specified&quot;);
+				v=false;
+			}
+
+
+			var textarea = $(&#039;#tags:last&#039;);
+			var textext = textarea.textext()[0];
+
+			if(textext.hiddenInput().val().length &lt; 3){
+				addmessage(&quot;danger&quot;,&quot;Skills has to be specified.&quot;);
+				v=false;
+			}
+
+			var text = textext.hiddenInput().val();
+			text = text.replace(&quot;[&quot;,&quot;&quot;);
+			text = text.replace(&quot;]&quot;,&quot;&quot;);
+			text = text.replace(/[&#039;&quot;]+/g, &#039;&#039;);
+
+			if(v){
+	   			jQuery(&quot;#addEmpSbmt&quot;).attr(&#039;disabled&#039;,&#039;disabled&#039;).html(&quot;updated&quot;); 
+	   			$.ajax({
+		   		    type: &#039;POST&#039;,
+		   		    url: &quot;/saveCandidate&quot;,
+		   		    dataType:&quot;json&quot;,
+		   		    data: {
+		   					&quot;name&quot;				: this.get(&quot;firstname&quot;),
+		   					&quot;title&quot;				: this.get(&quot;title&quot;),
+		   					&quot;email&quot;				: this.get(&quot;email&quot;),
+		   					&quot;phone&quot;				: this.get(&quot;phone&quot;),
+		   					&quot;exp&quot;				: this.get(&quot;experience&quot;),
+		   					&quot;country&quot;			: jQuery(&#039;#country&#039;).val(),
+		   					&quot;city&quot;				: jQuery(&#039;#city&#039;).val(),
+		   					&quot;cvpath&quot;			: cv,
+		   					&quot;company_id&quot;		: jQuery(&quot;#company&quot;).val(),
+		   					&quot;status&quot;			: jQuery(&quot;#status&quot;).val(),
+		   					&quot;skills&quot;			: text,
+		   					&quot;comments&quot;			: this.get(&quot;comments&quot;),
+		   					&quot;active&quot;		   	:jQuery(&#039;#employee&#039;).val()		
+		      		    },
+		   		    success: function(data){
+		   		    	bootbox.alert(data.message);
+		   		    	jQuery(&quot;.form-control&quot;).val(&quot;&quot;);
+	   					setTimeout(function(){that.transitionTo(&#039;dashboard&#039;);},500);
+		   		    },
+		   		    error: function(data){
+		   		    	bootbox.alert(data.message);
+		   		    }
+	   		     });
+          	}
+
+		}
+	}
+});
+
+App.AddvacancyController = Ember.Controller.extend({
+
+	init: function(){
+		var companyList =[];
+		var that = this;
+		$.ajax ({
+            type: &quot;GET&quot;, 
+            url:&#039;/companyList&#039;,            
+            success: function(data) {                 
+                for(var i=0;i&lt;data.length;i++){
+                    companyList.push({
+                    	id: data[i].id,
+                    	name:data[i].name});
+                }                                  
+                that.set(&#039;companies&#039;,companyList);                
+            },
+            error:function(data){
+                bootbox.alert(data.statusText);
+            }                        
+        });
+	},
+	needs : [ &#039;application&#039; ],
+	currentUser : Ember.computed.alias(&#039;controllers.application.loggedinUser&#039;),
+	companies: companyList,
+	country : countries,
+	city	: cities,
+	statuses: [&#039;OPEN&#039;,&#039;CLOSED&#039;],
+	actions :{
+		addCompany: function(){
+			var that =  this;
+			bootbox.prompt({
+				title: &quot;Enter the company name&quot;,
+				callback: function(result) {
+					if(result){
+						$.post(&#039;/updateCompany&#039;,{&#039;name&#039;:result},function(data){
+							if(data == &quot;200&quot;){
+								var companies = [];
+				                $.get(&#039;/companyList&#039;,function(data){		               		
+									for(var i=0;i&lt;data.length;i++){
+					                    companies.push({
+					                    	id: data[i].id,
+					                    	name:data[i].name});
+					                }   
+					                that.set(&#039;companies&#039;,companies);
+								});	
+
+							}else if(data ==&quot;201&quot;){
+								bootbox.alert(&quot;Already exists&quot;);
+							}
+						});
+					}					
+				},
+				className: &quot;bootbox-sm&quot;
+			});
+
+		},
+
+		savevacancy: function(){
+
+			var that = this;
+			var v = true;
+
+			if($(&quot;#min_experience&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;,&quot;Experience has to be specified&quot;);
+				v=false;
+			}
+			if($(&quot;#max_experience&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;,&quot;Experience has to be specified&quot;);
+				v=false;
+			}
+			if($(&quot;#jobTitle&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;,&quot;Email has to be specified&quot;);
+				v=false;
+			}
+			if($(&quot;#vacancy&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;, &quot;Phone number has to be specified&quot;);
+				v=false;
+			}
+			if($(&quot;#country&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;, &quot;country has to be specified&quot;);
+				v=false;
+			}
+			if($(&quot;#city&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;, &quot;city has to be specified&quot;);
+				v=false;
+			}
+			if($(&quot;#status&quot;).val() == &quot;&quot;){
+				addmessage(&quot;danger&quot;, &quot;status has to be specified&quot;);
+				v=false;
+			}
+
+			var textarea = $(&#039;#tags:last&#039;);
+			var textext = textarea.textext()[0];
+
+			if(textext.hiddenInput().val().length &lt; 3){
+				addmessage(&quot;danger&quot;,&quot;Skills has to be specified.&quot;);
+				v=false;
+			}		
+
+			var text = textext.hiddenInput().val();
+			text = text.replace(&quot;[&quot;,&quot;&quot;);
+			text = text.replace(&quot;]&quot;,&quot;&quot;);
+			text = text.replace(/[&#039;&quot;]+/g, &#039;&#039;);
+
+			if(v){
+	   			jQuery(&quot;#addEmpSbmt&quot;).attr(&#039;disabled&#039;,&#039;disabled&#039;).html(&quot;updated&quot;); 
+	   			$.ajax({
+		   		    type: &#039;POST&#039;,
+		   		    url: &quot;/saveVacancies&quot;,
+		   		    dataType:&quot;json&quot;,
+		   		    data: {
+		   					&quot;title&quot;			: this.get(&quot;jobTitle&quot;),
+		   					&quot;name&quot;			: this.get(&quot;vacancy&quot;),
+		   					&quot;country&quot;		: jQuery(&#039;#country&#039;).val(),
+		   					&quot;city&quot;			: jQuery(&#039;#city&#039;).val(),
+		   					&quot;exp_min&quot;		: this.get(&quot;min_experience&quot;),
+		   					&quot;exp_max&quot;		: this.get(&quot;max_experience&quot;),		   					
+		   					&quot;company_id&quot;	: jQuery(&quot;#company&quot;).val(),	
+		   					&quot;status&quot;		: jQuery(&quot;#status&quot;).val(),	   					
+		   					&quot;skills&quot;		: text,
+		   					&quot;description&quot;	: this.get(&quot;description&quot;),
+		      		    },
+		   		    success: function(data){		   		    	
+		   		    	bootbox.alert(data.message);
+		   		    	jQuery(&quot;.form-control&quot;).val(&quot;&quot;);
+	   					setTimeout(function(){that.transitionTo(&#039;dashboard&#039;);},500);
+		   		    },
+		   		    error: function(data){
+		   		    	bootbox.alert(&quot;error saving the data&quot;);
+		   		    } 
+	   		     });
+          	}
+
+		}
+	}
+});
+
+App.DashboardController = Ember.ObjectController.extend({
+	actions : {		
+		search : function (){
+			searchtype = $(&quot;input:radio[name=&#039;searchtype&#039;]:checked&quot;).val();
+			schema = &quot;v&quot;;
+			if(searchtype == &#039;candidate&#039;)
+				schema = &quot;c&quot;;
+			else if(searchtype == &#039;company&#039;)
+				schema = &quot;co&quot;
+			else if(searchtype == &#039;vacancy&#039;)
+				schema = &quot;v&quot;
+			else
+				return;
+
+			var that = this;
+			that.transitionTo(&#039;searchResult&#039;,search_text+&quot;&amp;schema=&quot;+schema);
+
+		}
+	}
+});
+
+App.VacancyController = Ember.ObjectController.extend({
+
+	actions:{
+		searchbyv: function(){
+			var m = this.get(&#039;content&#039;);
+			var key = m.city+&quot;+&quot;+m.country+&quot;+&quot;+m.skills+&quot;+&quot;+m.title+&quot;+&quot;+m.name+&quot;+&quot;+m.exp_max;
+			this.transitionTo(&#039;searchResult&#039;,key+&#039;&amp;schema=c&#039;+&#039;&amp;v=&#039;+m.id);
+		},
+		updatevacancystatus: function(){
+
+			var m = this.get(&#039;content&#039;);
+			var that = this;
+			$.ajax ({
+	            type: &quot;GET&quot;, 
+	            url:&#039;/statusList&#039;,            
+	            success: function(data) {                 
+	            	var sel = &quot;&lt;select class=&#039;form-control&#039; id=&#039;newstatus&#039;&gt;&quot;;
+
+	                for(var i=0;i&lt;data.length;i++){
+	                	if(data[i].id.indexOf(&quot;V0&quot;) &gt; -1){
+	                		sel = sel + &quot;&lt;option value=&#039;&quot;+data[i].name+&quot;&#039;&gt;&quot;+data[i].name+&quot;&lt;/option&gt;&quot;;
+		                }
+	                }
+
+					bootbox.confirm({
+						message: &quot;Select the status : &quot;+sel + &quot;&lt;/select&gt;&quot;,
+						callback: function(result) {
+							if(result){
+								$.post(&#039;/updatevacancystatus&#039;,{
+									id: m.id,
+									data:{
+										status: $(&#039;#newstatus&#039;).val(),
+									}
+								},function(res){
+									return $.get(&#039;/getvacancy/&#039;+m.id,function(data){
+										if(data.status == &quot;OPEN&quot;)
+											data.isOpen = true;
+										else
+											data.isOpen = false;
+										that.set(&#039;content&#039;,data);
+									});
+								});
+							}
+						},
+						className: &quot;bootbox-sm&quot;
+					});
+
+	            },
+	            error:function(data){
+	                bootbox.alert(data.statusText);
+	            }                        
+	        }); 
+
+		}
+	}
+
+});
+
+App.CandidateController = Ember.ObjectController.extend({
+
+	country : countries,
+	city	: cities,
+	actions:{
+		searchbyc: function(){
+			var m = this.get(&#039;content&#039;).details;
+			var key = m.city+&quot;+&quot;+m.country+&quot;+&quot;+m.skills+&quot;+&quot;+m.title+&quot;+&quot;+m.name+&quot;+&quot;+m.exp;
+			this.transitionTo(&#039;searchResult&#039;,key+&#039;&amp;schema=v&#039;+&#039;&amp;c=&#039;+m.id);
+		},
+		showHistory: function(m){
+			var that = this;
+			$.get(&#039;/apphistorybyid/&#039;+m.id,function(result){
+				that.set(&#039;content.apphistory&#039;,result);
+			});
+		},
+		updateapplication: function(m){
+
+			var that = this;
+			$.ajax ({
+	            type: &quot;GET&quot;, 
+	            url:&#039;/statusList&#039;,            
+	            success: function(data) {                 
+	            	var sel = &quot;&lt;select class=&#039;form-control&#039; id=&#039;newstatus&#039;&gt;&quot;;
+
+	                for(var i=0;i&lt;data.length;i++){
+	                	if(data[i].id.indexOf(&quot;C0&quot;) &gt; -1){
+	                		sel = sel + &quot;&lt;option value=&#039;&quot;+data[i].id+&quot;&#039;&gt;&quot;+data[i].name+&quot;&lt;/option&gt;&quot;;
+		                }
+	                }
+
+					bootbox.confirm({
+						message: &quot;Select the status : &quot;+sel + &quot;&lt;/select&gt;&lt;br/&gt;Comments: &lt;textarea rows=2 cols=30 class=&#039;form-control&#039; id=&#039;acomment&#039; /&gt;&quot;,
+						callback: function(result) {
+							if(result){
+								$.post(&#039;/updateappstatus&#039;,{
+									id: m.id,
+									candidate_id: that.get(&#039;content&#039;).details.id,
+									data:{
+										status: $(&#039;#newstatus&#039;).val(),
+									},
+									history:{
+										application_id: m.id,
+										prevstatus: m.status,
+										curstatus:  $(&#039;#newstatus&#039;).val()
+									},
+									comment: {
+										comment: $(&#039;#acomment&#039;).val()?$(&#039;#acomment&#039;).val():&quot;None.&quot;
+									}
+								},function(data){
+									$.get(&#039;/applicationbycid/&#039;+that.get(&#039;content&#039;).details.id,function(res){
+										that.set(&#039;content.applications&#039;,res);	
+									});
+								});
+							}
+						},
+						className: &quot;bootbox-sm&quot;
+					});
+
+	            },
+	            error:function(data){
+	                bootbox.alert(data.statusText);
+	            }                        
+	        }); 
+
+		},
+		UpdateCandidate:function(){
+			
+			var that = this;			
+			var candidateId = $(&quot;#candidateId&quot;).val();
+   			$.ajax({
+	   		    type: &#039;POST&#039;,
+	   		    url: &quot;/UpdateCandidate&quot;,
+	   		    dataType:&quot;json&quot;,
+	   		    data: {	   					
+	   					&quot;title&quot;				: $(&quot;#title&quot;).val(),	   					
+	   					&quot;phone&quot;				: $(&quot;#phone&quot;).val(),
+	   					&quot;exp&quot;				: $(&quot;#experience&quot;).val(),
+	   					&quot;country&quot;			: $(&#039;#country&#039;).val(),
+	   					&quot;city&quot;				: $(&#039;#city&#039;).val(),	   				
+	   					&quot;company_id&quot;		: $(&quot;#company&quot;).val(),	   				
+	   					&quot;id&quot;				: candidateId	
+	      		    },
+	   		    success: function(data){
+	   		    	bootbox.alert(data.statusText);
+	   		    	return $.get(&#039;/getcandidate/&#039;+candidateId,function(data){
+						if(data.applications){
+							$.each(data.applications,function(i,row){
+								if(data.applications[i].vacancy_status == &quot;OPEN&quot;)
+									data.applications[i].isOpen = true;
+								else
+									data.applications[i].isOpen = false;
+							});
+						}
+						that.set(&#039;content&#039;,data);
+					});
+	   		    },
+	   		    error: function(data){
+	   		    	bootbox.alert(data.statusText);
+	   		    }
+   		    });
+		},
+		UpdateCandidateResume : function(){
+
+			var that = this;
+			var fileName = JSON.parse($(&quot;.uploadedfile&quot;).text());
+			var cv = fileName.filepath;			
+			var candidateId = $(&quot;#candidateId&quot;).val();			
+			$.ajax({
+	   		    type: &#039;POST&#039;,
+	   		    url: &quot;/UpdateCandidateResume&quot;,
+	   		    dataType:&quot;json&quot;,
+	   		    data: {
+	   		    		updatedata: {	   						   					
+		   					&quot;cvpath&quot;			: cv,
+		   					&quot;id&quot;				: candidateId,
+	   					},
+	   					&quot;content&quot;			: that.get(&#039;content&#039;).details
+	      		    },
+	   		    success: function(data){
+	   		    	bootbox.alert(data.statusText);
+	   		    	$(&#039;#uploadcv&#039;).show();
+	   		    	$(&#039;.progress-bar&#039;).parent().prev().remove();
+	   		    	$(&#039;.uploadedfile&#039;).text(&#039;&#039;);
+					document.getElementById(&quot;#progress&quot;).remove();
+	   		    	return $.get(&#039;/getcandidate/&#039;+candidateId,function(data){
+						if(data.applications){
+							$.each(data.applications,function(i,row){
+								if(data.applications[i].vacancy_status == &quot;OPEN&quot;)
+									data.applications[i].isOpen = true;
+								else
+									data.applications[i].isOpen = false;
+							});
+						}
+						that.set(&#039;content&#039;,data);
+					});
+	   		    },
+	   		    error: function(data){
+	   		    	bootbox.alert(data.statusText);
+	   		    }
+   		    });	
+		},
+		updatecv : function(){
+			$(&#039;#uploadcv&#039;).show();
+	    	$(&#039;.progress-bar&#039;).parent().prev().remove();
+	    	$(&#039;.uploadedfile&#039;).text(&#039;&#039;);
+			document.getElementById(&quot;#progress&quot;).remove();
+		}
+	}
+
+});
+
+App.SearchResultController = Ember.ObjectController.extend({
+
+	actions : {		
+		search : function (){
+
+			searchtype = $(&quot;input:radio[name=&#039;searchtype&#039;]:checked&quot;).val();
+			schema = &quot;v&quot;;
+			if(searchtype == &#039;candidate&#039;)
+				schema = &quot;c&quot;;
+			else if(searchtype == &#039;company&#039;)
+				schema = &quot;co&quot;
+			else if(searchtype == &#039;vacancy&#039;)
+				schema = &quot;v&quot;
+			else
+				return;
+
+			var that = this;
+			that.transitionTo(&#039;searchResult&#039;,search_text+&quot;&amp;schema=&quot;+schema);
+ 
+		}
+	}
+
+
+});
+
+App.ProfileController = Ember.ObjectController.extend({
+	actions:{
+		updateProfile : function(){			
+			var that = this;
+			var description = this.get(&#039;description&#039;);
+			var mobile_number = this.get(&#039;mobile_number&#039;);	
+			var phonereg = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
+			if(((description)||(mobile_number))&amp;&amp;(phonereg.test(mobile_number))){
+				$.ajax ({
+	                type: &quot;POST&quot;, 
+	                url:&#039;/updateProfile&#039;,
+	                dataType:&#039;JSON&#039;,
+	                data:{&#039;description&#039;:description,&#039;mobile_number&#039;:mobile_number},                   
+	                success: function(data) {  
+		                bootbox.alert(data.message);	                
+		               	$.get(&#039;/getUserdata&#039;,function(data){		               		
+							that.set(&#039;content&#039;,data);
+						});									
+	                },
+	                error: function(data) {
+	                    bootbox.alert(data.statusText);
+	                }
+	            });	  
+			}	
+			else{
+				bootbox.alert(&#039;Enter the valid data&#039;);
+			}
+			                    
+		}
+	}
+});</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ complexity.cyclomatic }} <br>
+    Length : {{ complexity.halstead.length }} <br>
+    Difficulty : {{ complexity.halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ complexity.halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
