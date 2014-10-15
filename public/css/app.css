@@ -209,3 +209,8 @@ ul.follower li{
 .small-font{
   font-size: 20px;
 }
+
+tbody#table_configure{
+  height:500px;
+  overflow:overlay;
+}

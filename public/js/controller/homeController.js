@@ -1,10 +1,12 @@
 mesgs = [];
+
 var companyList,statusList,cityList;
 
 var countries = ["India", "United States"];
 
 var Employee_status = ['YES','NO'];          
 
+var empStatus = ['Active', 'In-Active'];
 
 var addmessage = function(type,msg){
 
@@ -14,6 +16,17 @@ var addmessage = function(type,msg){
 	});
 
 }
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0; i<ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return "";
+  }
+var admin = getCookie('isAdmin');
 
 setInterval(function() {
 
@@ -163,7 +176,7 @@ switch (value) {
         res = res + '<label class="label label-tag label-danger">REJECTED</label>';
         break;   
     case "C07":
-        res = res + '<label class="label label-tag label-danger">FAKE</label>';
+        res = res + '<label class="label label-tag label-danger">INVALID</label>';
         break;  
     case "YES":
     	res = res + '<i class="fa fa-star" style="color:#DAA520"></i>'
@@ -292,25 +305,87 @@ Ember.Handlebars.helper('format-country', function(value) {
   return new Ember.Handlebars.SafeString(res);
 });
 
+Ember.Handlebars.helper('format-emproles', function(value) {
+  var res="";
+
+  // alert(roleenum["manager"]);
+
+  var roles = value.split(",");
+
+  $.each(roles,function(i,role){
+
+	switch (role) {
+	    case "1":
+	  		res = res+' Manager';
+	        break;
+	    case "2":
+	        res = res+' Recruiter';
+	        break;
+	    case "3":
+	        res = res+' Sales';
+	        break;        
+	    case "4":
+	        res = res+' Admin';
+	        break;   
+	    case "5":
+	        res = res+' Marketing';
+	        break;
+        case "true":
+	    	res = res + '<li><a href="/home.html#/configure/"><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Configure</a></li>'
+	    	break;
+	    case "false":
+	    	res = res + '<li class="disabled"><a href="#"><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Configure</a></li>'
+	    	break;
+		case "e01":
+	    	res = res + '<label class="label label-tag label-success">Active</label>'
+	    	break;
+	    case "e02":
+	    	res = res + '<label class="label label-tag label-warning">In-Active</label>'; 
+	}
+
+  });
+
+
+
+  return new Ember.Handlebars.SafeString(res);
+});
+
+Ember.Handlebars.helper('format-posting', function(value,id) {
+  var res="";
+  
+	switch (value) {
+	    case "YES":
+	  		res = res+' <div class="pull-right col-xs-12 col-sm-auto">\
+	  		<a href="/home.html#/addposting/'+id+'"><button class="btn btn-outline btn-primary btn-labeled">\
+	  		<span class="btn-label icon fa fa-plus"></span>&nbsp;&nbsp;Posting &nbsp;&nbsp;</button>\
+	  		</a></div>';	          	 
+	}
+
+  return new Ember.Handlebars.SafeString(res);
+});
+
 
 /********************************
- * Controllers
- **********************************/
+ * Controllers m, mm m mm m  nnb *
+ ********************************/
 
 App.ApplicationController = Ember.Controller.extend({
 	name: "",
+	isAdmin:admin,
 
 	init: function(){
 		var that = this;
 		$.get('/me',function(data){
 			that.set('name',data[0].name);
-		});
+		});				
 	},
 
 	actions:{				
 		signout:function(){			
 			document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
 			document.cookie = "region=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+			document.cookie = "isAdmin=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+			document.cookie = "rolescnt=; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     		window.location='login.html';
 		},	
 	}
@@ -365,7 +440,7 @@ App.AddcandidateController = Ember.Controller.extend({
 		addCity: function(){
 			var that =  this;
 			bootbox.prompt({
-				title: "Enter the company name",
+				title: "Enter the City name",
 				callback: function(result) {					
 					if(result){
 						$.post('/updateCity',{'city':result},function(data){
@@ -403,7 +478,7 @@ App.AddcandidateController = Ember.Controller.extend({
 				v=false;
 			}			
 			if(($("#title").val() == "")){
-				addmessage("danger","Enter the Name ");
+				addmessage("danger","Enter the title ");
 				v=false;
 			}
 			if(($("#experience").val() == "")||(!expreg.test($('#experience').val()))){
@@ -417,15 +492,7 @@ App.AddcandidateController = Ember.Controller.extend({
 			if(($("#phone").val() == "")||(!phonereg.test($('#phone').val()))){
 				addmessage("danger","Enter valid Mobile number");
 				v=false;
-			}
-			if(($("#alt_email").val() == "")||(!emailreg.test($('#alt_email').val()))){
-				addmessage("danger","Enter a Alternate valid Email");				
-				v=false;
-			}
-			if(($("#alt_phone").val() == "")||(!phonereg.test($('#alt_phone').val()))){
-				addmessage("danger","Enter valid Alternate Mobile number");
-				v=false;
-			}
+			}			
 			if($("#country").val() == ""){
 				addmessage("danger", "country has to be specified");
 				v=false;
@@ -475,7 +542,7 @@ App.AddcandidateController = Ember.Controller.extend({
 		   		    success: function(data){
 		   		    	bootbox.alert(data.message);
 		   		    	jQuery(".form-control").val("");
-	   					setTimeout(function(){that.transitionTo('dashboard');},500);
+	   					setTimeout(function(){that.transitionToRoute('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	bootbox.alert(data.message);
@@ -559,7 +626,7 @@ App.AddvacancyController = Ember.Controller.extend({
 		addCity: function(){
 			var that =  this;
 			bootbox.prompt({
-				title: "Enter the company name",
+				title: "Enter the City name",
 				callback: function(result) {					
 					if(result){
 						$.post('/updateCity',{'city':result},function(data){
@@ -650,7 +717,7 @@ App.AddvacancyController = Ember.Controller.extend({
 		   		    success: function(data){		   		    	
 		   		    	bootbox.alert(data.message);
 		   		    	jQuery(".form-control").val("");
-	   					setTimeout(function(){that.transitionTo('dashboard');},500);
+	   					setTimeout(function(){that.transitionToRoute('dashboard');},500);
 		   		    },
 		   		    error: function(data){
 		   		    	bootbox.alert("error saving the data");
@@ -677,7 +744,7 @@ App.DashboardController = Ember.ObjectController.extend({
 				return;
 
 			var that = this;
-			that.transitionTo('searchResult',search_text+"&schema="+schema);
+			that.transitionToRoute('searchResult',search_text+"&schema="+schema);
 
 		}
 	}
@@ -707,7 +774,7 @@ App.VacancyController = Ember.ObjectController.extend({
 		addCity: function(){
 			var that =  this;
 			bootbox.prompt({
-				title: "Enter the company name",
+				title: "Enter the City name",
 				callback: function(result) {					
 					if(result){
 						$.post('/updateCity',{'city':result},function(data){
@@ -732,7 +799,7 @@ App.VacancyController = Ember.ObjectController.extend({
 		searchbyv: function(){
 			var m = this.get('content');
 			var key = m.city+"+"+m.country+"+"+m.skills;
-			this.transitionTo('searchResult',key+'&schema=c'+'&v='+m.id);
+			this.transitionToRoute('searchResult',key+'&schema=c'+'&v='+m.id);
 		},
 		updatevacancystatus: function(){
 
@@ -854,7 +921,7 @@ App.CandidateController = Ember.ObjectController.extend({
 		addCity: function(){
 			var that =  this;
 			bootbox.prompt({
-				title: "Enter the company name",
+				title: "Enter the City name",
 				callback: function(result) {					
 					if(result){
 						$.post('/updateCity',{'city':result},function(data){
@@ -880,14 +947,21 @@ App.CandidateController = Ember.ObjectController.extend({
 		searchbyc: function(){
 			var m = this.get('content').details;
 			var key = m.city+"+"+m.country+"+"+m.skills;
-			this.transitionTo('searchResult',key+'&schema=v'+'&c='+m.id);
+			this.transitionToRoute('searchResult',key+'&schema=v'+'&c='+m.id);
 		},
 		showHistory: function(m){
 			var that = this;
 			$.get('/apphistorybyid/'+m.id,function(result){
 				that.set('content.apphistory',result);
 			});
-		},
+		},	
+		showPosHistory: function(m){
+			var that = this;			
+			$.get('/poshistorybyid/'+m.id,function(result){
+				console.log(JSON.stringify(result));
+				that.set('content.postinghistory',result);
+			});
+		},		
 		updateapplication: function(m){
 
 			var that = this;
@@ -938,6 +1012,57 @@ App.CandidateController = Ember.ObjectController.extend({
 	        }); 
 
 		},
+
+		UpdatePostingApp: function(m){
+
+			var that = this;
+			$.ajax ({
+	            type: "GET", 
+	            url:'/statusList',            
+	            success: function(data) {                 
+	            	var sel = "<select class='form-control' id='newstatus_p'>";
+
+	                for(var i=0;i<data.length;i++){
+	                	if(data[i].id.indexOf("C0") > -1){
+	                		sel = sel + "<option value='"+data[i].id+"'>"+data[i].name+"</option>";
+		                }
+	                }
+
+					bootbox.confirm({
+						message: "Select the status : "+sel + "</select><br/>Comments: <textarea rows=2 cols=30 class='form-control' id='pcomment' />",
+						callback: function(result) {							
+							if(result){
+								$.post('/updatepostingStatus',{
+									id: m.id,
+									candidate_id: that.get('content').details.id,
+									data:{
+										status: $('#newstatus_p').val(),
+									},
+									history:{
+										posting_id: m.id,
+										prevstatus: m.status,
+										curstatus:  $('#newstatus_p').val()
+									},
+									comment: {
+										posting_note: $('#pcomment').val()?$('#pcomment').val():"None."
+									}
+								},function(data){
+									$.get('/postingbycid/'+that.get('content').details.id,function(res){										
+										that.set('content.posting',res);	
+									});
+								});
+							}
+						},
+						className: "bootbox-sm"
+					});
+
+	            },
+	            error:function(data){
+	                bootbox.alert(data.statusText);
+	            }                        
+	        }); 
+
+		},		
 		UpdateCandidate:function(){
 			
 			var that = this;			
@@ -960,14 +1085,7 @@ App.CandidateController = Ember.ObjectController.extend({
 				bootbox.alert("Enter valid Mobile number");
 				v = false;
 			}
-			if(($("#alt_email").val() == "")||(!emailreg.test($('#alt_email').val()))){
-				bootbox.alert("Enter a Alternate valid Email");				
-				v = false;
-			}
-			if(($("#alt_phone").val() == "")||(!phonereg.test($('#alt_phone').val()))){
-				bootbox.alert("Enter valid Alternate Mobile number");
-				v = false;
-			}
+			
 			if(v){
 				$.ajax({
 		   		    type: 'POST',
@@ -981,7 +1099,8 @@ App.CandidateController = Ember.ObjectController.extend({
 		   					"alt_email"			: $("#alt_email").val(),
 		   					"exp"				: $("#experience").val(),		   					
 		   					"city"				: $('#city').val(),	   				
-		   					"company_id"		: $("#company").val(),	   				
+		   					"company_id"		: $("#company").val(),
+		   					"comments"			: $("#comments").val(),	   				
 		   					"id"				: candidateId	
 		      		    },
 		   		    success: function(data){
@@ -1071,7 +1190,7 @@ App.SearchResultController = Ember.ObjectController.extend({
 				return;
 
 			var that = this;
-			that.transitionTo('searchResult',search_text+"&schema="+schema);
+			that.transitionToRoute('searchResult',search_text+"&schema="+schema);
  
 		}
 	}
@@ -1083,8 +1202,8 @@ App.ProfileController = Ember.ObjectController.extend({
 	actions:{
 		updateProfile : function(){			
 			var that = this;
-			var description = this.get('description');
-			var mobile_number = this.get('mobile_number');	
+			var description = $('#description').val();
+			var mobile_number = $('#mobile_number').val();	
 			var phonereg = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;
 			if(((description)||(mobile_number))&&(phonereg.test(mobile_number))){
 				$.ajax ({
@@ -1105,8 +1224,449 @@ App.ProfileController = Ember.ObjectController.extend({
 			}	
 			else{
 				bootbox.alert('Enter the valid data');
+			}			                   
+		}
+	}
+});
+
+App.AddpostingController = Ember.ObjectController.extend({
+	init: function(){
+		var companyList =[];
+		var cityList = [];
+		var statusList = [];
+		var that = this;
+		$.ajax ({
+            type: "GET", 
+            url:'/companyList',            
+            success: function(data) {                 
+                for(var i=0;i<data.length;i++){
+                    companyList.push({
+                    	id: data[i].id,
+                    	name:data[i].name});
+                }                                  
+                that.set('companies_p',companyList);                
+            },
+            error:function(data){
+                bootbox.alert(data.statusText);
+            }                        
+        });
+        $.ajax ({
+            type: "GET", 
+            url:'/cityList',            
+            success: function(data) {              	
+                for(var i=0;i<data.length;i++){                	
+                    cityList.push(data[i].city);	              
+                }                                
+                that.set('city',cityList);                
+            },
+            error:function(data){
+                bootbox.alert(data.statusText);
+            }                        
+        });         	
+		$.ajax ({
+            type: "GET", 
+            url:'/statusList',            
+            success: function(data) {                                
+            	if(data[0].id.indexOf("C0") > -1){
+                    statusList.push({
+                    	id:data[0].id,
+                    	name:data[0].name
+                    });
+                }                                      
+                that.set('statuses',statusList);                
+            },
+            error:function(data){
+                bootbox.alert(data.statusText);
+            }                        
+        }); 
+	},
+	needs : [ 'application' ],
+	currentUser : Ember.computed.alias('controllers.application.loggedinUser'),
+	companies_p: companyList,
+	country : countries,
+	city	: cityList,
+	types	: ['Client','Reference','Prospect'],
+	employment_types : ['Contract','Full-time','Part-time'],
+	statuses: statusList, 
+	actions :{
+		addCompany: function(){
+			var that =  this;
+			bootbox.prompt({
+				title: "Enter the company name",
+				callback: function(result) {
+					if(result){
+						$.post('/updateCompany',{'name':result},function(data){
+							if(data == "200"){
+								var companies = [];
+				                $.get('/companyList',function(data){		               		
+									for(var i=0;i<data.length;i++){
+					                    companies.push({
+					                    	id: data[i].id,
+					                    	name:data[i].name});
+					                }   
+					                that.set('companies_p',companies);
+								});	
+
+							}else if(data =="201"){
+								bootbox.alert("Already exists");
+							}
+						});
+					}					
+				},
+				className: "bootbox-sm"
+			});
+		},
+		addCity: function(){
+			var that =  this;
+			bootbox.prompt({
+				title: "Enter the City name",
+				callback: function(result) {					
+					if(result){
+						$.post('/updateCity',{'city':result},function(data){
+							if(data == "200"){
+								var cityList = [];
+				                $.get('/cityList',function(data){				                	
+									for(var i=0;i<data.length;i++){
+					                    cityList.push(data[i].city);
+					                }   
+					                that.set('city',cityList);
+								});	
+
+							}else if(data =="201"){
+								bootbox.alert("Already exists");
+							}
+						});
+					}					
+				},
+				className: "bootbox-sm"
+			});
+		},
+
+		saveposting: function(){			
+			var that = this;
+			var v = true;
+
+			if($("#min_experience").val() == ""){
+				addmessage("danger","Experience has to be specified");
+				v=false;
 			}
-			                    
+			if($("#max_experience").val() == ""){
+				addmessage("danger","Experience has to be specified");
+				v=false;
+			}
+			if($("#postingId").val() == ""){
+				addmessage("danger","posting Id has to be specified");
+				v=false;
+			}
+			if($("#posting").val() == ""){
+				addmessage("danger", "posting title has to be specified");
+				v=false;
+			}
+			if($("#country").val() == ""){
+				addmessage("danger", "country has to be specified");
+				v=false;
+			}
+			if($("#city").val() == ""){
+				addmessage("danger", "city has to be specified");
+				v=false;
+			}
+			if($("#status").val() == ""){
+				addmessage("danger", "status has to be specified");
+				v=false;
+			}
+
+			var textarea = $('#tags:last');
+			var textext = textarea.textext()[0];
+
+			if(textext.hiddenInput().val().length < 3){
+				addmessage("danger","Skills has to be specified.");
+				v=false;
+			}		
+
+			var text = textext.hiddenInput().val();
+			text = text.replace("[","");
+			text = text.replace("]","");
+			text = text.replace(/['"]+/g, '');
+
+			if(v){	
+				
+	   			$.ajax({
+		   		    type: 'POST',
+		   		    url: "/savePosting",
+		   		    dataType:"json",
+		   		    data: {
+		   					"title"			: this.get("posting"),
+		   					"candidate_id"	: this.get('candidate_id'),
+		   					"description"	: this.get("pos_description"),
+		   					"country"		: jQuery('#country').val(),
+		   					"city"			: jQuery('#city').val(),
+		   					"exp_min"		: this.get("min_experience"),
+		   					"exp_max"		: this.get("max_experience"),		   					
+		   					"company_id"	: jQuery("#companies_p").val(),	
+		   					"type"			: jQuery("#types_p").val(),
+		   					"employment_type": $("#etypes_p").val(),
+		   					"status"		: jQuery("#status_p").val(),
+		   					"comments"		: this.get("notes"),	   					
+		   					"skills"		: text,		   					
+		      		    },
+		   		    success: function(data){		   		    	
+		   		    	bootbox.alert(data.message);
+		   		    	jQuery(".form-control").val("");
+	   					setTimeout(function(){that.transitionToRoute('dashboard');},500);
+		   		    },
+		   		    error: function(data){
+		   		    	bootbox.alert("error saving the data");
+		   		    } 
+	   		     });
+          	}
+
+		}
+	}
+});
+
+App.PostingController = Ember.ObjectController.extend({
+	types	: ['Client','Reference','Prospect'],
+	employment_types : ["Contract","Full-time","Part-time"],
+	actions:{
+		loadCity: function(){
+			var cityList = [];
+			companyList = [];
+			var that = this;		
+	        $.ajax ({
+	            type: "GET", 
+	            url:'/cityList',            
+	            success: function(data) {              	
+	                for(var i=0;i<data.length;i++){                	
+	                    cityList.push(data[i].city);	              
+	                }                                
+	                that.set('v_city',cityList); 
+
+	                /* get the company List*/  
+
+	                $.ajax ({
+			            type: "GET", 
+			            url:'/companyList',            
+			            success: function(data) {                 
+			                for(var i=0;i<data.length;i++){
+			                    companyList.push({
+			                    	id: data[i].id,
+			                    	name:data[i].name});
+			                }                                  
+			                that.set('companies_p',companyList);                
+			            },
+			            error:function(data){
+			                bootbox.alert(data.statusText);
+			            }                        
+			        }); 
+
+	            },
+	            error:function(data){
+	                bootbox.alert(data.statusText);
+	            }                        
+	        }); 
+		},
+		addCompany: function(){
+			var that =  this;
+			bootbox.prompt({
+				title: "Enter the company name",
+				callback: function(result) {
+					if(result){
+						$.post('/updateCompany',{'name':result},function(data){
+							if(data == "200"){
+								var companies = [];
+				                $.get('/companyList',function(data){		               		
+									for(var i=0;i<data.length;i++){
+					                    companies.push({
+					                    	id: data[i].id,
+					                    	name:data[i].name});
+					                }   
+					                that.set('companies_p',companies);
+								});	
+
+							}else if(data =="201"){
+								bootbox.alert("Already exists");
+							}
+						});
+					}					
+				},
+				className: "bootbox-sm"
+			});
+		},
+		addCity: function(){
+			var that =  this;
+			bootbox.prompt({
+				title: "Enter the City name",
+				callback: function(result) {					
+					if(result){
+						$.post('/updateCity',{'city':result},function(data){
+							if(data == "200"){
+								var cityList = [];
+				                $.get('/cityList',function(data){				                	
+									for(var i=0;i<data.length;i++){
+					                    cityList.push(data[i].city);
+					                }   
+					                that.set('v_city',cityList);
+								});	
+
+							}else if(data =="201"){
+								bootbox.alert("Already exists");
+							}
+						});
+					}					
+				},
+				className: "bootbox-sm"
+			});
+		},
+		UpdatePosting: function(){			
+			var posting_id = this.get('id');
+			var that = this;
+			$.ajax({
+	   		    type: 'POST',
+	   		    url: "/updatePosting",
+	   		    dataType:"json",
+	   		    data: {	   					
+	   					"id"			: this.get('id'),
+	   					"description"	: $('#description_p').val(),	   					
+	   					"city"			: jQuery('#p_city').val(),
+	   					"exp_min"		: $('#exp_min_p').val(),
+	   					"exp_max"		: $('#exp_max_p').val(),		   					
+	   					"company_id"	: jQuery("#companies_p").val(),	
+	   					"type"			: jQuery("#types_p").val(),
+	   					"status"		: jQuery("#status_p").val(),
+	   					"employment_type": jQuery('#etypes').val(),
+	   					"comments"		: $("#note").val()
+	      		    },
+	   		    success: function(data){		   		    	
+	   		    	bootbox.alert(data.message);	
+	   		    	return $.get('/getposting/'+posting_id,function(data){	   		    		
+						that.set('content',data);
+					});   		    	
+	   		    },
+	   		    error: function(data){
+	   		    	bootbox.alert("error saving the data");
+	   		    } 
+   		    });
+		},
+	}
+});
+
+
+/****************
+User Configure - Controller
+****************/
+
+App.ConfigureController = Ember.ObjectController.extend({	
+	empStatus : empStatus,		
+	actions : {
+		editRegion : function(email){
+	      	var that = this;
+	      	var sel = '<select class="form-control" id="userRegion">\
+							<option value="1">United States</option>\
+							<option value="2">India</option>\
+							<option value="3">India & United States</option>\
+						</select>';			
+            bootbox.confirm({
+				message:  'Choose the region :<br/><br/>' +sel,
+				callback: function(result) {
+					if(result){						
+						$.ajax({
+							type:"POST",
+							url:'/updateUser',
+							dataType:"json",
+							data:{
+								'region' : $('#userRegion').val(),
+								'email' : email
+							},
+							success : function(data){
+								bootbox.alert(data.message);
+								return $.get('/userList',function(data){	
+									that.set('content',data);
+								});
+							}
+						});
+					}
+				},
+				className: "bootbox-sm"
+			});
+
+		},
+		editRole : function(email){
+			var that = this;
+
+			$.ajax ({
+	            type: "GET", 
+	            url:'/roles',            
+	            success: function(data) {
+					var sel = "<select class='form-control' id='newRole' multiple='multiple'>";
+
+		            for(var i=0;i<data.length;i++){            	
+		           		sel = sel + "<option value='"+data[i].id+"'>"+data[i].name+"</option>";
+		            }
+
+					bootbox.confirm({
+						message: "Select the status : "+sel,
+						callback: function(result) {
+							var count = $("#newRole :selected").length;		
+
+							if((result)&&(count <=2)){								
+								var role = $('#newRole').val();
+								var roles = role.toString();							
+								$.ajax({
+									type:"POST",
+									url:'/updateUser',
+									dataType:"json",
+									data:{
+										'role'  : roles,
+										'email' : email
+									},
+									success : function(data){
+										bootbox.alert(data.message);
+										return $.get('/userList',function(data){	
+											that.set('content',data);
+										});
+									}
+								});
+							}
+							else if(count > 2){
+								bootbox.alert("Person can have only two Roles");
+							}
+						},
+						className: "bootbox-sm"
+					});
+
+	            },
+	            error:function(data){
+	                bootbox.alert(data.statusText);
+	            }                        
+	        });
+		},
+		editStatus: function(email){
+			var that =  this;
+			var sel = '<select class="form-control" id="userStatus"><option value="e01">Active</option>\
+			<option value="e02">In-Active</option></select>';			
+            bootbox.confirm({
+				message:  'Choose the region :<br/><br/>' +sel,
+				callback: function(result) {					
+					if(result){						
+						$.ajax({
+							type:"POST",
+							url:'/updateUser',
+							dataType:"json",
+							data:{
+								'status' : $('#userStatus').val(),
+								'email' : email
+							},
+							success : function(data){
+								bootbox.alert(data.message);
+								return $.get('/userList',function(data){	
+									that.set('content',data);
+								});
+							}
+						});
+					}
+				},
+				className: "bootbox-sm"
+			});
 		}
 	}
 });

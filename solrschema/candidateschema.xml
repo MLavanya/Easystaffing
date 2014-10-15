@@ -149,25 +149,24 @@
 
   ******************                ************************     
 -->
-  <field name="cname" type="text_general" indexed="true" stored="true" />
-  <field name="ctitle" type="text_general" indexed="true" stored="true" multiValued="fasle"/>
-  <field name="cemail" type="text_general" indexed="true" stored="true" multiValued="fasle"/>
-  <field name="cexp" type="text_general" indexed="true" stored="true" multiValued="false"/>
-  <field name="cphone" type="text_general" indexed="true" stored="true" />
-  <field name="calt_phone" type="text_general" indexed="true" stored="true" />
-  <field name="calt_email" type="text_general" indexed="true" stored="true" />
-  <field name="ccity" type="text_general" indexed="true" stored="true" />
-  <field name="ccountry" type="text_general" indexed="true" stored="true" />
-  <field name="cskills" type="text_general" indexed="true" stored="true" multiValued="fasle" />
-  <field name="ccvpath" type="text_general" indexed="true" stored="true" multiValued="fasle"/>
-  <field name="ccompany_id" type="text_general" indexed="true" stored="true" multiValued="fasle"/>
-  <field name="cstatus" type="text_general" indexed="true" stored="true" multiValued="false"/>
-  <field name="cactive" type="text_general" indexed="true" stored="true" multiValued="false"/>
-  <field name="ccomments" type="text_general" indexed="true" stored="true" multiValued="fasle"/>
-  <field name="ccreated_date" type="date" indexed="true" stored="true" multiValued="false"/>
-  <field name="cupdated_time" type="date" indexed="true" stored="true" multiValued="fasle"/>
-  <field name="ccreated_by" type="text_general" indexed="true" stored="true" multiValued="false"/>
-  
+   <field name="cname" type="text_general" indexed="true" stored="true" />
+   <field name="ctitle" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <field name="cemail" type="text_general" indexed="true" stored="true" multiValued="fasle"/>
+   <field name="cexp" type="text_general" indexed="true" stored="true" multiValued="false"/>
+   <field name="cphone" type="text_general" indexed="true" stored="true" />
+   <field name="calt_phone" type="text_general" indexed="true" stored="true" />
+   <field name="calt_email" type="text_general" indexed="true" stored="true" />
+   <field name="ccity" type="text_general" indexed="true" stored="true" />
+   <field name="ccountry" type="text_general" indexed="true" stored="true" />
+   <field name="cskills" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <field name="ccvpath" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <field name="ccompany_id" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <field name="cstatus" type="text_general" indexed="true" stored="true" multiValued="false"/>
+   <field name="cactive" type="text_general" indexed="true" stored="true" multiValued="false"/>
+   <field name="ccomments" type="text_general" indexed="true" stored="true" multiValued="true"/>
+   <field name="ccreated_date" type="date" indexed="true" stored="true" multiValued="false"/>
+    <field name="cupdated_time" type="date" indexed="true" stored="true" multiValued="true"/>
+    <field name="ccreated_by" type="text_general" indexed="true" stored="true" multiValued="false"/>
  
    <!-- Common metadata fields, named specifically to match up with
      SolrCell metadata when parsing rich documents such as Word, PDF.

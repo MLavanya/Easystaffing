@@ -117,62 +117,63 @@
 
 <div class="theme-default page-signin">
 
-<div id="page-signin-bg">
+	<div id="page-signin-bg">
 		<!-- Background overlay -->
 		<div class="overlay"></div>
 		<!-- Replace this with your bg image -->
 		<img src="assets/demo/signin-bg-1.jpg" alt="">
 	</div>
 	<!-- / Page background -->
+	<form class="panel form-horizontal"role="form">
+		<!-- Container -->
+		<div class="signin-container">
+			<!--form class="panel form-horizontal"role="form"-->
+	             <!-- Left side -->
+			<div class="signin-info">
+				<a href="index.html" class="logo">
+					<img src="assets/demo/logo-big.png" alt="" style="margin-top: -5px;">&nbsp;
+					Easy Staffing
+				</a> <!-- / .logo -->
+				<div class="slogan">
+					Simple. Flexible. Powerful.
+				</div> <!-- / .slogan -->
+				<ul>
+					<li><i class="fa fa-search signin-icon"></i> Freetext Search</li>
+					<li><i class="fa fa-sitemap signin-icon"></i> Comprehensive Tracking</li>
+					<li><i class="fa fa-heart signin-icon"></i> Easy to use</li>
+					<li><i class="fa fa-star signin-icon"></i> Responsive</li>
+				</ul> <!-- / Info list -->
+			</div>
+			<!-- / Left side -->
 
-	<!-- Container -->
-	<div class="signin-container">
 
-             <!-- Left side -->
-		<div class="signin-info">
-			<a href="index.html" class="logo">
-				<img src="assets/demo/logo-big.png" alt="" style="margin-top: -5px;">&nbsp;
-				Easy Staffing
-			</a> <!-- / .logo -->
-			<div class="slogan">
-				Simple. Flexible. Powerful.
-			</div> <!-- / .slogan -->
-			<ul>
-				<li><i class="fa fa-search signin-icon"></i> Freetext Search</li>
-				<li><i class="fa fa-sitemap signin-icon"></i> Comprehensive Tracking</li>
-				<li><i class="fa fa-heart signin-icon"></i> Easy to use</li>
-				<li><i class="fa fa-star signin-icon"></i> Responsive</li>
-			</ul> <!-- / Info list -->
-		</div>
-		<!-- / Left side -->
-
-
-		
-		<div class="signin-form">
-				<div class="signin-text">
-					<span>Sign In to your account</span>
-				</div> <!-- / .signin-text -->
-
-				<div class="form-group w-icon">
-					<input type="text" name="signin_username" id="email_id" class="form-control input-lg" placeholder="Email">
-					<span class="fa fa-user signin-form-icon"></span>
-				</div> <!-- / Username -->
-
-				<div class="form-group w-icon">
-					<input type="password" name="signin_password" id="password_id" class="form-control input-lg" placeholder="Password">
-					<span class="fa fa-lock signin-form-icon"></span>
-				</div> <!-- / Password -->				
 			
-				<div class="form-actions">
-					<input type="submit" value="SIGN IN" class="signin-btn bg-primary" {{action 'signinclick'}}>
-					<a href="#" class="forgot-password" id="forgot-password-link">Forgot your password?</a>
-				</div> 
+			<div class="signin-form">
+					<div class="signin-text">
+						<span>Sign In to your account</span>
+					</div> <!-- / .signin-text -->
+
+					<div class="form-group w-icon">
+						<input type="text" name="signin_username" id="email_id" class="form-control input-lg" placeholder="Enter Email-Prefix">
+						<span class="fa fa-user signin-form-icon"></span>
+					</div> <!-- / Username -->
+
+					<div class="form-group w-icon">
+						<input type="password" name="signin_password" id="password_id" class="form-control input-lg" placeholder="Password">
+						<span class="fa fa-lock signin-form-icon"></span>
+					</div> <!-- / Password -->				
+				
+					<div class="form-actions">
+						<input type="submit" value="SIGN IN" class="signin-btn bg-primary" {{action 'signinclick'}}>
+						<a href="#" class="forgot-password" id="forgot-password-link">Forgot your password?</a>
+					</div> 
 
 
+			</div>
+			<!-- Right side -->
 		</div>
-		<!-- Right side -->
-	</div>
-	<!-- / Container -->
+		<!-- / Container -->
+	</form>
 
 	<div class="not-a-member">
 		Not a member? <a href="#">{{#linkTo 'signup'}}sign up now{{/linkTo}}</a>
@@ -196,7 +197,7 @@
 		</div> <!-- / .modal-dialog -->
 	</div> <!-- / .modal -->
 	<!-- / Success -->
-  </script>
+ </script>
 
 <script type="text/x-handlebars" id="signup">
 
@@ -225,7 +226,8 @@
 		<!-- / Header -->
 
 		<!-- Form -->
-		<div class="signup-form">
+		<form class="panel form-horizontal"role="form">	
+			<div class="signup-form">
 				<div class="signup-text">
 					<span>Create an account</span>
 				</div>
@@ -273,8 +275,8 @@
 				<div class="form-actions">
 					<input type="button" value="SIGN UP" class="signup-btn bg-primary" {{action 'signupclick'}}>
 				</div>
-	
-		</div>
+			</div>
+		</form>
 		<!-- Right side -->
 	</div>
 

@@ -78,6 +78,17 @@ app.post('/UpdateCandidate',services.UpdateCandidate);
 app.post('/UpdateCandidateResume',services.UpdateCandidateResume);
 app.post('/UpdateVacancy',services.UpdateVacancy);
 app.post('/updateCity',services.updateCity);
+app.get('/userList',services.userList);
+app.get('/roles',services.roles);
+app.post('/updateUser',services.updateUser);
+app.post('/savePosting',services.savePosting);
+app.get('/getposting/:id',services.getposting);
+app.post('/updatePosting',services.updatePosting);
+app.post('/updatepostingStatus',services.updatepostingStatus);
+app.get('/postingbycid/:candidate_id',services.postingbycid);
+app.get('/poshistorybyid/:posting_id',services.poshistorybyid);
+
+
 
 
 

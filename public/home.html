@@ -95,15 +95,16 @@
 									<a href="#" class="dropdown-toggle user-menu" data-toggle="dropdown">
 										<img src="images/user.png">
 										<span>{{name}}</span>
-									</a>
+									</a>							
 									<ul class="dropdown-menu">
 										<li>{{#link-to 'profile'}}<i class="dropdown-icon fa fa-user"></i>&nbsp;&nbsp;Profile{{/link-to}}</li>
-										<li><a href="#" {{action configure}}><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Configure</a></li>
+										{{format-emproles isAdmin}}
+										<!--li>{{#link-to 'configure'}}<i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Configure{{/link-to}}</li-->
 										<li class="divider"></li>
 										<li role="presentation" class="dropdown-header">Insights</li>
 										<li><a href="#" {{action stats}}><i class="dropdown-icon fa  fa-bar-chart-o"></i>&nbsp;&nbsp;Click here ...</a></li>
 										<li class="divider"></li>	
-										<li {{action 'signout'}}><a><i class="dropdown-icon fa fa-power-off" ></i>&nbsp;&nbsp;Log Out</a></li>
+										<li {{action 'signout'}}><a href="#"><i class="dropdown-icon fa fa-power-off" ></i>&nbsp;&nbsp;Log Out</a></li>
 									</ul>
 								</li>
 							</ul> <!-- / .navbar-nav -->
@@ -119,6 +120,48 @@
 	</div>
 </script>
 
+<script type="text/x-handlebars" id="configure">
+	
+	<div class="page-header">
+		<div class="row">
+			<!-- Page header, center on small screens -->
+			<h1 class="col-xs-12 col-sm-4 text-center text-left-sm"><i class="fa fa-edit page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / User Configuration</h1>
+		</div>
+	</div> <!--/.page-header-->
+
+	<div class="row">
+	 	<div class="table-primary">
+			<div class="table-header">
+				<div class="table-caption">
+					Employee Table
+				</div>
+			</div>
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Working for</th>
+						<th>Role</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+				<tbody id='table_configure'>
+					{{#each data}}
+					<tr>
+						<td>{{name}}</td>
+						<td>{{format-country region}}<i class="fa fa-edit pull-right" {{action editRegion email}}></i></td>
+						<td>{{format-emproles role}}<i class="fa fa-edit pull-right" {{action editRole email}}></i></td>
+						<td>{{format-emproles status}}<i class="fa fa-edit pull-right" {{action editStatus email}}></i></td>
+					</tr>
+					{{/each}}
+				</tbody>				
+			</table>	
+			<div class="table-footer">
+				Click on the Edit icon to edit the user data
+			</div>		
+		</div>
+	</div>
+</script>
 
 <script type="text/x-handlebars" id="dashboard">
 	
@@ -244,7 +287,7 @@
 				<div class="col-sm-4" >
 					<div class="panel" id="employee_active">
 						<div class="panel-heading">
-							<span class="panel-title">Available Employees</span>
+							<span class="panel-title">Employees in Bench</span>
 							<div class="panel-heading-controls">
 								<span class="label label-danger"><i class="fa fa-star"></i></span>
 							</div>							
@@ -256,7 +299,6 @@
 									<tr>
 										<th>#</th>
 										<th>Candidate</th>										
-										<th>Created By</th>
 										<th>Created At</th>
 									</tr>
 								</thead-->	
@@ -265,7 +307,7 @@
 									<tr>
 										<td>{{id}}</td>
 										<td>{{#link-to 'candidate' id}}{{name}}{{/link-to}}</td>
-										<td><small>By:</small>&nbsp;{{created_by}}</td>	
+										<td>{{format-cstatus status}}</td>
 										<td><small>At:</small>&nbsp;{{format-date created_date}}</td>									
 									</tr>									
 								</tbody>
@@ -361,7 +403,7 @@
 			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>			
 		</div>
 		{{#view App.AddCandidateView}}
-		<form class="panel form-horizontal"role="form" {{action "savecandidate" on="submit"}}>
+		<div>
 			<div id="alertMsg"></div>
 			<div class="panel-heading">
 				<span class="panel-title">Enter Details</span>
@@ -464,18 +506,18 @@
 
               	<div class="form-group">
                     <label for="comments" class="col-sm-2 control-label">Comments</label>
-                    <div class="col-sm-4">
-                      {{input type="text" class="form-control" id="comments" placeholder="Comments" value=comments}}
+                    <div class="col-sm-4">                      
+                      {{textarea  rows=2 cols=30 class="form-control" id="comments" placeholder="Comments" value=comments}}
                 	</div>
               	</div>
 
               	<div class="form-group">
                     <div class="col-sm-offset-2 col-sm-6">
-                      <button id="addEmpSbmt" type="submit" class="btn btn-primary">Save</button>
+                      <button id="addEmpSbmt" type="submit" class="btn btn-primary" {{action "savecandidate"}}>Save</button>
                     </div>
               	</div>
             </div>
-		</form>
+		</div>
 		{{/view}}
 	</script>
 
@@ -486,7 +528,7 @@
 			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>	
 		</div>
 		{{#view App.AddVacancyView}}
-		<form class="panel form-horizontal"role="form" {{action "savevacancy" on="submit"}}>
+		<div>
 			<div id="alertMsg"></div>
 			<div class="panel-heading">
 				<span class="panel-title">Enter Details</span>
@@ -571,11 +613,11 @@
 
               	<div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                      <button id="addEmpSbmt" type="submit" class="btn btn-primary">Save</button>
+                      <button id="addEmpSbmt" type="submit" class="btn btn-primary" {{action "savevacancy"}}>Save</button>
                     </div>
               	</div>
             </div>
-		</form>
+		</div>
 		{{/view}}
 	</script>
 
@@ -692,7 +734,7 @@
 								<h4 class="modal-title" id="myModalLabel">Update Vacancy</h4>
 							</div>
 							<div class="modal-body">	
-								<form class=""role="form">
+								<div>
 									<input type="hidden" id="vacancyId" {{bind-attr value=id}} >
 
 									<div class="form-group">
@@ -740,7 +782,7 @@
 					                    </div>
 					    	        </div>
 
-								</form>
+								</div>
 							</div> <!-- / .modal-body -->
 							<div class="modal-footer">						
 								<button type="button" class="btn btn-primary" data-dismiss="modal" {{action "UpdateVacancy"}}>Save updates</button>
@@ -847,8 +889,15 @@
 
 	<script type="text/x-handlebars" id="candidate">
 		<div class="page-header">
+			
 			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Candidate</h1>
-			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>			
+		
+			{{format-posting details.active details.id}}		
+		
+			<div class="pull-right col-xs-12 col-sm-auto">
+				<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>
+			</div>
+				
 		</div>
 	<!-- candidate -->
 		<div class="panel panel-info panel-dark widget-profile">
@@ -870,7 +919,7 @@
 				<div class="col-xs-2"><span>{{format-cstats stats "C06"}}</span><br>REJECTED</div>
 			</div>			
 			<div class="widget-profile-text">
-				<p></p><h4>Status : &nbsp; &nbsp;{{format-cstatus details.status}}<p></p>
+				<p></p><h4>Status : &nbsp; &nbsp;{{format-cstatus details.status}}&nbsp;&nbsp;{{format-cstatus details.active "YES"}}<p></p>
 			</div>
 		</div>
 
@@ -885,7 +934,7 @@
 								<h4 class="modal-title" id="myModalLabel">Update Candidate</h4>
 							</div>
 							<div class="modal-body">	
-								<form class=""role="form">
+								<div>
 									<input type="hidden" id="candidateId" {{bind-attr value=details.id}} >
 
 									<div class="form-group">
@@ -948,8 +997,16 @@
 						                <div class="col-sm-2">                     
 					                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCity}} ><span class="btn-label icon fa fa-plus"></span>City</button>
 					                    </div>
-					    	        </div>						    	        			              
-								</form>
+					    	        </div>	
+
+					    	        <div class="form-group">
+					                    <label for="comments" class="col-sm-3 control-label">Comments</label>
+					                    <div class="col-sm-6">
+					                      {{textarea  rows=2 cols=30 class="form-control" id="comments" placeholder="Comments" value=details.comments}}
+					                	</div>
+					              	</div>
+
+								</div>
 							</div> <!-- / .modal-body1 -->
 							<div class="modal-footer">						
 								<button type="button" class="btn btn-primary" data-dismiss="modal" {{action "UpdateCandidate"}}>Save updates</button>
@@ -1041,6 +1098,43 @@
 					</div>
 				</div>
 
+			{{#if emp_posting}}
+				<div class="panel colourable">
+					<div class="panel-heading">
+						<span class="panel-title"><i class="panel-title-icon fa fa-folder-open"></i>Postings</span>
+					</div>
+					<div class="panel-body">
+						<table class="table table-hover">
+						<thead>
+							<tr><td>ID</td><td>Title</td><td>Type</td><td>Status</td><td>created_by</td><td>view</td></tr>
+						</thead>
+							{{#each posting}}							
+								<tr {{action showPosHistory this}}><td>{{id}}</td><td>{{title}}</td><td>{{type}}</td><td>{{format-cstatus status}}&nbsp;&nbsp;<i class="fa fa-edit" {{action UpdatePostingApp this}}></i></td><td>{{created_by}}</td><td>{{#link-to 'posting' id }}<i class="fa fa-eye"></i>{{/link-to}}</td></tr>								
+							{{else}}
+								No Postings.
+							{{/each}}
+
+						</table>
+					</div>
+				</div>
+
+				<div class="panel colourable">
+					<div class="panel-heading">
+						<span class="panel-title"><i class="panel-title-icon fa fa-folder-open"></i>Posting History</span>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+						<thead>
+							<tr><td>Id</td><td>Prev Status</td><td>Curr Status</td><td>Updated on</td><td>Comments</td></tr>
+						</thead>
+							{{#each postinghistory}}
+							<tr><td>{{posting_id}}</td><td>{{format-cstatus prevstatus}}</td><td>{{format-cstatus curstatus}}</td><td>{{format-date updated_time}}</td><td>{{posting_note}}</td></tr>
+							{{/each}}
+						</table>							
+					</div>
+				</div>
+			{{/if}}
+
 				<div class="panel colourable">
 					<div class="panel-heading">
 						<span class="panel-title"><i class="panel-title-icon fa fa-folder-open"></i>Applications</span>
@@ -1098,6 +1192,307 @@
 	<!--/ candidate -->
 	</script>
 
+	<script type="text/x-handlebars" id="addposting">
+		<div class="page-header">
+			
+			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Posting</h1>
+			
+			<div class="pull-right col-xs-12 col-sm-auto">
+				<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>
+			</div>
+				
+		</div>		
+		<div>
+			<div id="alertMsg"></div>
+			<div class="panel-heading">
+				<span class="panel-title">Enter Details</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+                    <label for="name" class="col-sm-2 control-label">Posting Id</label>
+                    <div class="col-sm-4">
+                      {{input type="text" class="form-control" id="postingId" placeholder="Posting Id" value=postingId}}
+                      <input type="hidden" id="candidate_id" {{bind-attr value=candidate_id}} >
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label for="title" class="col-sm-2 control-label">Posting Title</label>
+                    <div class="col-sm-4">
+                      {{input type="text" class="form-control" id="posting" placeholder="Posting Title" value=posting}}
+                    </div>
+                </div>
+
+
+              	<div class="form-group">
+                    <label for="comments" class="col-sm-2 control-label">Description</label>
+                    <div class="col-sm-4">
+                      {{input type="text" class="form-control" id="pos_description" placeholder="Description" value=pos_description}}
+                	</div>
+              	</div>
+
+
+              	<div class="form-group">
+                    <label for="experience" class="col-sm-2 control-label">Experience</label>
+                    <div class="col-sm-2">
+                      {{input type="num" class="form-control" id="min_experience" placeholder="Min" value=min_experience}}
+                    </div><div class="col-sm-2">
+                      {{input type="num" class="form-control" id="max_experience" placeholder="Max" value=max_experience}}
+                    </div>
+              	</div>                  
+
+              	<div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">Skills</label>
+                    <div class="col-sm-6">
+	                      {{#view App.TagsView}}
+	                        {{view Ember.TextArea class="" rows="1" cols="80" id="tags" placeholder="Skills" value=skills cols="60"}}
+	                        <p class="help-block"><b>NOTE :</b> Press Enter key after each skill</p>
+	                      {{/view}}                    
+
+	                </div>
+    	        </div>    	        
+
+    	        <div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">Country</label>
+                    <div class="col-sm-4">
+                        {{view Ember.Select  classNames="form-control" id="country" value=forcountry  content=country}}
+	                </div>
+    	        </div>
+
+    	        <div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">City</label>
+                    <div class="col-sm-4">
+                        {{view Ember.Select  classNames="form-control" id="city" value=forcity  content=city}}
+	                </div>
+	                <div class="col-sm-2">                     
+                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action 'addCity' on="click" bubbles="false"}} ><span class="btn-label icon fa fa-plus"></span>City</button>
+                    </div>
+    	        </div>
+
+        	    <div class="form-group">
+                    <label for="usertype" class="col-sm-2 control-label">Company</label>
+                    <div class="col-sm-4">
+                      {{view Ember.Select  classNames="form-control" id="companies_p" value=forcompany  content=companies_p optionValuePath="content.id" optionLabelPath="content.name"}}                      
+                    </div>	
+                    <div class="col-sm-2">                     
+                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action 'addCompany' }} ><span class="btn-label icon fa fa-plus"></span>Company</button>
+                    </div>
+                </div>               
+
+              	<div class="form-group">
+                    <label for="country" class="col-sm-2 control-label">Type</label>
+                    <div class="col-sm-4">
+                      {{view Ember.Select  classNames="form-control" id="types_p"  value=types_p   content=types }}
+                	</div>
+              	</div>
+
+              	<div class="form-group">
+                    <label for="country" class="col-sm-2 control-label">Employment Type</label>
+                    <div class="col-sm-4">
+                      {{view Ember.Select  classNames="form-control" id="etypes_p"  value=etypes_p   content=employment_types }}
+                	</div>
+              	</div>
+
+              	<div class="form-group">
+                    <label for="country" class="col-sm-2 control-label">Status</label>
+                    <div class="col-sm-4">
+                      {{view Ember.Select  classNames="form-control" id="status_p"  value=status_p   content=statuses optionValuePath="content.id" optionLabelPath="content.name"}}
+                	</div>
+              	</div>
+
+              	<div class="form-group">
+                    <label for="comments" class="col-sm-2 control-label">Comments</label>
+                    <div class="col-sm-4">                      
+                      {{textarea  rows=2 cols=30 class="form-control" id="note" placeholder="Note" value=notes}}
+                	</div>
+              	</div>	
+
+              	<div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <button type="submit" class="btn btn-primary"  {{action "saveposting"}}>Save</button>
+                    </div>
+              	</div>
+            </div>
+		</div>
+	</script>
+
+	<script type="text/x-handlebars" id="posting">
+		<div class="page-header">
+			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Posting</h1>
+			<button class="pull-right btn btn-outline btn-primary " onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>	
+		</div>
+
+		<div class="panel panel-info panel-dark widget-profile">
+			<div class="panel-heading">
+				<div class="widget-profile-bg-icon"><i class="fa fa-money"></i></div>
+				<div class="widget-profile-header">
+					<span>{{title}}</span><br/><br/>					
+					<label class="badge badge-primary">{{type}}</label>	
+				</div>
+			</div> <!-- / .panel-heading -->					
+			<div class="widget-profile-text">								
+				<p>{{description}}</p>			
+			</div>
+		</div>
+
+		<div class="row">
+
+			<div class="col-sm-12">
+				<div id="UpdatePostingForm" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true"}}>×</button>
+								<h4 class="modal-title" id="myModalLabel">Update Posting</h4>
+							</div>
+							<div class="modal-body">	
+								<div>
+									<input type="hidden" id="postingId" {{bind-attr value=id}} >
+
+									<!--div class="form-group">
+					                    <label for="title" class="col-sm-4 control-label">Title</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="title" placeholder="title" value=title}}
+					                    </div>
+					                </div-->
+
+					                <div class="form-group">
+					                    <label for="description" class="col-sm-4 control-label">Posting Description</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="description_p" placeholder="description" value=description}}
+					                    </div>
+					                </div>
+
+					                 <div class="form-group">
+					                    <label for="usertype" class="col-sm-4 control-label">Company</label>
+					                    <div class="col-sm-6">
+					                      {{view Ember.Select  classNames="form-control" id="companies_p" value=forcompany  content=companies_p optionValuePath="content.id" optionLabelPath="content.name"}}                      
+					                    </div>	
+					                    <!--div class="col-sm-4"></div-->
+					                    <div class="col-sm-2">                     
+					                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCompany}} ><span class="btn-label icon fa fa-plus"></span>Company</button>
+					                    </div>
+					                </div> 
+
+					                <div class="form-group">
+					                    <label for="exp_min" class="col-sm-4 control-label">Min Experience</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="exp_min_p" placeholder="Min Exp" value=exp_min}}
+					                    </div>
+					                </div>
+
+					                <div class="form-group">
+					                    <label for="exp_max" class="col-sm-4 control-label">Max Experience</label>
+					                    <div class="col-sm-6">
+					                      {{input type="text" class="form-control" id="exp_max_p" placeholder="Max Exp" value=exp_max}}
+					                    </div>
+					                </div>
+
+					                <div class="form-group">
+					                    <label for="city" class="col-sm-4 control-label">City</label>
+					                    <div class="col-sm-6">
+					                        {{view Ember.Select  classNames="form-control" id="p_city" value=""  content=v_city}}
+						                </div>
+						                <div class="col-sm-2">                     
+					                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCity}} ><span class="btn-label icon fa fa-plus"></span>City</button>
+					                    </div>
+					    	        </div>
+
+					                <div class="form-group">
+					                    <label for="type" class="col-sm-4 control-label">Type</label>
+					                    <div class="col-sm-6">
+					                      {{view Ember.Select  classNames="form-control" id="types_p"  value=types_p   content=types }}
+					                	</div>
+					              	</div>
+
+					              	<div class="form-group">
+					                    <label for="country" class="col-sm-4 control-label">Employment Type</label>
+					                    <div class="col-sm-6">
+					                      {{view Ember.Select  classNames="form-control" id="etypes"  value=etypes_p   content=employment_types }}
+					                	</div>
+					              	</div>
+
+					              	<div class="form-group">
+					                    <label for="comments" class="col-sm-4 control-label">Comments</label>
+					                    <div class="col-sm-6">                      
+					                      {{textarea  rows=2 cols=30 class="form-control" id="note" placeholder="Note" value=comments}}
+					                	</div>
+					              	</div>
+
+								</div>
+							</div> <!-- / .modal-body -->
+							<div class="modal-footer">						
+								<button type="button" class="btn btn-primary" data-dismiss="modal" {{action "UpdatePosting"}}>Save updates</button>
+							</div><!--/.modal-footer -->
+						
+						</div> <!-- / .modal-content -->
+					</div> <!-- / .modal-dialog -->
+				</div> <!-- /.modal -->
+				<!-- / Modal -->
+				<div class="panel colourable">
+					<div class="panel-heading">
+						<span class="panel-title"><i class="panel-title-icon fa fa-info"></i>Details</span>
+						<div class="panel-heading-controls">
+							<div class="btn btn-xs panel-heading-icon" data-toggle="modal" data-target="#UpdatePostingForm" {{action 'loadCity'}}><i class="fa fa-edit"></i>&nbsp;Edit</div>
+						</div>								
+					</div>
+					<div class="panel-body">
+
+						<table id="user" class="table table-bordered table-striped" style="clear: both">
+							<tbody>
+								<tr>
+									<td>Skills</td>
+									<td>{{format-skill skills}}</td>
+								</tr>
+								<tr>
+									<td>Company</td>
+									<td>{{company_id}}</td>
+								</tr>
+								<tr>
+									<td>Type of Posting</td>
+									<td>{{type}}</td>
+								</tr>
+								<tr>
+									<td>Type of Employment</td>
+									<td>{{employment_type}}</td>
+								</tr>
+								<tr>
+									<td>Min Experience</td>
+									<td>{{exp_min}}</td>
+								</tr>
+								<tr>
+									<td>Max Experience</td>
+									<td>{{exp_max}}</td>
+								</tr>
+								<tr>
+									<td>City</td>
+									<td>{{city}}</td>
+								</tr>
+								<tr>
+									<td>Country</td>
+									<td>{{country}}</td>
+								</tr>
+								<tr>
+									<td>Note</td>
+									<td>{{comments}}</td>
+								</tr>								
+								<tr>
+									<td>Posted by</td>
+									<td>{{created_by}}</td>
+								</tr>
+								<tr>
+									<td>Posted Date</td>
+									<td>{{format-date created_date}}</td>
+								</tr>								
+							</tbody>
+						</table>
+					</div>
+				</div>			
+			</div>
+
+		</div><!--/.row-->
+
+	</script>
 
 	<script type="text/x-handlebars" id="profile">
 
@@ -1110,11 +1505,11 @@
 					</div>
 					<div class="modal-body">	
 						<div>					
-							{{input type="text" class="form-control" id="description" placeholder="Description" value=description}}
+							{{textarea rows=2 cols=30 class="form-control" id="description" placeholder="Description" value=userdata.description}}
 						</div>
 						&nbsp;&nbsp;
 						<div class="">
-							{{input type="text" class="form-control" id="mobile_number" placeholder="Mobile Number" value=mobile_number}}
+							{{input type="text" class="form-control" id="mobile_number" placeholder="Mobile Number" value=userdata.mobile_number}}
 						</div>
 					</div> <!-- / .modal-body -->
 					<div class="modal-footer">						

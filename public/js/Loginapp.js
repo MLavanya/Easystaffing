@@ -9,8 +9,8 @@ App = Ember.Application.create({
             }
             return "";
           }
-          var user=getCookie("email");
-          if(user !=""){
+          var email=getCookie("email");
+          if(email !=""){
             window.location = 'home.html';
           }
         }
@@ -22,7 +22,7 @@ App.Router.map(function() {
 });
 
 App.IndexRoute = Ember.Route.extend({
-  	afterModel:function(){
+  	afterModel:function(){      
    		this.transitionTo("login");
   	}
 });

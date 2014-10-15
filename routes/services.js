@@ -1,4 +1,4 @@
-    
+
 var pool=require('./databaseconnection');    
 var fs = require('fs');
 var mammoth = require("mammoth");
@@ -25,7 +25,9 @@ exports.register = function(req, res) {
         "username"      :user.username,
         "name"          :user.name,
         "password"      :password,
-        "region"        :user.region
+        "region"        :user.region,
+        "role"          :2,
+        "status"        :'e01'
     }
 
     pool.getConnection(function(err,con){
@@ -56,13 +58,16 @@ exports.register = function(req, res) {
 
     });
 
- }
+}
 
 exports.login = function(req, res) {
 
-var email=req.body.email;
-var pwd=req.body.password;
-var password = cryptr.encrypt(pwd);
+    var emailPrefix=req.body.email;
+    var email = emailPrefix+"@srsconsultinginc.com";
+    var pwd=req.body.password;
+    var password = cryptr.encrypt(pwd);
+    var admin;
+    var rolescnt;
 
     pool.getConnection(function(err,con){
 
@@ -72,23 +77,41 @@ var password = cryptr.encrypt(pwd);
 
         con.connect();
 
-        con.query('SELECT email,name,region  from user where email="'+email+'" and password="'+password+'"', function(err, rows, fields) {
-           if (err) throw err;
+        con.query('SELECT email,role from user where role LIKE "%4%" and email=?',[email], function(err, rows, fields){
+            if (err) throw err;
+            //console.log(" split(",") "+rows[0].role.split(","));                    
+            if(rows.length>0){
+                var roles = rows[0].role.split(","); 
+                rolescnt = roles.length; 
+                admin = true;
+            }else if (rows.length <= 0){                
+                admin = false;
+                rolescnt = 2;
+            }           
+        });
 
-           if(rows.length <= 0)
+        con.query('SELECT email,name,region,status  from user where email="'+email+'" and password="'+password+'"', function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length <= 0)
                 //con.release();
                 res.send({status:401});
-           else{
-             con.release();
-             res.send({
-                status:200,
-                email:rows[0].email,
-                name: rows[0].name,
-                region: rows[0].region,
-                redirectTo : "home.html"
-            });            
-           }
-       });        
+            else if(rows[0].status== 'e02'){
+                res.send({status:401});
+            }
+                else{
+                    con.release();
+                    res.send({
+                        status:200,
+                        email:rows[0].email,
+                        name: rows[0].name,
+                        region: rows[0].region,
+                        admin : admin,
+                        rolescnt : rolescnt,
+                        redirectTo : "home.html"
+                    });            
+               }
+        });        
 
     });       
 
@@ -101,7 +124,6 @@ exports.validateadm = function(req, res) {
     }else{
         res.send("failure");
     }
-
 }
 
 exports.me = function(req, res) {
@@ -171,39 +193,6 @@ exports.saveCandidate = function(req, res) {
         });
     });
 
-}
-
-exports.candidateretreive = function(req, res) {
-    pool.getConnection(function(err,con){
-
-        if(err){
-            console.log("Error connection to the db.");
-        }
-
-        con.connect();
-        con.query('SELECT *  from candidate', function(err, rows, fields) {
-            if (err) throw err;
-
-            con.release();
-            res.send(rows);
-        });         
-    });       
-}
-
-exports.candidateupdate = function(req, res) {
-    pool.getConnection(function(err,con){
-
-        if(err){
-            console.log("Error connection to the db.");
-        }
-        con.connect();
-        con.query('update candidate set ', function(err, rows, fields) {
-            if (err) throw err;
-
-            con.release();
-            res.send(rows);
-        });       
-    });
 }
 
 exports.saveVacancies = function(req, res) {
@@ -288,64 +277,6 @@ exports.getvacancy = function(req, res) {
     });       
 }
 
-exports.vacancyretreive = function(req, res) {
-
-    pool.getConnection(function(err,con){
-
-        if(err){
-            console.log("Error connection to the db.");
-        }
-
-        con.connect();
-        con.query('SELECT *  from vacancy', function(err, rows, fields) {
-            if (err) throw err;
-
-            con.release();
-            res.send(rows);
-        });         
-
-    });       
-}
-
-exports.vacancyupdate = function(req, res) {
-    pool.getConnection(function(err,con){
-
-        if(err){
-            console.log("Error connection to the db.");
-        }
-
-        con.connect();
-
-        con.query('update vacancy set ', function(err, rows, fields) {
-            if (err) throw err;
-
-            con.release();
-            res.send(rows);
-        });         
-
-    });
-
-}
-
-/*exports.companies = function(req, res) {
-
-    pool.getConnection(function(err,con){
-
-        if(err){
-            console.log("Error connection to the db.");
-        }
-
-        con.connect();
-        con.query('SELECT *  from company', function(err, rows, fields) {
-            if (err) throw err;
-
-            con.release();
-            res.send(rows);
-        });         
-
-    });       
-}*/
-
 exports.getcandidate = function(req, res) {    
     pool.getConnection(function(err,con){
         if(err){
@@ -365,7 +296,10 @@ exports.getcandidate = function(req, res) {
                 data_result.details = rows[0];
                 data_result.applications = [];
                 data_result.apphistory = [];
+                data_result.postinghistory = [];
                 data_result.stats = [];
+                data_result.posting = [];
+                data_result.emp_posting = false;
 
                 fs.readFile(docPath, function (err, data) {                   
                     var newFilePath = __dirname+"/uploads/";
@@ -377,6 +311,15 @@ exports.getcandidate = function(req, res) {
                         //var messages = result.messages; // Any messages, such as warnings during conversion  
 
                         data_result.docFile = html;
+
+                        con.query('SELECT posting.id,posting.title,posting.type,posting.status,posting.created_by from posting where posting.candidate_id = ? ', [data_result.details.id],function(err, rows, fields) {
+                            if (err) throw err;
+
+                            if(rows.length > 0){
+                                data_result.posting = rows;
+                                data_result.emp_posting = true;
+                            }
+                        });
 
                         con.query('SELECT application.id,application.status,vacancy.name,vacancy.title,vacancy.status as vacancy_status from application,vacancy,candidate where application.candidate_id = candidate.id and application.vacancy_id = vacancy.id and application.candidate_id = ? ', [data_result.details.id],function(err, rows, fields) {
                             if (err) throw err;
@@ -579,7 +522,8 @@ exports.applicationbycid = function(req, res) {
             }
         });         
 
-    });       
+    });   
+        
 }
 
 exports.applicationbyvid = function(req, res) {
@@ -630,7 +574,6 @@ exports.apphistorybyid = function(req, res) {
 
     });       
 }
-
 
 exports.getUserdata = function(req,res){
     
@@ -745,9 +688,6 @@ exports.updateappstatus = function(req,res){
 
             });
         });                            
-
-
-
     });
 }
 
@@ -801,7 +741,7 @@ exports.dashboardDetails = function(req, res) {
                 if (err) throw err;
                 available=rows.length;
             });
-            con.query('SELECT *  from candidate where active="YES" and status="C01" and country=? order by created_date asc',[region_], function(err, rows, fields) {
+            con.query('SELECT *  from candidate where active="YES" and status in("C01","C02","C03","C04") and country=? order by created_date asc',[region_], function(err, rows, fields) {
                 if (err) throw err;
                 employee_active = rows;            
             });
@@ -849,9 +789,9 @@ exports.dashboardDetails = function(req, res) {
                 if (err) throw err;
                 available=rows.length;                
             });
-            con.query('SELECT *  from candidate where active="YES" and status="C01" order by created_date asc', function(err, rows, fields) {
+            con.query('SELECT *  from candidate where active="YES" and status in("C01","C02","C03","C04") order by created_date asc', function(err, rows, fields) {
                 if (err) throw err;
-                employee_active = rows;            
+                employee_active = rows; 
             });
             con.query('SELECT *  from vacancy where status="OPEN"' , function(err, rows, fields) {
                 if (err) throw err;
@@ -904,9 +844,9 @@ exports.updateCompany = function(req,res){
 
         con.connect();
 
-        con.query('SELECT * from company where name = ?', [company], function(err, rows, fields) {
+        con.query('SELECT name from company where ?', [company], function(err, rows, fields) {
                 
-            if (err) throw err;
+            if (err) throw err;            
 
             if(rows.length > 0){
                 con.release();   
@@ -928,6 +868,7 @@ exports.updateCompany = function(req,res){
 exports.UpdateCandidate = function(req,res){
     var candidateData = req.body;
     var id = candidateData.id;
+    candidateData.updated_time = new Date();
    
     pool.getConnection(function(err,con){
         if(err){
@@ -946,7 +887,8 @@ exports.UpdateCandidate = function(req,res){
                 "cemail" : {"set": candidateData.email},
                 "ccity" : {"set": candidateData.city},
                 "calt_email" : {"set": candidateData.alt_email},
-                "calt_phone" : {"set": candidateData.alt_phone}
+                "calt_phone" : {"set": candidateData.alt_phone},
+                "ccomments"  : {"set": candidateData.comments}
             });
             res.send({"status":200,"statusText":"updated Successfully"});
         });
@@ -979,6 +921,7 @@ exports.UpdateVacancy = function(req,res){
 
     var vacancyData = req.body;
     var id = vacancyData.id;
+    vacancyData.updated_time = new Date();
     
     pool.getConnection(function(err,con){
         if(err){
@@ -1029,6 +972,229 @@ exports.updateCity = function(req,res){
         });
     });
 }
+
+exports.userList = function(req,res){
+
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT name,region,role,status,email from user', function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();
+                res.send({data:rows})
+            }
+        });
+    });
+
+}
+
+exports.roles = function(req,res){
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('SELECT *  from roles',function(err, rows, fields) {
+            if (err) throw err;                                
+            con.release();
+            res.send(rows);
+        });
+    });
+}
+
+exports.updateUser = function(req,res){
+    var userdata = req.body;
+    
+    var email = userdata.email;
+
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('UPDATE user set ? WHERE email = ?',[userdata,email], function(err, rows, fields) {
+            con.release();
+            res.send({message:"Updated Successfully"});
+        });        
+    });
+}
+
+exports.savePosting = function(req,res){
+    
+    var postingdetails = req.body;
+    postingdetails.created_by = req.cookies.email;
+    postingdetails.updated_time = moment();
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+
+        var query = con.query('INSERT INTO posting SET ?', postingdetails, function(err, result) {
+                
+            if (err) throw err;
+
+            con.release();
+            postingdetails.id = result.insertId;           
+            res.send({message:"posting saved"});
+            
+        });
+
+    });
+}
+
+exports.getposting = function(req,res){
+    var company;    
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT *  from posting where id = ?', [req.params.id],function(err, rows, fields) {
+            if (err) throw err;            
+
+            if(rows.length > 0){
+                
+                con.query('SELECT name  from company where id = ?', [rows[0].company_id],function(err, company, fields) {
+                    if (err) throw err;                    
+                    company = company[0].name;
+                    rows[0].company_id = company;
+                });                
+                var data = rows[0];                
+                data.stats=[];
+
+                con.query('SELECT status , count(*) as cnt FROM posting WHERE id = ? GROUP BY STATUS ',[req.params.id],function(err, rows, fields) {
+                    if (err) throw err;                                
+
+                    if(rows.length > 0){
+                        data.stats = rows;
+                    }
+
+                    con.release();                                
+                    res.send(data);
+
+                });                     
+               
+            }else{
+                con.release();
+                res.send({});                
+            }
+        });         
+
+    }); 
+}
+
+exports.updatePosting = function(req,res){
+
+    var postingdetails = req.body;
+    var id = postingdetails.id;
+    postingdetails.updated_time = new Date();
+    
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('UPDATE posting set ? WHERE id = ?',[postingdetails,id], function(err, rows, fields) {
+            if (err) throw err;
+                                         
+            con.release();           
+            res.send({"status":200,"message":"updated Successfully"});
+        });
+    });
+
+}
+
+
+exports.updatepostingStatus = function(req,res){
+   
+    pool.getConnection(function(err,con){
+        if(err){
+            console.log("Error connection to the db.");
+        }
+        con.connect();
+        con.query('UPDATE posting set ? WHERE id = ?',[req.body.data,req.body.id], function(err, rows, fields) {
+            con.query('insert into posting_h set ? ',req.body.history, function(err,result) {                
+                
+                req.body.comment.posting_h_id = result.insertId;
+                
+                if(req.body.data.status == "C06")
+                  req.body.data.status = "C01";
+                con.query('UPDATE candidate set ? WHERE id = ?',[req.body.data,req.body.candidate_id], function(err, rows, fields) {
+                                       
+                    req.body.comment.created_by = req.cookies.email;
+                    con.query('insert into comments set ? ',req.body.comment, function(err,result) {
+                      //console.log("inserted" + JSON.stringify(result));
+                      con.release();
+                      res.send({message:"Updated Successfully"});
+                    });
+                    
+                });                            
+
+            });
+        });                            
+    });  
+
+}
+
+exports.postingbycid = function(req, res) {
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT posting.id,posting.status,posting.type,posting.title from posting,candidate where posting.candidate_id = candidate.id and posting.candidate_id = ?', [req.params.candidate_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();                
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });   
+}
+
+exports.poshistorybyid = function(req, res) {
+    
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();        
+        con.query('SELECT posting_h.id,posting_h.posting_id,posting_h.prevstatus,posting_h.curstatus,posting_h.updated_time,comments.posting_note from posting_h,comments where posting_h.id = comments.posting_h_id and posting_id = ?', [req.params.posting_id],function(err, rows, fields) {
+            if (err) throw err;
+
+            if(rows.length > 0){
+                con.release();                
+                res.send(rows);
+            }else{
+                con.release();
+                res.send([]);                
+            }
+        });         
+
+    });       
+}
+
 
 /*-------------------------------*/
 // Solr API

@@ -36,13 +36,10 @@ App.LoginController=Ember.Controller.extend({
                             var email = data.email; 
                             var region = data.region; 
                             setCookie("email", email, 30);
-                            setCookie("region", region, 30); 
-                            /*bootbox.alert({
-                                message: "Successfully Logged-In",
-                                callback: function(result) {*/
-                                    window.location = data.redirectTo; //redirects to the main page
-                             /*   }
-                            });*/
+                            setCookie("isAdmin", data.admin, 30);
+                            setCookie("rolescnt", data.rolescnt,30);
+                            setCookie("region", region, 30);                             
+                                window.location = data.redirectTo; //redirects to the main page                             
                         } else{
                             bootbox.alert({
                                 message: "Invalid User",                                                          
@@ -73,16 +70,18 @@ App.SignupController=Ember.Controller.extend({
             var password = $("#signuppassword_id").val();
             var region =$(".radio-inline input[type='radio']:checked").val();            
 
-            var emailreg = /^([a-zA-Z0-9_\.\-])+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+            var emailreg = /^([a-zA-Z0-9_\.\-])+@srsconsultinginc.com/;
             var namereg =/^[a-zA-Z][a-zA-Z\\s0-9]+$/;
             if(name == "" || email == "" || username == "" || password == ""){
-                bootbox.alert('some of the required fields are Empty!!');
+                bootbox.alert('some of the required fields are to be filled!!');
             }
             else if(!namereg.test(username)){
                 bootbox.alert('Enter valid Name');
             }
             else if(!emailreg.test(email)){
-                bootbox.alert('Enter the valid email address');
+                bootbox.alert('Enter the valid SRS email address');
+            }else if (!region) {
+                bootbox.alert("select the region you work for !")
             }
             else{
                 var adddetails={};
@@ -110,7 +109,9 @@ App.SignupController=Ember.Controller.extend({
 
 });
 
-//set cookie for username
+/******
+set cookie 
+******/
 function setCookie(cname,cvalue,exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
