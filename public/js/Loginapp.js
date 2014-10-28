@@ -19,6 +19,8 @@ App = Ember.Application.create({
 App.Router.map(function() {
    this.resource('login');
    this.resource('signup');
+   this.resource('forgotPassword');
+   this.resource('changePassword',{ path: '/changePassword/:email'});
 });
 
 App.IndexRoute = Ember.Route.extend({
@@ -57,5 +59,12 @@ App.SignupRoute = Ember.Route.extend({
         });        
 
     }
-})
+});
+
+App.ChangePasswordRoute = Ember.Route.extend({
+    model:function(params){            
+      return [{'email':params.email}];
+    }
+});
+
 

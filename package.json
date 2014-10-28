@@ -17,7 +17,10 @@
     "mammoth": "^0.3.9",
     "solr-client": "^0.3.0",
     "mysql": "^2.4.3",
-    "cryptr": "^1.0.0"
+    "cryptr": "^1.0.0",
+    "node-uuid": "^1.4.1",
+    "email-templates": "^1.1.2",
+    "nodemailer": "^0.7.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

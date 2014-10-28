@@ -521,6 +521,132 @@
 		{{/view}}
 	</script>
 
+
+	<script type="text/x-handlebars" id="addcandidateV">
+		<div class="page-header">
+			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Add Candidate</h1>
+			<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>			
+		</div>
+		{{#view App.AddCandidateView}}
+		<div>
+			<div id="alertMsg"></div>
+			<div class="panel-heading">
+				<span class="panel-title">Enter Details</span>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+                    <label for="name" class="col-sm-2 control-label">Name</label>
+                    <div class="col-sm-4">
+                      {{input type="text" class="form-control" id="name" placeholder="Name" value=firstname}}
+                      <input type="hidden" id="vacancy_id" {{bind-attr value=vacancy_id}} >
+                    </div>
+                </div>
+				
+				<div class="form-group">
+                    <label for="title" class="col-sm-2 control-label">Title</label>
+                    <div class="col-sm-4">
+                      {{input type="text" class="form-control" id="title" placeholder="Title" value=title}}
+                    </div>
+                </div>
+
+              	<div class="form-group">
+                    <label for="email" class="col-sm-2 control-label">Email</label>
+	                <div class="col-sm-4">
+    	              {{input type="email" class="form-control" id="Cemail" placeholder="Email" value=email}}
+        	        </div>
+        	        <label for="email" class="col-sm-2 control-label">Alternate Email</label>
+        	        <div class="col-sm-4">
+    	              {{input type="email" class="form-control" id="alt_email" placeholder="Alt-Email" value=alt_email}}
+        	        </div>
+
+            	</div>
+
+              	<div class="form-group">
+                    <label for="experience" class="col-sm-2 control-label">Experience</label>
+                    <div class="col-sm-4">
+                      {{input type="num" class="form-control" id="experience" placeholder="Experience" value=experience}}
+                    </div>
+              	</div>                  
+
+              	<div class="form-group">
+                	<label for="phone" class="col-sm-2 control-label">Phone</label>
+                	<div class="col-sm-4">
+                      {{input type="tel" class="form-control" id="phone" placeholder="Phone" value=phone}}
+                    </div>
+                    <label for="alt-phone" class="col-sm-2 control-label">Alternate Phone</label>
+                	<div class="col-sm-4">
+                      {{input type="tel" class="form-control" id="alt_phone" placeholder="Alt-Phone" value=alt_phone}}
+                    </div>
+              	</div>
+
+
+              	<div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">Skills</label>
+                    <div class="col-sm-4">
+	                      {{#view App.TagsView}}
+	                        {{view Ember.TextArea class="" rows="1" cols="80" id="tags" placeholder="Skills" value=skills cols="60"}}
+	                        <p class="help-block"><b>NOTE :</b> Press Enter key after each skill</p>
+	                      {{/view}}                    
+
+	                </div>
+    	        </div>
+
+    	        <div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">Country</label>
+                    <div class="col-sm-4">
+                        {{view Ember.Select  classNames="form-control" id="country" value=forcountry  content=country}}
+	                </div>
+    	        </div>
+
+    	        <div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">City</label>
+                    <div class="col-sm-4">
+                        {{view Ember.Select  classNames="form-control" id="city" value=forcity  content=city}}
+	                </div>
+	                <div class="col-sm-2">                     
+                      <button id="ui-bootbox-prompt" class="btn btn-outline btn-primary btn-sm btn-labeled" {{action addCity}} ><span class="btn-label icon fa fa-plus"></span>City</button>
+                    </div>
+    	        </div>
+
+              	<div class="form-group">
+                    <label for="" class="col-sm-2 control-label">Resume / CV </label>
+                    <div class="col-sm-4">
+                     {{#view App.CVUploadTool name="file" data-url="/uploadcv" id="uploadcv"}}{{/view}}
+                      <label class="uploadedfile" style="display:none;"></label> 
+	                </div>
+    	        </div>
+             
+              	<div class="form-group">
+                    <label for="country" class="col-sm-2 control-label">Prescreening Status</label>
+                    <div class="col-sm-4">
+                      {{view Ember.Select  classNames="form-control" id="status"  value=status   content=statuses optionValuePath="content.id" optionLabelPath="content.name"}}
+                	</div>
+              	</div>
+
+              	<div class="form-group">
+                    <label for="skills" class="col-sm-2 control-label">Employee</label>
+                    <div class="col-sm-4">
+                        {{view Ember.Select  classNames="form-control" id="employee" value=foremployee  content=employee}}
+	                </div>
+    	        </div>
+
+              	<div class="form-group">
+                    <label for="comments" class="col-sm-2 control-label">Comments</label>
+                    <div class="col-sm-4">                      
+                      {{textarea  rows=2 cols=30 class="form-control" id="comments" placeholder="Comments" value=comments}}
+                	</div>
+              	</div>
+
+              	<div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-6">
+                      <button id="addEmpSbmt" type="submit" class="btn btn-primary" {{action "savecandidate"}}>Save & Apply</button>
+                    </div>
+              	</div>
+            </div>
+		</div>
+		{{/view}}
+	</script>
+
 	<script type="text/x-handlebars" id="addvacancy">
 
 		<div class="page-header">
@@ -701,6 +827,14 @@
 
 		<div class="page-header">
 			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Vacancy</h1>
+			{{#if isOpen}}
+				<div class="pull-right col-xs-12 col-sm-auto">
+		  			{{#link-to 'addcandidateV' id}}
+		  				<button class="btn btn-outline btn-primary btn-labeled">
+		  				<span class="btn-label icon fa fa-plus"></span>&nbsp;&nbsp;Candidate &nbsp;&nbsp;</button>
+		  			{{/link-to}}
+		  		</div>
+	  		{{/if}}	
 			<button class="pull-right btn btn-outline btn-primary " onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>	
 		</div>
 
@@ -891,8 +1025,13 @@
 		<div class="page-header">
 			
 			<h1><i class="fa fa-search page-header-icon"></i>&nbsp;&nbsp;Easy Staffing / Candidate</h1>
-		
-			{{format-posting details.active details.id}}		
+					
+			<div class="pull-right col-xs-12 col-sm-auto">
+	  			{{#link-to 'addposting' details.id}}
+	  				<button class="btn btn-outline btn-primary btn-labeled">
+	  				<span class="btn-label icon fa fa-plus"></span>&nbsp;&nbsp;Posting &nbsp;&nbsp;</button>
+	  			{{/link-to}}
+	  		</div>		
 		
 			<div class="pull-right col-xs-12 col-sm-auto">
 				<button class="pull-right btn btn-outline btn-primary" onclick="window.history.back()"><span class="fa fa-arrow-left"></span> Back</button>
@@ -989,6 +1128,12 @@
 						                </div>
 					    	        </div-->					    	     
 
+					    	        <div class="form-group">
+					                    <label for="skills" class="col-sm-3 control-label">Employee</label>
+					                    <div class="col-sm-6">
+					                        {{view Ember.Select  classNames="form-control" id="update_emp" value=foremployee  content=employee}}
+						                </div>
+					    	        </div>
 					    	        <div class="form-group">
 					                    <label for="city" class="col-sm-3 control-label">City</label>
 					                    <div class="col-sm-6">

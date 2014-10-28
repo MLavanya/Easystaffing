@@ -154,7 +154,7 @@
 					</div> <!-- / .signin-text -->
 
 					<div class="form-group w-icon">
-						<input type="text" name="signin_username" id="email_id" class="form-control input-lg" placeholder="Enter Email-Prefix">
+						<input type="text" name="signin_username" id="email_id" class="form-control input-lg" placeholder="Email Prefix">
 						<span class="fa fa-user signin-form-icon"></span>
 					</div> <!-- / Username -->
 
@@ -165,7 +165,7 @@
 				
 					<div class="form-actions">
 						<input type="submit" value="SIGN IN" class="signin-btn bg-primary" {{action 'signinclick'}}>
-						<a href="#" class="forgot-password" id="forgot-password-link">Forgot your password?</a>
+						<a href="#" class="forgot-password" id="forgot-password-link">{{#link-to 'forgotPassword'}}Forgot your password?{{/link-to}}</a>
 					</div> 
 
 
@@ -198,6 +198,115 @@
 	</div> <!-- / .modal -->
 	<!-- / Success -->
  </script>
+
+<script type="text/x-handlebars" id="forgotPassword">
+	
+	<div class="theme-default page-signup">
+	<div id="page-signup-bg">
+			<!-- Background overlay -->
+			<div class="overlay"></div>
+			<!-- Replace this with your bg image -->
+			<img src="assets/demo/signin-bg-1.jpg" alt="">
+		</div>
+		<!-- / Page background -->
+
+		<!-- Container -->
+		<div class="signup-container">
+			<!-- Header -->
+			<div class="signup-header">
+				<a href="index.html" class="logo">
+					<img src="assets/demo/logo-big.png" alt="" style="margin-top: -5px;">&nbsp;
+					EasyAdmin
+				</a> <!-- / .logo -->
+				<div class="slogan">
+					Simple. Flexible. Powerful.
+				</div> <!-- / .slogan -->
+			</div>
+			<!-- / Header -->
+
+			<!-- Form -->
+			<form class="panel form-horizontal"role="form">	
+				<div class="signup-form">
+					<div class="signup-text">
+						<span>Enter your registered Email Id</span>
+					</div>
+					
+					<div class="form-group w-icon">
+						{{input type="text" name="signup_email" id="email_id_fp" class="form-control input-lg" placeholder="E-mail"}}
+						<span class="fa fa-envelope signup-form-icon"></span>
+					</div>				
+
+					<div class="form-actions">
+						<input type="button" value="Send mail" class="signup-btn bg-primary" {{action 'PasswordLink'}}>
+					</div>
+				</div>
+			</form>
+			<!-- Right side -->
+		</div>
+
+			<div class="have-account">
+			Back to login page? <a href="#">{{#linkTo 'login'}}sign in{{/linkTo}}</a>
+
+	</div>
+</script>
+
+<script type="text/x-handlebars" id="changePassword">
+	
+	<div class="theme-default page-signup">
+	<div id="page-signup-bg">
+			<!-- Background overlay -->
+			<div class="overlay"></div>
+			<!-- Replace this with your bg image -->
+			<img src="assets/demo/signin-bg-1.jpg" alt="">
+		</div>
+		<!-- / Page background -->
+
+		<!-- Container -->
+		<div class="signup-container">
+			<!-- Header -->
+			<div class="signup-header">
+				<a href="index.html" class="logo">
+					<img src="assets/demo/logo-big.png" alt="" style="margin-top: -5px;">&nbsp;
+					EasyAdmin
+				</a> <!-- / .logo -->
+				<div class="slogan">
+					Simple. Flexible. Powerful.
+				</div> <!-- / .slogan -->
+			</div>
+			<!-- / Header -->
+
+			<!-- Form -->
+			<form class="panel form-horizontal"role="form">	
+				<div class="signup-form">
+					<div class="signup-text">
+						<span>Enter Password</span>
+					</div>
+					
+					<div class="form-group w-icon">
+					{{#each model}}<input type="hidden" id="email" {{bind-attr value=email}} >{{/each}}
+						{{input type="password" name="change_password" id="change_password" class="form-control input-lg" placeholder="New Password"}}
+						<span class="fa fa-lock signup-form-icon"></span>
+					</div>	
+
+					<div class="form-group w-icon">
+						{{input type="password" name="change_password" id="confirm_password" class="form-control input-lg" placeholder="Confirm Password"}}
+						<span class="fa fa-lock signup-form-icon"></span>
+					</div>				
+
+					<div class="form-actions">
+						<input type="button" value="Update Password" class="signup-btn bg-primary" {{action 'changePassword'}}>
+					</div>
+				</div>
+			</form>
+			<!-- Right side -->
+		</div>
+
+			<div class="have-account">
+			Back to login page? <a href="#">{{#linkTo 'login'}}sign in{{/linkTo}}</a>
+
+	</div>
+</script>
+
 
 <script type="text/x-handlebars" id="signup">
 
@@ -267,7 +376,7 @@
 				
 				<div class="form-group" style="margin-top: 20px;margin-bottom: 20px;">
 					<label class="checkbox-inline">
-						<input type="checkbox" name="signup_confirm" class="px" id="confirm_id">
+						<input type="checkbox" name="signup_confirm" class="px" id="confirm_id" checked="checked">
 						<span class="lbl">I agree with the <a href="#" target="_blank">Terms and Conditions</a></span>
 					</label>
 				</div>

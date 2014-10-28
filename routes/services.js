@@ -1,12 +1,15 @@
 
-var pool=require('./databaseconnection');    
+var pool=require('./databaseconnection');  
+var mailer = require('../mailer');
+var config = require('../config');
 var fs = require('fs');
 var mammoth = require("mammoth");
 var solr = require('solr-client');
 var moment = require('moment');
 var solrinfo=require('../solrconfig');
 var Cryptr = require("cryptr"),
-    cryptr = new Cryptr('myTotalySecretKey');
+    cryptr = new Cryptr('myTotalySecretKey'),
+    uuid = require('node-uuid');
 
 
 /*
@@ -61,13 +64,12 @@ exports.register = function(req, res) {
 }
 
 exports.login = function(req, res) {
-
     var emailPrefix=req.body.email;
     var email = emailPrefix+"@srsconsultinginc.com";
     var pwd=req.body.password;
     var password = cryptr.encrypt(pwd);
     var admin;
-    var rolescnt;
+    var rolescnt;  
 
     pool.getConnection(function(err,con){
 
@@ -143,6 +145,71 @@ exports.me = function(req, res) {
         });         
 
     });       
+
+}
+
+exports.verificationMail = function(req, res){
+    
+    var userEmail = req.body.email;  
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT email from user where email = ?',[userEmail], function(err, rows, fields) {
+            if (err) throw err;
+            
+            if(rows.length > 0){
+                var activation_Id = uuid.v4(); 
+                var link = config.HOST_URL+"#/changePassword/"+userEmail;
+                console.log(link);  
+                mailer.sendMail(userEmail, 'mailtemplate', {      
+                    from_address: config.from_address,
+                    to_address: userEmail,
+                    "user_info": userEmail,
+                    'link': link
+                });
+                con.release(); 
+                res.send({statusText:'Click on the link sent to your mail to reset the password'});  
+            }else{
+                con.release();
+                res.send({statusText:'Please Enter the registered email id'});
+            }
+                            
+        });         
+
+    });  
+
+}
+
+exports.changePassword = function(req,res){
+
+    var pwd = req.body.password;
+    var email = req.body.email;
+    var password = cryptr.encrypt(pwd);
+
+    var change_password = {
+        "password" : password
+    }
+
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('UPDATE user set ? where email = ?',[change_password,email], function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release(); 
+            res.send({message:'Successfully updated password'});                      
+        });         
+
+    });  
 
 }
 
@@ -353,6 +420,26 @@ exports.getcandidate = function(req, res) {
             }
         });         
     });       
+}
+
+exports.getcandidateId = function(req,res){
+    
+    var candidateEmail = req.params.candidateEmail;
+    pool.getConnection(function(err,con){
+
+        if(err){
+            console.log("Error connection to the db.");
+        }
+
+        con.connect();
+        con.query('SELECT id from candidate where email = ?',[candidateEmail], function(err, rows, fields) {
+            if (err) throw err;
+
+            con.release();        
+            res.send({id:rows[0].id});                      
+        });         
+
+    });  
 }
 
 exports.applyvacancy = function(req, res) {
@@ -1156,7 +1243,7 @@ exports.postingbycid = function(req, res) {
         }
 
         con.connect();
-        con.query('SELECT posting.id,posting.status,posting.type,posting.title from posting,candidate where posting.candidate_id = candidate.id and posting.candidate_id = ?', [req.params.candidate_id],function(err, rows, fields) {
+        con.query('SELECT posting.id,posting.status,posting.type,posting.title,posting.created_by from posting,candidate where posting.candidate_id = candidate.id and posting.candidate_id = ?', [req.params.candidate_id],function(err, rows, fields) {
             if (err) throw err;
 
             if(rows.length > 0){

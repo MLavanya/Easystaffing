@@ -4,7 +4,7 @@ var companyList,statusList,cityList;
 
 var countries = ["India", "United States"];
 
-var Employee_status = ['YES','NO'];          
+var Employee_status = ['NO','YES'];          
 
 var empStatus = ['Active', 'In-Active'];
 
@@ -93,6 +93,23 @@ function applyforv(vid,url,elem){
 		callback: function(result) {
 			if(result){
 				$.post('/applyvacancy',{company_id:0,candidate_id:getParameterByName('c'),vacancy_id:vid,status:'C02'},function(data){
+					$(elem).attr('disabled','true');
+				});
+			}
+		},
+		className: "bootbox-sm"
+	});
+
+}
+
+
+function applyCandidateforv(cid,vid,url,elem){
+
+	bootbox.confirm({
+		message: "Are you sure you want to post this candidate for this vacancy ?",
+		callback: function(result) {
+			if(result){
+				$.post('/applyvacancy',{company_id:0,candidate_id:cid,vacancy_id:vid,status:'C02'},function(data){
 					$(elem).attr('disabled','true');
 				});
 			}
@@ -350,13 +367,13 @@ Ember.Handlebars.helper('format-emproles', function(value) {
   return new Ember.Handlebars.SafeString(res);
 });
 
-Ember.Handlebars.helper('format-posting', function(value,id) {
+Ember.Handlebars.helper('format-addcandidate_v', function(value,vacancy_id) {
   var res="";
   
 	switch (value) {
-	    case "YES":
+	    case "OPEN":
 	  		res = res+' <div class="pull-right col-xs-12 col-sm-auto">\
-	  		<a href="/home.html#/addposting/'+id+'"><button class="btn btn-outline btn-primary btn-labeled">\
+	  		<a href="/home.html#/addcandidate_v/'+vacancy_id+'"><button class="btn btn-outline btn-primary btn-labeled">\
 	  		<span class="btn-label icon fa fa-plus"></span>&nbsp;&nbsp;Posting &nbsp;&nbsp;</button>\
 	  		</a></div>';	          	 
 	}
@@ -900,6 +917,7 @@ App.CandidateController = Ember.ObjectController.extend({
 	
 	country : countries,
 	city	: cityList,
+	employee : Employee_status,
 	actions:{
 		loadCity: function(){
 			var cityList = [];
@@ -1100,7 +1118,8 @@ App.CandidateController = Ember.ObjectController.extend({
 		   					"exp"				: $("#experience").val(),		   					
 		   					"city"				: $('#city').val(),	   				
 		   					"company_id"		: $("#company").val(),
-		   					"comments"			: $("#comments").val(),	   				
+		   					"comments"			: $("#comments").val(),	
+		   					"active"		   	: $('#update_emp').val(),   				
 		   					"id"				: candidateId	
 		      		    },
 		   		    success: function(data){
@@ -1548,6 +1567,171 @@ App.PostingController = Ember.ObjectController.extend({
    		    });
 		},
 	}
+});
+
+App.AddcandidateVController = Ember.ObjectController.extend({
+
+	country : countries,	
+	employee : Employee_status,
+
+	init: function(){		
+		var statusList = [];
+		var cityList = [];
+		var that = this;
+		$.ajax ({
+            type: "GET", 
+            url:'/statusList',            
+            success: function(data) {                                 
+                	if(data[0].id.indexOf("C0") > -1){
+	                    statusList.push({
+	                    	id:data[0].id,
+	                    	name:data[0].name
+	                    });
+	                }                                         
+                that.set('statuses',statusList);                
+            },
+            error:function(data){
+                bootbox.alert(data.statusText);
+            }                        
+        }); 
+        $.ajax ({
+            type: "GET", 
+            url:'/cityList',            
+            success: function(data) {              	
+                for(var i=0;i<data.length;i++){                	
+                    cityList.push(data[i].city);	              
+                }                                
+                that.set('city',cityList);                
+            },
+            error:function(data){
+                bootbox.alert(data.statusText);
+            }                        
+        }); 
+	},
+	statuses : statusList, 
+	city : cityList,               
+	actions :{
+		addCity: function(){
+			var that =  this;
+			bootbox.prompt({
+				title: "Enter the City name",
+				callback: function(result) {					
+					if(result){
+						$.post('/updateCity',{'city':result},function(data){
+							if(data == "200"){
+								var cityList = [];
+				                $.get('/cityList',function(data){
+				                	console.log(data);
+									for(var i=0;i<data.length;i++){
+					                    cityList.push(data[i].city);
+					                }   
+					                that.set('city',cityList);
+								});	
+
+							}else if(data =="201"){
+								bootbox.alert("Already exists");
+							}
+						});
+					}					
+				},
+				className: "bootbox-sm"
+			});
+		},
+		savecandidate: function(){			
+			var that = this;
+			var v = true;
+			var fileName = JSON.parse($(".uploadedfile").text());
+			var cv = fileName.filepath;
+			var vacancyId = $('#vacancy_id').val();
+			var candidateEmail = $('#Cemail').val();
+			
+			var phonereg = /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/;		
+			var emailreg = /^([a-zA-Z0-9_\.\-])+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+			var expreg = /^[0-9]{0,2}$/;
+
+			if(($("#name").val() == "")){
+				addmessage("danger","Enter the Name ");
+				v=false;
+			}			
+			if(($("#title").val() == "")){
+				addmessage("danger","Enter the title ");
+				v=false;
+			}
+			if(($("#experience").val() == "")||(!expreg.test($('#experience').val()))){
+				addmessage("danger","Check the Experience ");
+				v=false;
+			}
+			if(($("#Cemail").val() == "")||(!emailreg.test($('#Cemail').val()))){
+				addmessage("danger","Enter a valid Email");				
+				v=false;
+			}
+			if(($("#phone").val() == "")||(!phonereg.test($('#phone').val()))){
+				addmessage("danger","Enter valid Mobile number");
+				v=false;
+			}			
+			if($("#country").val() == ""){
+				addmessage("danger", "country has to be specified");
+				v=false;
+			}
+			if($("#city").val() == ""){
+				addmessage("danger", "city has to be specified");
+				v=false;
+			}
+
+
+			var textarea = $('#tags:last');
+			var textext = textarea.textext()[0];
+
+			if(textext.hiddenInput().val().length < 3){
+				addmessage("danger","Skills has to be specified.");
+				v=false;
+			}
+
+			var text = textext.hiddenInput().val();
+			text = text.replace("[","");
+			text = text.replace("]","");
+			text = text.replace(/['"]+/g, '');
+
+			if(v){
+	   			jQuery("#addEmpSbmt").attr('disabled','disabled').html("updated"); 	   			
+	   			$.ajax({
+		   		    type: 'POST',
+		   		    url: "/saveCandidate",
+		   		    dataType:"json",
+		   		    data: {
+		   					"name"				: this.get("firstname"),
+		   					"title"				: this.get("title"),
+		   					"email"				: this.get("email"),
+		   					"phone"				: this.get("phone"),
+		   					"alt_phone"			: this.get("alt_phone"),
+		   					"alt_email"			: this.get("alt_email"),
+		   					"exp"				: this.get("experience"),
+		   					"country"			: jQuery('#country').val(),
+		   					"city"				: jQuery('#city').val(),
+		   					"cvpath"			: cv,
+		   					"company_id"		: jQuery("#company").val(),
+		   					"status"			: jQuery("#status").val(),
+		   					"skills"			: text,
+		   					"comments"			: this.get("comments"),
+		   					"active"		   	:jQuery('#employee').val()		
+		      		    },
+		   		    success: function(data){
+		   		    	//bootbox.alert(data.message);
+		   		    	jQuery(".form-control").val("");		   		    	
+						$.get('/getcandidateId/'+candidateEmail,function(data){							
+							applyCandidateforv(data.id,vacancyId,window.location.href,that);
+						});							
+	   					setTimeout(function(){that.transitionToRoute('vacancy',vacancyId);},500);	   					
+		   		    },
+		   		    error: function(data){
+		   		    	bootbox.alert(data.error);
+		   		    }
+	   		     });
+          	}
+
+		}
+	}
+
 });
 
 

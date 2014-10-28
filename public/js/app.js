@@ -49,4 +49,5 @@ App.Router.map(function() {
 	this.resource('configure');
 	this.resource('addposting',{ path: '/addposting/:id' });
 	this.resource('posting',{ path: '/posting/:id'});
+	this.resource('addcandidateV',{path: '/addcandidateV/:id'});
 });

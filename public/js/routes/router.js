@@ -122,6 +122,12 @@ App.AddpostingRoute = Ember.Route.extend({
 	}
 });
 
+App.AddcandidateVRoute = Ember.Route.extend({
+	model: function(params){
+		return {vacancy_id:params.id};	
+	}
+});
+
 
 /********************************
  * configure router

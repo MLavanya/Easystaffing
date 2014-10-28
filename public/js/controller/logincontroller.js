@@ -68,7 +68,8 @@ App.SignupController=Ember.Controller.extend({
             var email = $("#email_id").val();
             var username = $("#signupusername_id").val();
             var password = $("#signuppassword_id").val();
-            var region =$(".radio-inline input[type='radio']:checked").val();            
+            var region =$(".radio-inline input[type='radio']:checked").val(); 
+            var agree = document.getElementById("confirm_id").checked;        
 
             var emailreg = /^([a-zA-Z0-9_\.\-])+@srsconsultinginc.com/;
             var namereg =/^[a-zA-Z][a-zA-Z\\s0-9]+$/;
@@ -81,7 +82,9 @@ App.SignupController=Ember.Controller.extend({
             else if(!emailreg.test(email)){
                 bootbox.alert('Enter the valid SRS email address');
             }else if (!region) {
-                bootbox.alert("select the region you work for !")
+                bootbox.alert("select the region you work for !");
+            }else if(!agree){
+                bootbox.alert("Accept the Terms and conditions");
             }
             else{
                 var adddetails={};
@@ -107,6 +110,65 @@ App.SignupController=Ember.Controller.extend({
         }
     }
 
+});
+
+App.ForgotPasswordController = Ember.Controller.extend({
+    actions:{
+        PasswordLink : function(){  
+            var that = this;
+            var mail = $('#email_id_fp').val();
+            var emailreg = /^([a-zA-Z0-9_\.\-])+@srsconsultinginc.com/;
+            if(!emailreg.test(mail)){
+                bootbox.alert('Enter the valid SRS email address');
+            }else{
+                $.ajax ({
+                    type: "POST",
+                    url:'/verificationMail', 
+                    data:{'email':mail},                  
+                    success: function(data) {  
+                        bootbox.alert(data.statusText);
+                        that.transitionTo("login");                
+                    },
+                    error: function(data) {
+                        bootbox.alert("Msg: "+ data.status + ": " + data.statusText);
+                    }
+                }); 
+            }                        
+        },        
+    }
+});
+
+App.ChangePasswordController = Ember.Controller.extend({
+    actions:{
+        changePassword : function(){
+            var that = this;
+            var email = $('#email').val();
+            var password = $('#change_password').val();
+            var confirm_password = $('#confirm_password').val();
+            if(!password){
+                bootbox.alert('Enter the password');
+            }else if (password !== confirm_password){
+                bootbox.alert('password and confirm password do not match');
+            }else{                
+                $.ajax({
+                    type: 'POST',
+                    url: "/changePassword",
+                    dataType:"json",
+                    data: {
+                            "email"             : email,
+                            "password"          : password,                            
+                        },
+                    success: function(data){
+                        bootbox.alert(data.message);
+                        that.transitionTo("login"); 
+                    },
+                    error: function(data){
+                        bootbox.alert("something went wrong");
+                    }
+                 });
+            }
+        }
+    }
 });
 
 /******

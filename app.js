@@ -87,9 +87,9 @@ app.post('/updatePosting',services.updatePosting);
 app.post('/updatepostingStatus',services.updatepostingStatus);
 app.get('/postingbycid/:candidate_id',services.postingbycid);
 app.get('/poshistorybyid/:posting_id',services.poshistorybyid);
-
-
-
+app.post('/verificationMail',services.verificationMail);
+app.post('/changePassword',services.changePassword);
+app.get('/getcandidateId/:candidateEmail',services.getcandidateId);
 
 
 console.log('Express server listening on port '+ config.port);
